@@ -174,3 +174,9 @@ We tried a different connection update. Each output unit looks at the signal it 
 At 32 stored sequences, it predicted the missing symbol correctly about 53% of the time, compared with 44% for the earlier one-pass graph rules and 98% for lookup. But when we removed the connections between output units, it scored about 54%. That tells us the supervised error rule is useful on this task, but the extra recurrent interactions have not shown a benefit. The full graph also failed to reach a no-change state within the 20-step limit on roughly 43% of those queries.
 
 The new graph practiced each stored sequence 30 times; the original rules saw each once. Repeating the existing Storkey update 30 times made its weights large and its answers worse in this particular setup, but that isn't a carefully tuned comparison. Both versions are still tested on corruptions of sequences they already saw. This is one useful building block, not yet a system learning language or organizing itself.
+
+## Are unsettled graphs causing the mistakes?
+
+We looked back at the 32-sequence experiment. The full graph answered correctly about 57% of the time when it settled within 20 sweeps, and 47% when it did not. That might make settling look like the cause of success.
+
+But on those very same groups of inputs, the feedback-free model also dropped from about 58% to 49%. That suggests the unsettled cases may simply include harder inputs for both models. To work out cause and effect, we'd need to change the graph's update dynamics while keeping the learned connections and inputs the same, then observe what changes.

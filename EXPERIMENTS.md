@@ -494,3 +494,21 @@ The full predictive graph exceeded one-pass Storkey in all 20 paired seeds at ea
 To check exposure count, `training_budget` presents each sequence to the Storkey baseline for the same 30 epochs in the same deterministic shuffled order. It consumes the same random initialization draws to preserve subsequent order; Storkey itself does not use output-state initializations. This repeated baseline uses its normal sparse Storkey rule without clipping or per-epoch retuning. It is stopped if any weight becomes nonfinite or exceeds an absolute value of 1,000,000; stopped runs have no scored prediction. All 20 test seeds completed in these runs. Mean repeated-Storkey accuracy at loads 8/16/32 was 0.276/0.095/0.194, with median maximum absolute weights approximately 1.55/37.69/43,264 after the last epoch. This is a negative result for **naively repeating this implementation**; Storkey is normally an incremental rule, and other rates, normalization or stopping policies were not tested. The predictive graph's clipping and target-dependent error make it a different algorithm, so equal presentations do not imply equal compute or equal optimization effort.
 
 `predictive_graph` saves per-query predictions and convergence, output-bit metrics, last-epoch online local squared error, directed output-edge weights and measured training time. The diagnostic error is measured during the last changing-weight epoch, not a frozen loss or an independently validated objective. `training_budget` saves repeated-baseline metrics and predictions; its timer includes checking the numerical guard after every presentation and is not directly comparable with the predictive training timer. Resource usage, unseen-sequence generalization, online language modeling, continual retention and self-organization are not measured. Outputs are ignored by Git, source/Nix revisions remain unrecorded, and run destinations must be new.
+
+## Post-hoc settling analysis
+
+This is a descriptive follow-up to the directed local prediction-error experiment, not a new model run. The new `settling_analysis` utility groups the *existing* held-out prediction rows by whether the full recurrent graph reached a no-change sweep within its 20-sweep limit. It reports results for that graph and the feedback-free control on the **same queries**, both per seed and pooled. The grouping uses the full graph's outcome after inference, so it is a post-hoc selection, not information available before choosing a model. Queries share seeds and stored sequences; pooled counts do not imply independent samples.
+
+```sh
+nix-shell --run 'cargo test --manifest-path toolkit/Cargo.toml'
+nix-shell --run 'cargo run --quiet --release --manifest-path toolkit/Cargo.toml --bin settling_analysis -- toolkit/runs/predictive-test-32/predictions.csv'
+```
+
+At 32 stored sequences, on the previously reported 20 test seeds:
+
+| Full graph within 20 sweeps | Queries | Full graph accuracy | Feedback-free accuracy on same queries |
+|---|---:|---:|---:|
+| Settled | 7,243 | 0.570 | 0.579 |
+| Did not settle | 5,557 | 0.468 | 0.487 |
+
+The feedback-free control was also less accurate on the unsettled group. This is consistent with those inputs being harder for both models, so it does not establish that failing to settle caused the full graph's prediction errors. Likewise, a model reaching a fixed point does not guarantee a correct answer, and reaching the step limit does not prove the graph would never settle. We did not intervene on the dynamics, examine trajectories, or estimate uncertainty; these are post-hoc descriptive results. The input runs are ignored by Git and must be regenerated using the commands in the preceding experiment if absent. The parser accepts only the runner's unquoted CSV format, validates required fields, and emits per-seed and pooled counts to standard output.

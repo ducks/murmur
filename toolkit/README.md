@@ -74,3 +74,11 @@ nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin pr
 ```
 
 The destination must be new. This tests retrieval of stored sequences, not generalization to unseen sequences. The full graph has directed weights and no Hopfield-energy convergence guarantee.
+
+`settling_analysis` summarizes an existing predictive-graph predictions file by whether the full graph settled, alongside the feedback-free model's accuracy on the same queries. This is a descriptive, post-hoc grouping, not a causal test:
+
+```sh
+nix-shell --run 'cargo run --quiet --release --manifest-path toolkit/Cargo.toml --bin settling_analysis -- toolkit/runs/predictive-test-32/predictions.csv'
+```
+
+The input run must exist locally; outputs are printed as CSV. See [EXPERIMENTS.md](../EXPERIMENTS.md).

@@ -146,3 +146,7 @@ This is related to local error/delta learning and predictive-coding research suc
 ## Modular models and prior work
 
 Combining smaller specialized models with a learned gate is established [mixture-of-experts work](https://www.cs.toronto.edu/~hinton/absps/jjnh91.pdf), and sparse conditional routing has been studied at scale ([Shazeer et al., 2017](https://arxiv.org/abs/1701.06538)). Murmur's experimental question is narrower: whether locally interacting persistent modules can adapt, grow, retain and generalize under controlled resource budgets without depending on conventional global attention. The current experiments do not demonstrate that combination. Prior work is a baseline and a source of mechanisms, not proof that our implementation has achieved something novel.
+
+## Follow-up on settling
+
+A post-hoc grouping of the existing 32-sequence test queries found 0.570 accuracy when the full predictive graph settled within 20 sweeps and 0.468 when it did not. The feedback-free control scored 0.579 and 0.487 on those same groups. The shared drop is consistent with hard inputs as a confound; this selection does not demonstrate that non-settling caused errors. A useful next experiment would record trajectories and intervene on update dynamics while holding trained weights and cues fixed, then measure both settling and accuracy against the no-feedback control. See [EXPERIMENTS.md](EXPERIMENTS.md).

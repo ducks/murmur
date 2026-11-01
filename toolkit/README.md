@@ -64,3 +64,13 @@ nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin le
 ```
 
 The destination must be new. The runner saves labels, router coefficients, predictions, per-seed metrics, timings and parameter-size estimates; see [EXPERIMENTS.md](../EXPERIMENTS.md) for protocol and limitations.
+
+## Local prediction-error graph
+
+`predictive_graph` compares an experimental directed recurrent graph and a no-feedback ablation against the existing one-pass graph rules and lookup. It trains each output unit with an explicitly supplied target bit and saves convergence and learned-weight diagnostics. `training_budget` is a separate 30-presentation Storkey control; its numerical guard and timing scope are documented in [EXPERIMENTS.md](../EXPERIMENTS.md).
+
+```sh
+nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin predictive_graph -- toolkit/configs/predictive/test-32.cfg toolkit/runs/my-predictive-run'
+```
+
+The destination must be new. This tests retrieval of stored sequences, not generalization to unseen sequences. The full graph has directed weights and no Hopfield-energy convergence guarantee.

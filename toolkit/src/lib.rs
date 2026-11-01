@@ -2,6 +2,7 @@
 pub mod independent_encoding;
 pub mod learned_router;
 pub mod matched_budget;
+pub mod predictive_graph;
 pub mod sharded;
 use murmur_local_graph::{
     diagnostics::{margin_flips, without_output_feedback},

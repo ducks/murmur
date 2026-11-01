@@ -166,3 +166,11 @@ We trained a small decision model to select one of the four graphs from a noisy 
 It chose the assigned graph about 55% of the time, compared with about 99% for searching stored prefixes. As a result, the four graphs recovered about 51% of missing symbols with the learned router, compared with 76% using prefix search. The decision model itself was faster in the local timing, but its mistakes lost much of the benefit of splitting memories.
 
 Why? The assignments were arbitrary and the router made a simple linear decision, so the labels may be hard to express using that rule. Training much longer on clean examples did not reliably fit the labels in a small diagnostic, but that alone doesn't prove the model is incapable. A next experiment can give related inputs related graph assignments, then test whether the same router does better.
+
+## A graph that learns from local prediction errors
+
+We tried a different connection update. Each output unit looks at the signal it receives, compares its own prediction with the correct target bit during training, and adjusts its incoming connections. This is related to established error-correcting learning, not a newly invented principle. The output units also exchange signals with one another in the full version.
+
+At 32 stored sequences, it predicted the missing symbol correctly about 53% of the time, compared with 44% for the earlier one-pass graph rules and 98% for lookup. But when we removed the connections between output units, it scored about 54%. That tells us the supervised error rule is useful on this task, but the extra recurrent interactions have not shown a benefit. The full graph also failed to reach a no-change state within the 20-step limit on roughly 43% of those queries.
+
+The new graph practiced each stored sequence 30 times; the original rules saw each once. Repeating the existing Storkey update 30 times made its weights large and its answers worse in this particular setup, but that isn't a carefully tuned comparison. Both versions are still tested on corruptions of sequences they already saw. This is one useful building block, not yet a system learning language or organizing itself.

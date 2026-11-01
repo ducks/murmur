@@ -80,6 +80,8 @@ pub struct SeedRun {
     pub stored: Vec<[usize; POSITIONS]>,
     pub rows: Vec<Row>,
     pub resources: Resources,
+    pub shard_hebb: Vec<Graph>,
+    pub shard_storkey: Vec<Graph>,
 }
 fn bytes(g: &Graph) -> usize {
     g.weights.capacity() * std::mem::size_of::<f64>()
@@ -254,6 +256,8 @@ pub fn run_seed(c: &Config, seed: u64) -> Result<SeedRun, &'static str> {
         stored,
         rows,
         resources,
+        shard_hebb: shard_h,
+        shard_storkey: shard_s,
     })
 }
 fn bits(x: &[i8]) -> String {

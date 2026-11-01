@@ -158,3 +158,11 @@ There is an important catch: the router finds the nearest stored prefix, which i
 We gave the single graph a larger budget: 256 units, enough connection-array space to match the four 128-unit graphs. On noisy cues, the larger single graph recovered about 46% of missing symbols with Storkey-style learning; the four routed graphs recovered about 76%. We also tried a different way of encoding inputs for the larger graph, which raised its result to about 49% but did not close the gap. Direct lookup still scored about 98%.
 
 The comparison is useful but not perfectly matched: the four-graph system has more total units and uses a router that searches stored prefixes. It is still retrieving examples seen during training. The evidence is that this particular way of spreading the memories helps under a similar connection-storage budget—not that it has solved learning or routing.
+
+## Can a small decision model choose the graph?
+
+We trained a small decision model to select one of the four graphs from a noisy prefix. The assignment was supplied during training; the router learned from those labels. At test time it saw the prefix, but not the correct graph or missing symbol.
+
+It chose the assigned graph about 55% of the time, compared with about 99% for searching stored prefixes. As a result, the four graphs recovered about 51% of missing symbols with the learned router, compared with 76% using prefix search. The decision model itself was faster in the local timing, but its mistakes lost much of the benefit of splitting memories.
+
+Why? The assignments were arbitrary and the router made a simple linear decision, so the labels may be hard to express using that rule. Training much longer on clean examples did not reliably fit the labels in a small diagnostic, but that alone doesn't prove the model is incapable. A next experiment can give related inputs related graph assignments, then test whether the same router does better.

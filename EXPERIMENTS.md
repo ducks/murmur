@@ -434,3 +434,36 @@ In the 20%-noise test, the mean active undirected edge count was approximately 8
 For context only, the 20%-noise duplicate-code local run measured roughly 54.5 µs/query for single-large Hebbian and 13.7 µs for routed-four Hebbian; 60.0 and 14.2 µs for Storkey; lookup was 1.8 µs. The larger graph's timed call includes constructing duplicated input blocks; the sharded routed call includes prefix search plus a selected-graph call. Data generation, graph and index construction, I/O, and other graph queries are excluded. Timers run in fixed order in an unisolated process and include timer/allocation effects; no stable or compute-matched speed claim follows. The independent-code sensitivity runs measured similar scopes but are separate executions. `resources.csv` records individual seed totals and sample counts.
 
 The matched and sensitivity runners write versioned config, protocol, exact base/extra cues and predictions, per-seed metrics, resource estimates, and status in new directories. The duplicate and independent runs used runner versions 0.4.0 and 0.4.1 respectively; source/Nix revisions remain unrecorded and the Nix channel is unpinned. Run artifacts are ignored by Git. Neither model learns the router, grows shards, or operates token by token.
+
+## A supervised learned router
+
+This exploratory comparison asks whether a small decision model can route noisy prefixes to the existing graph shards without scanning a stored-prefix index. The four 128-unit graphs and 32 sequences use the same balanced insertion-order assignment as the previous sharding experiment. A separate linear multiclass softmax router is trained **from scratch** with those externally assigned shard labels. It has 96 binary prefix inputs, four outputs, and 388 `f64` coefficients including biases. It trains for 100 epochs with shuffled stored prefixes and newly sampled 20%-bit-flip augmentation, using learning rate 0.15 with updates normalized by 96 input features. It receives no missing target symbol when routing. The graph memories and router are frozen during evaluation. This is supervised routing to a supplied partition, not unsupervised assignment, structural growth, or routing learned by local graph units. It is a small conventional classifier used as an auxiliary router, not the graph's learning mechanism.
+
+Compare the learned router to the oracle true shard, the previous nearest-stored-prefix router, and direct nearest-prefix lookup. All graph variants see the same stored sequences, topology, noisy evaluation prefixes and missing-block initializations for each seed. Router training uses its own deterministic augmentation stream (`s+12000`); evaluation corruptions use the task's separate stream (`s+3000`). Training and evaluation use the same underlying stored prefixes with new noise, so neither unseen-sequence nor compositional generalization is tested. The 32 sequences are assigned round-robin by insertion order, without regard to similarity; the labels are an arbitrary supervised target. Development seeds 51001–51010 were inspected, and the unchanged settings were evaluated on test seeds 52001–52020. No hyperparameter search was performed; the experiment was exploratory, not preregistered.
+
+```sh
+nix-shell --run 'cargo test --manifest-path toolkit/Cargo.toml && cargo build --release --manifest-path toolkit/Cargo.toml --bin learned_router'
+nix-shell --run 'for group in dev test; do toolkit/target/release/learned_router "toolkit/configs/learned-router/$group.cfg" "toolkit/runs/learned-router-$group-example"; done'
+```
+
+Mean accuracy across 20 test seeds (640 noisy queries per seed):
+
+| Metric | Accuracy |
+|---|---:|
+| Correct shard, supervised linear router | 0.554 |
+| Correct shard, nearest-prefix router | 0.986 |
+| Single Storkey-style graph, final symbol | 0.432 |
+| Four graphs, supervised router, final symbol | 0.511 |
+| Four graphs, nearest-prefix router, final symbol | 0.764 |
+| Four graphs, oracle shard, final symbol | 0.771 |
+| Direct nearest-prefix lookup, final symbol | 0.985 |
+
+The router correctly classified 0.625 of clean training prefixes on average after noisy augmentation. As a post-hoc investigation on **development seeds only**, `router_diagnostic` trained the same linear model on clean prefixes for longer: average clean training accuracy was 0.622 after 100 epochs, 0.625 after 1,000, and 0.628 after 5,000; routing accuracy on noisy cues was 0.528, 0.504, and 0.494 respectively. These exploratory runs suggest that simply training longer did not fix this setup and that arbitrary shard assignments may not fit this additive linear decision rule well. They do not prove mathematical non-separability, optimal convergence, or that other routers or shard assignments would fail. These diagnostics changed augmentation and are not a held-out test.
+
+```sh
+nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin router_diagnostic -- toolkit/configs/learned-router/dev.cfg toolkit/runs/router-diagnostic-example'
+```
+
+The learned router's parameter array uses 3,104 bytes (`4 × 97 × 8`) versus 1,024 bytes for the nearest-prefix index at this load on the current 64-bit platform; four graphs' dense weight/mask payload is 589,824 bytes for both. These figures exclude common codebooks, model/Vec headers, training data, allocator/stack overhead beyond the router's coefficient array, temporary data and process memory. On the local unisolated release run, learned-router training averaged 3.58 ms per seed; route-only prediction averaged 0.31 µs versus 1.81 µs for nearest-prefix search. These timings use fixed execution order and include timer/temporary overhead; training covers augmentation and router learning only, not graph or index construction. They are exploratory implementation-specific timings, not matched-budget performance guarantees. The learned router is quicker in this run but made substantially more routing mistakes.
+
+The runner saves configuration, externally assigned training labels, per-query predictions and cues, router coefficients, per-seed metrics, timing/payload estimates and status. Outputs under `toolkit/runs` are ignored by Git, source/Nix revisions are unrecorded, and the channel remains unpinned. Output destinations must be new. No automatic router assignment, context growth, or recurrent sequence-learning claim follows.

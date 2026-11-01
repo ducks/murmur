@@ -1,5 +1,6 @@
 //! First research-runner slice: matched sequence-completion inputs and outputs.
 pub mod independent_encoding;
+pub mod learned_router;
 pub mod matched_budget;
 pub mod sharded;
 use murmur_local_graph::{

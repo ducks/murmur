@@ -54,3 +54,13 @@ nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin in
 ```
 
 Each destination must be new. Run-level protocol, predictions, metrics, approximate resource measurements and status are saved; see [EXPERIMENTS.md](../EXPERIMENTS.md) for limitations and the fact that the independent-code control was added after inspecting initial results.
+
+## Supervised learned-router experiment
+
+`learned_router` trains a small linear classifier on externally assigned shard labels and compares its routing and downstream graph predictions with the oracle shard, nearest-prefix search and lookup. It does not learn the assignment or generalize to unseen stored prefixes. `router_diagnostic` is an exploratory development-only check with longer training on clean prefixes.
+
+```sh
+nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin learned_router -- toolkit/configs/learned-router/test.cfg toolkit/runs/my-learned-router'
+```
+
+The destination must be new. The runner saves labels, router coefficients, predictions, per-seed metrics, timings and parameter-size estimates; see [EXPERIMENTS.md](../EXPERIMENTS.md) for protocol and limitations.

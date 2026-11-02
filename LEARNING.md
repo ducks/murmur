@@ -180,3 +180,9 @@ The new graph practiced each stored sequence 30 times; the original rules saw ea
 We looked back at the 32-sequence experiment. The full graph answered correctly about 57% of the time when it settled within 20 sweeps, and 47% when it did not. That might make settling look like the cause of success.
 
 But on those very same groups of inputs, the feedback-free model also dropped from about 58% to 49%. That suggests the unsettled cases may simply include harder inputs for both models. To work out cause and effect, we'd need to change the graph's update dynamics while keeping the learned connections and inputs the same, then observe what changes.
+
+## What happens when the graph doesn't settle?
+
+We kept the trained connections and inputs fixed and changed how the output units updated. Under the original fixed order, every query that failed to settle within 20 sweeps had already entered a repeating cycle. Most of these alternated between two states. Waiting up to 100 sweeps didn't make them settle or improve the answer.
+
+We also asked units to ignore weak signals. That made the modified rule stop more often, but many stopped states would still change under the original rule—and accuracy hardly changed. This is a useful distinction: **stopping** is not the same as reaching the right answer, or even the original model's idea of a stable state.

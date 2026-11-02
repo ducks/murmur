@@ -512,3 +512,39 @@ At 32 stored sequences, on the previously reported 20 test seeds:
 | Did not settle | 5,557 | 0.468 | 0.487 |
 
 The feedback-free control was also less accurate on the unsettled group. This is consistent with those inputs being harder for both models, so it does not establish that failing to settle caused the full graph's prediction errors. Likewise, a model reaching a fixed point does not guarantee a correct answer, and reaching the step limit does not prove the graph would never settle. We did not intervene on the dynamics, examine trajectories, or estimate uncertainty; these are post-hoc descriptive results. The input runs are ignored by Git and must be regenerated using the commands in the preceding experiment if absent. The parser accepts only the runner's unquoted CSV format, validates required fields, and emits per-seed and pooled counts to standard output.
+
+## Frozen-weight interventions on graph dynamics
+
+This experiment changes **only inference dynamics**, keeping each trained full predictive graph's directed weights, clamped input prefix, target, and initial output state fixed across interventions. The graph is retrained deterministically from the same configuration/seed as the preceding experiment; `forward20` is checked against that experiment's prediction and convergence on every query. The existing feedback-free predictor, one-pass Storkey graph, and nearest-prefix lookup are recorded on the same cues. Training remains supervised, for 30 epochs on the stored sequences. Evaluation is on fresh corruptions of those same sequences, not novel-sequence generalization.
+
+The six update modes are:
+
+- `forward20`: original fixed ascending unit order, zero threshold, at most 20 sweeps.
+- `forward100`: the same deterministic order and rule, at most 100 sweeps.
+- `reverse20`: fixed descending order, zero threshold, 20 sweeps.
+- `shuffled20`: a seeded random permutation each sweep, zero threshold, 20 sweeps. One random-order trajectory is sampled per query; this is not an average over random orders.
+- `margin005` and `margin020`: ascending order, 20 sweeps; a unit only changes if its local field is above +0.05/+0.20 or below −0.05/−0.20. A value inside the interval keeps its prior state.
+
+A mode **converges by its own rule** when a whole sweep makes no changes. `strict_stable` separately checks whether every final output unit would also remain unchanged under the original zero-threshold rule; reaching a margin-based fixed point does not necessarily satisfy that stricter condition. A shuffled trajectory can end at a strict fixed point on its last allowed sweep without a subsequent no-change sweep to confirm convergence. For deterministic fixed-order modes, exact repetition of the output state at a sweep boundary is logged as a cycle; the clamped prefix, weights and order are fixed, so a repeated boundary state will repeat under those conditions. Cycle detection is intentionally omitted for shuffled order because the future update order changes. The simulator retains the final state at the sweep limit even after detecting a cycle, making the output depend on which cycle phase is reached.
+
+Development seeds 71001–71010 and test seeds 72001–72020 are the same seed groups used in the earlier predictive-graph experiment. Both groups were already inspected in the earlier study, so they are separate from one another but **not fresh confirmatory test seeds** for this follow-up. The selected thresholds and modes are exploratory and were not preregistered. Loads 16 and 32 use 20% prefix corruption and 20 query initializations per stored sequence. Graph topology, learned weights, cues, and evaluation labels are paired across modes; only dynamics change. Shuffled-order RNG uses `(seed+25000 wrapping) XOR (sequence_index × 0x9e3779b97f4a7c15 wrapping) XOR trial`. The ground-truth target does not enter inference.
+
+```sh
+nix-shell --run 'cargo test --manifest-path toolkit/Cargo.toml && cargo build --release --manifest-path toolkit/Cargo.toml --bin dynamics'
+nix-shell --run 'for group in dev test; do for k in 16 32; do toolkit/target/release/dynamics "toolkit/configs/predictive/$group-$k.cfg" "toolkit/runs/dynamics-$group-$k-example"; done; done'
+```
+
+At 32 stored sequences, pooled across the 20 previously inspected test seeds, 12,800 queries total:
+
+| Mode | Missing-symbol accuracy | Converged by own rule | Strictly stable under original rule | Mean sweeps |
+|---|---:|---:|---:|---:|
+| forward20 | 0.526 | 0.566 | 0.566 | 10.74 |
+| forward100 | 0.525 | 0.566 | 0.566 | 45.47 |
+| reverse20 | 0.530 | 0.564 | 0.564 | 10.76 |
+| shuffled20 | 0.524 | 0.590 | 0.590 | 10.60 |
+| margin005 | 0.529 | 0.691 | 0.432 | 8.69 |
+| margin020 | 0.531 | 0.938 | 0.174 | 4.46 |
+
+For `forward20`, all 5,557 queries that failed to reach a no-change sweep had already repeated an exact sweep-boundary state; 4,597 were two-sweep cycles. Repeating the identical deterministic update for 100 sweeps produced no additional converged cases and almost unchanged accuracy; a different cycle phase can change a prediction. The no-feedback model scored 0.539 on the same queries. The stronger margin greatly increased stopping under its **modified** rule but had little effect on accuracy, and most final states were not stable under the original rule. This is not evidence that recurrence is useful or that thresholding fixes the memory. A no-feedback graph is a simpler control, and none of these differences establish a statistically significant improvement.
+
+At load 16, `forward20` accuracy/convergence was 0.722/0.962; `forward100` remained 0.722/0.962; `margin020` was 0.711/0.999 by its own rule but only 0.454 strictly stable; no-feedback accuracy was 0.742. The results are paired but queries sharing stored sequences and seeds are correlated; no confidence intervals or compute/time benchmark are reported. `metrics.csv` retains per-seed counts and total sweeps; `predictions.csv` records each intervention's output, convergence, strict stability and fixed-order cycle length. No trajectories, averaged cycle predictions, cycle interventions during training, memory growth or unseen-language tasks were tested. The output is local, ignored by Git, and is not a model checkpoint.

@@ -150,3 +150,7 @@ Combining smaller specialized models with a learned gate is established [mixture
 ## Follow-up on settling
 
 A post-hoc grouping of the existing 32-sequence test queries found 0.570 accuracy when the full predictive graph settled within 20 sweeps and 0.468 when it did not. The feedback-free control scored 0.579 and 0.487 on those same groups. The shared drop is consistent with hard inputs as a confound; this selection does not demonstrate that non-settling caused errors. A useful next experiment would record trajectories and intervene on update dynamics while holding trained weights and cues fixed, then measure both settling and accuracy against the no-feedback control. See [EXPERIMENTS.md](EXPERIMENTS.md).
+
+## Intervening on predictive-graph dynamics
+
+On the existing 32-sequence predictive test, all 5,557 of 12,800 queries that did not settle under 20 fixed-order sweeps had already repeated an exact sweep-boundary state; 4,597 were two-sweep cycles. Extending the same rule to 100 sweeps gave no additional converged cases (accuracy 0.525 versus 0.526 at 20 sweeps). A 0.20 update margin stopped on 0.938 of queries under its own rule, but only 0.174 of final states were fixed points of the original rule, and accuracy remained about 0.531 versus 0.539 for the feedback-free model. These frozen-weight interventions reveal a mechanism behind non-settling but do not make recurrence useful. The seed groups were reused from earlier exploratory work, and thresholded stopping is not the same as original-rule stability. See [EXPERIMENTS.md](EXPERIMENTS.md).

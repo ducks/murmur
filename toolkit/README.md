@@ -82,3 +82,13 @@ nix-shell --run 'cargo run --quiet --release --manifest-path toolkit/Cargo.toml 
 ```
 
 The input run must exist locally; outputs are printed as CSV. See [EXPERIMENTS.md](../EXPERIMENTS.md).
+
+## Frozen-weight dynamics interventions
+
+`dynamics` retrains the existing predictive graph deterministically, then compares fixed-order, reversed, seeded-shuffled, longer-running, and thresholded updates on the same frozen weights and cues. It records fixed-order cycles and checks stability under the original rule separately from threshold-based stopping. It reuses the earlier exploratory seed groups; see [EXPERIMENTS.md](../EXPERIMENTS.md).
+
+```sh
+nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin dynamics -- toolkit/configs/predictive/test-32.cfg toolkit/runs/my-dynamics-run'
+```
+
+The destination must be new. Per-seed metrics, per-query outcomes and protocol are saved locally; the outputs are not restartable checkpoints.

@@ -110,3 +110,13 @@ nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin te
 ```
 
 The output directory must be new. The runner logs streams, per-query predictions, per-seed metrics, resolved configuration and protocol. It does not save a restartable model or measure actual buffer memory; see [EXPERIMENTS.md](../EXPERIMENTS.md) for the corrected seed split, protocol, results and limitations.
+
+## Temporal connection plasticity
+
+`temporal_plasticity` compares frozen recurrent edges against eligibility-trace learning with task feedback and unrelated-feedback control, on paired continuous streams. It logs edge weights and training drift alongside held-out predictions; see [EXPERIMENTS.md](../EXPERIMENTS.md) for the limitations and results.
+
+```sh
+nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin temporal_plasticity -- toolkit/configs/temporal-plasticity/test.cfg toolkit/runs/my-plasticity-run'
+```
+
+The output directory must be new.

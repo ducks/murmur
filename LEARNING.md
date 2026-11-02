@@ -200,3 +200,9 @@ Instead of showing the graph the same short stored examples, we fed it a continu
 At a four-step delay, the graph with connections answered correctly about 66% of the time; identical units without those connections managed about 52%. A simple buffer that remembers the last four inputs got every answer right. So the connections helped this graph carry a memory trace, but the model is still much less effective than an ordinary memory buffer.
 
 The graph's connections were random and fixed. Only a separate reader learned from examples. That makes this evidence for the usefulness of recurrent interactions on this task—not evidence that the graph learned to organize itself.
+
+## Can the connections learn too?
+
+Previously, the connections stayed random while the reader learned. We now let each connection keep a short trace of how active it has been, and use the reader's prediction error to nudge its weight. We compared this with frozen connections and with connections nudged using unrelated random answers. All three readers still trained on the correct answers.
+
+The graph did learn in the narrow sense that its weights changed. On new streams, it improved slightly over frozen connections, but random nudges did better. Those random nudges also moved the weights farther, so we can't yet tell whether their apparent benefit comes from the signal or simply the size of the changes. The next useful test would make those changes comparable in size and inspect what they do to memory. This is why a control matters: an improvement over doing nothing is not automatically evidence that our proposed teaching signal is working.

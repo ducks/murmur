@@ -6,6 +6,7 @@ pub mod matched_budget;
 pub mod predictive_graph;
 pub mod sharded;
 pub mod symmetric_feedback;
+pub mod temporal_plasticity;
 pub mod temporal_stream;
 use murmur_local_graph::{
     diagnostics::{margin_flips, without_output_feedback},

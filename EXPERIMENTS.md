@@ -605,3 +605,27 @@ Mean accuracy over 20 final test seeds, with `2000−delay` scored inputs per se
 The connected graph exceeded the edge-free graph in all 20 paired seeds at every tested delay. At delay four the per-seed accuracy advantage ranged from approximately 0.083 to 0.169. This is evidence that the fixed recurrent connections contribute to the trained readout's short-term memory *on this task*, beyond the leaky-unit-only control. It does not isolate a particular path or show that graph connections learned. The history buffer is exact, much simpler for this task, and makes clear that the graph is not competitive as a bit-memory implementation. Adjacent queries share history and are correlated, and no confidence intervals, wall-clock or peak-memory measurements, continual-learning tests, novel-rule generalization, or language results are reported. Comparing graph and buffer as equal-resource models would be misleading.
 
 `resolved.cfg`, `protocol.txt`, `streams.csv`, `predictions.csv`, `metrics.csv`, `summary.md`, and `status.txt` are written to a new output directory. Existing destinations are refused. The runner records graph edge counts and readout parameter counts, not the buffer's actual memory consumption; zero learned parameters does not mean zero memory. Runs under `toolkit/runs` are ignored by Git, and source/Nix revisions remain unrecorded and unpinned.
+
+## Temporal connection plasticity
+
+Can changing recurrent edges improve continuous delayed-bit recall? This experiment uses the preceding stream task and controls, with delays 4 and 8. Every graph has the same initial 128-unit, 512-edge topology and a separately trained 258-parameter readout. The adaptive graph also trains 512 edge weights; the fixed graph does not, so their trainable parameter budgets differ. No connections or units are added or removed.
+
+After each synchronous graph step, each edge maintains a decaying eligibility trace: `trace = 0.8 * trace + leak * (1 - tanh_field²) * previous_source_state`. The graph receives a scalar error, `target - sigmoid(class_1_score)`, broadcast through fixed random destination signs scaled by `1/sqrt(128)`. Its edge update is `0.02 * error * destination_feedback * trace`, clipped to [-0.5, 0.5]. This is an approximate local-activity/error heuristic, not backpropagation through time or an established gradient. Its feedback is shared, not wholly local. The unrelated-feedback control uses the same inputs, initial graph, feedback signs and true-label readout learning, but supplies separately seeded random bits as the edge-learning targets; those bits can coincide with true targets. Consequently this is not an exact error permutation, and its weight changes need not match the adaptive model's magnitude.
+
+All models train for 6,000 symbols and evaluate on a separate 2,000-symbol stream, after resetting state and freezing weights. The first `delay` symbols are not scored. Development seeds 291001–291010 and final seeds 391001–391020 use roles `s` for the graph, `s+31000` for train, `s+32000` for test, `s+33000` for feedback signs and `s+34000` for unrelated targets, with wrapping arithmetic. Tests check cross-group seed-role collisions; distinct deterministic pseudorandom seeds do not prove independence. The test settings were held fixed after observing the development results, but the whole protocol was not preregistered.
+
+```sh
+nix-shell --run 'cargo test --manifest-path toolkit/Cargo.toml --test temporal_plasticity && cargo build --release --manifest-path toolkit/Cargo.toml --bin temporal_plasticity'
+nix-shell --run 'for group in dev test; do toolkit/target/release/temporal_plasticity "toolkit/configs/temporal-plasticity/$group.cfg" "toolkit/runs/plasticity-$group-example"; done'
+```
+
+Observed pooled accuracy on 20 final seeds (1,996 or 1,992 scored symbols per seed):
+
+| Delay | Fixed graph | Task feedback | Unrelated feedback | Edge-free | Reset state | Shift register |
+|---:|---:|---:|---:|---:|---:|---:|
+| 4 | 0.6579 | 0.6596 | 0.6657 | 0.5198 | 0.5009 | 1.0000 |
+| 8 | 0.5353 | 0.5398 | 0.5529 | 0.5015 | 0.4986 | 1.0000 |
+
+Task feedback beat fixed in 12/20 seeds at delay 4 (one tie) and 17/20 at delay 8 (three ties), but beat unrelated feedback in only 4/20 (one tie) and 3/20 (one tie), respectively. At the end of training, mean absolute edge changes averaged 0.031 and 0.040 for task feedback, versus 0.193 and 0.100 for unrelated feedback, at delays 4 and 8. No task-feedback edges hit the clip limit; unrelated feedback averaged 11.45 and 0.05 clipped edges out of 512. The magnitude difference is a confound: this experiment does not isolate whether the unrelated signal or simply a larger perturbation helped. Adjacent test examples are correlated; these descriptive differences are not statistical significance claims. We do not measure runtime or peak memory here. The perfect shift register knows the delay and stores history; it is not resource-matched.
+
+The result does not establish useful task-specific recurrent learning: indiscriminate changes did better under this setup. A useful follow-up is to match edge-change magnitudes, include frozen random perturbations, and examine whether the signal changes memory persistence or readout conditioning before designing a more complex learning rule. The logs contain resolved config, protocol, per-symbol predictions, metrics, training checkpoints, edge weights, feedback signs, and run status. They are not restartable snapshots; source and Nix revisions are not recorded and `toolkit/runs` is ignored by Git.

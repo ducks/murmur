@@ -1,8 +1,9 @@
 [package]
 name = "murmur-research-runner"
-version = "0.8.0"
+version = "0.9.1"
 edition = "2021"
 default-run = "murmur-research-runner"
 
 [dependencies]
+murmur = { path = ".." }
 murmur-local-graph = { path = "../alternatives/local_graph" }

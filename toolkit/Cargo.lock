@@ -3,12 +3,17 @@
 version = 3
 
 [[package]]
+name = "murmur"
+version = "0.1.0"
+
+[[package]]
 name = "murmur-local-graph"
 version = "0.1.0"
 
 [[package]]
 name = "murmur-research-runner"
-version = "0.8.0"
+version = "0.9.1"
 dependencies = [
+ "murmur",
  "murmur-local-graph",
 ]

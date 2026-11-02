@@ -54,3 +54,5 @@ Graph-interference diagnostics are described in the [local graph README](alterna
 The [research runner first slice](toolkit/README.md) runs the local-graph sequence comparison from a versioned config and saves matched inputs and per-model results.
 
 [Visual research story](STORY.md): an accessible map of the project’s progression and current evidence.
+
+The [continuous-stream experiment](toolkit/README.md#continuous-stream-delayed-recall) tests short-term memory with and without graph connections.

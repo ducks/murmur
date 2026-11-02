@@ -100,3 +100,13 @@ The destination must be new. Per-seed metrics, per-query outcomes and protocol a
 ```sh
 nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin symmetric_feedback -- toolkit/configs/symmetric/test-32.cfg toolkit/runs/my-symmetric-run'
 ```
+
+## Continuous-stream delayed recall
+
+`temporal_stream` uses the earlier fixed recurrent reservoir and separately trained readout to recall prior bits from continuous streams. It compares matched edge-free and reset-state graph controls with an explicit causal shift register and majority baseline. The task-specific configuration is versioned separately in `configs/temporal/`; the dev/test seed sets are checked for cross-group stream-seed collisions by tests.
+
+```sh
+nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin temporal_stream -- toolkit/configs/temporal/test.cfg toolkit/runs/my-temporal-run'
+```
+
+The output directory must be new. The runner logs streams, per-query predictions, per-seed metrics, resolved configuration and protocol. It does not save a restartable model or measure actual buffer memory; see [EXPERIMENTS.md](../EXPERIMENTS.md) for the corrected seed split, protocol, results and limitations.

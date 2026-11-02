@@ -575,3 +575,33 @@ Mean missing-symbol accuracy over 20 test seeds:
 For 32 sequences, the directed graph reached a no-change sweep within 20 sweeps on 0.572 of queries; both the symmetric and no-feedback graphs did so on 1.000. The symmetric model took a mean of 3.12 sweeps, with a maximum of 7, on these queries. These are observed counts, not a guarantee that every possible input settles within 20 sweeps. Across paired seeds at load 32, symmetric accuracy exceeded directed in 14 of 20 and no-feedback in 12 of 20, with two ties against no-feedback. The observed differences are small and no statistical superiority is claimed; at lower loads the no-feedback mean was higher.
 
 Thus symmetry addressed the observed non-settling in these runs, while leaving retrieval accuracy close to the controls and well below lookup. This does not establish that recurrent feedback is beneficial, nor that symmetry makes learning self-organizing. `predictions.csv` and `metrics.csv` record per-query outcomes and per-seed counts; `weights.csv` records learned symmetric output-row weights for inspection, not a complete restartable model. Source and Nix revisions are unrecorded; generated runs are ignored by Git.
+
+## Continuous delayed-bit recall
+
+This experiment asks whether fixed recurrent connections help represent an ongoing sequence, rather than whether a static graph can complete a stored pattern. A deterministic generator emits a stream of pseudorandom binary symbols. After consuming `x[t]`, each model predicts the **previously observed** bit `x[t−delay]`. The first `delay` steps are warm-up and are not scored. A separate model/readout is trained for each delay.
+
+The connected model is the original fixed sparse leaky reservoir from `src/graph.rs`: 128 units, four incoming sampled edges per unit (512 directed edge entries, including possible self/duplicate edges), leak 0.35, fixed random input weights and graph weights, and one synchronous update per input symbol. Only the two-output online logistic readout learns (258 trainable weights including biases). The edge-free control is a clone with all graph edges removed; it retains the same input weights, leaky self-state, and an independently trained readout of the same size. The reset-state control uses the original graph but clears all state before each input, so it cannot carry earlier input through the graph. Each readout trains separately on the same stream and target timing. The recurrent graph's weights **do not learn**; this is reservoir computing, not the later symmetric local-error model, self-organization, or graph growth.
+
+A causal shift register stores the last `delay` observed symbols and returns the oldest after seeing the current symbol. It knows the task delay, is not trained, and does not receive future input. The majority control predicts the most frequent delayed target in the training stream. Both are useful references but are not parameter-, memory- or compute-matched with the graph; the shift register has no learned weights but does consume memory for history. All models observe the same input stream.
+
+Each graph/readout sees 6,000 training input symbols, makes an online supervised update for every step from `delay` onward, then has its state reset. Evaluation uses a separate 2,000-symbol stream with frozen readout weights and no within-stream reset (except the explicit reset-state ablation). The buffer also starts empty. The runner logs the generated streams and every scored test prediction. The task uses pseudorandom bits from deterministic SplitMix64 streams; distinct seeds are a reproducibility measure, not a mathematical proof of statistical independence.
+
+Development model seeds are 91001–91010; final test model seeds are 192001–192020. Input streams use wrapping seed offsets `s+31000` for training and `s+32000` for evaluation. The supplied configurations are tested to ensure that none of these derived development stream seeds overlap the derived final test stream seeds. The runner also rejects a configuration whose own training and test stream seeds collide across runs. An earlier exploratory test group 92001–92020 had training stream seeds that overlapped development evaluation stream seeds and was **discarded**; its run directory contains `SEED_OVERLAP_WARNING.txt` and is not used for the results below. The groups and delay settings were not preregistered, and the test group was changed after detecting the seed issue.
+
+```sh
+nix-shell --run 'cargo test --manifest-path toolkit/Cargo.toml && cargo build --release --manifest-path toolkit/Cargo.toml --bin temporal_stream'
+nix-shell --run 'for group in dev test; do toolkit/target/release/temporal_stream "toolkit/configs/temporal/$group.cfg" "toolkit/runs/temporal-$group-example"; done'
+```
+
+Mean accuracy over 20 final test seeds, with `2000−delay` scored inputs per seed:
+
+| Delay | Connected graph | Edge-free graph | Reset state | Shift register | Majority |
+|---:|---:|---:|---:|---:|---:|
+| 1 | 0.695 | 0.660 | 0.498 | 1.000 | 0.500 |
+| 2 | 0.687 | 0.596 | 0.497 | 1.000 | 0.500 |
+| 4 | 0.659 | 0.525 | 0.497 | 1.000 | 0.500 |
+| 8 | 0.543 | 0.502 | 0.497 | 1.000 | 0.500 |
+
+The connected graph exceeded the edge-free graph in all 20 paired seeds at every tested delay. At delay four the per-seed accuracy advantage ranged from approximately 0.083 to 0.169. This is evidence that the fixed recurrent connections contribute to the trained readout's short-term memory *on this task*, beyond the leaky-unit-only control. It does not isolate a particular path or show that graph connections learned. The history buffer is exact, much simpler for this task, and makes clear that the graph is not competitive as a bit-memory implementation. Adjacent queries share history and are correlated, and no confidence intervals, wall-clock or peak-memory measurements, continual-learning tests, novel-rule generalization, or language results are reported. Comparing graph and buffer as equal-resource models would be misleading.
+
+`resolved.cfg`, `protocol.txt`, `streams.csv`, `predictions.csv`, `metrics.csv`, `summary.md`, and `status.txt` are written to a new output directory. Existing destinations are refused. The runner records graph edge counts and readout parameter counts, not the buffer's actual memory consumption; zero learned parameters does not mean zero memory. Runs under `toolkit/runs` are ignored by Git, and source/Nix revisions remain unrecorded and unpinned.

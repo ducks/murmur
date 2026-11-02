@@ -192,3 +192,11 @@ We also asked units to ignore weak signals. That made the modified rule stop mor
 We made the feedback connections between output units symmetric: if A pushes B with some weight, B pushes A with the same weight. The graph updates one unit at a time, while the input stays fixed. Under those conditions a known energy argument gives the graph a path toward a stable state.
 
 In the experiment, the symmetric version stopped within 20 sweeps for every tested query. That solved the observed looping problem in this setting. But stopping isn't the same as answering correctly: its accuracy stayed close to the original graph and the version with no feedback. This is a useful distinction between improving a system's **dynamics** and improving the task it performs.
+
+## Can the graph remember a continuous stream?
+
+Instead of showing the graph the same short stored examples, we fed it a continuous stream such as `1, 0, 1, 1, 0, …`. After each new bit, it had to report the bit from a fixed number of steps earlier. Each delay was trained separately, and the test used a different stream.
+
+At a four-step delay, the graph with connections answered correctly about 66% of the time; identical units without those connections managed about 52%. A simple buffer that remembers the last four inputs got every answer right. So the connections helped this graph carry a memory trace, but the model is still much less effective than an ordinary memory buffer.
+
+The graph's connections were random and fixed. Only a separate reader learned from examples. That makes this evidence for the usefulness of recurrent interactions on this task—not evidence that the graph learned to organize itself.

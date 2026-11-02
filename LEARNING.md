@@ -186,3 +186,9 @@ But on those very same groups of inputs, the feedback-free model also dropped fr
 We kept the trained connections and inputs fixed and changed how the output units updated. Under the original fixed order, every query that failed to settle within 20 sweeps had already entered a repeating cycle. Most of these alternated between two states. Waiting up to 100 sweeps didn't make them settle or improve the answer.
 
 We also asked units to ignore weak signals. That made the modified rule stop more often, but many stopped states would still change under the original rule—and accuracy hardly changed. This is a useful distinction: **stopping** is not the same as reaching the right answer, or even the original model's idea of a stable state.
+
+## Did symmetric connections help?
+
+We made the feedback connections between output units symmetric: if A pushes B with some weight, B pushes A with the same weight. The graph updates one unit at a time, while the input stays fixed. Under those conditions a known energy argument gives the graph a path toward a stable state.
+
+In the experiment, the symmetric version stopped within 20 sweeps for every tested query. That solved the observed looping problem in this setting. But stopping isn't the same as answering correctly: its accuracy stayed close to the original graph and the version with no feedback. This is a useful distinction between improving a system's **dynamics** and improving the task it performs.

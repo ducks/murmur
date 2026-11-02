@@ -92,3 +92,11 @@ nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin dy
 ```
 
 The destination must be new. Per-seed metrics, per-query outcomes and protocol are saved locally; the outputs are not restartable checkpoints.
+
+## Symmetric-feedback graph
+
+`symmetric_feedback` compares local-error graphs trained with directed, symmetric, or absent output feedback. It records settling and accuracy on shared stored-sequence cues; the symmetric energy property assumes frozen weights and clamped inputs. See [EXPERIMENTS.md](../EXPERIMENTS.md).
+
+```sh
+nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin symmetric_feedback -- toolkit/configs/symmetric/test-32.cfg toolkit/runs/my-symmetric-run'
+```

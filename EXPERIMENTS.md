@@ -548,3 +548,30 @@ At 32 stored sequences, pooled across the 20 previously inspected test seeds, 12
 For `forward20`, all 5,557 queries that failed to reach a no-change sweep had already repeated an exact sweep-boundary state; 4,597 were two-sweep cycles. Repeating the identical deterministic update for 100 sweeps produced no additional converged cases and almost unchanged accuracy; a different cycle phase can change a prediction. The no-feedback model scored 0.539 on the same queries. The stronger margin greatly increased stopping under its **modified** rule but had little effect on accuracy, and most final states were not stable under the original rule. This is not evidence that recurrence is useful or that thresholding fixes the memory. A no-feedback graph is a simpler control, and none of these differences establish a statistically significant improvement.
 
 At load 16, `forward20` accuracy/convergence was 0.722/0.962; `forward100` remained 0.722/0.962; `margin020` was 0.711/0.999 by its own rule but only 0.454 strictly stable; no-feedback accuracy was 0.742. The results are paired but queries sharing stored sequences and seeds are correlated; no confidence intervals or compute/time benchmark are reported. `metrics.csv` retains per-seed counts and total sweeps; `predictions.csv` records each intervention's output, convergence, strict stability and fixed-order cycle length. No trajectories, averaged cycle predictions, cycle interventions during training, memory growth or unseen-language tasks were tested. The output is local, ignored by Git, and is not a model checkpoint.
+
+## Symmetric feedback during local-error learning
+
+The directed prediction-error graph updates incoming weights for each output unit independently; its output-output connections can become asymmetric, allowing fixed-order cycles. This comparison changes the *training constraint*, not just the stopping rule. After each pattern's usual directed local-error update and clipping, every existing output-output edge pair is replaced with the average of its two proposed weights. Both endpoints' updates contribute. Prefix-to-output weights remain directed; prefix states are clamped during inference. This preserves a symmetric, zero-diagonal output block without adding or removing connections. The two graphs begin with the same sparse topology and use the same stored patterns, shuffled training order, random initial output states, local targets, 30 training epochs and learning rate. Their trajectories and learned weights can differ after the first update.
+
+For frozen symmetric output weights and a fixed clamped prefix, asynchronous one-unit-at-a-time sign updates with ties preserving state do not increase the corresponding Hopfield-style energy in exact arithmetic, and eventually settle in a finite state space. This does **not** guarantee correctness, convergence within an arbitrary 20-sweep limit, stability while weights are changing, or the same property for the directed graph. A unit test checks symmetry, sparsity and bounded weights after learning; another checks non-increasing restricted energy over sampled frozen-graph sweeps. Floating-point comparisons are tested with a tolerance, not proven for all possible numerical inputs.
+
+The feedback-free control removes output-output edges and trains with the same local-error rule. The one-pass Storkey-style graph and nearest-prefix lookup are additional references, but have different learning algorithms and training presentations. All models use identical sequence sets, noise, and query initialization per seed. Evaluation corrupts sequences previously shown during training; it does not measure unseen-sequence generalization or temporal processing. No model receives the evaluation target for prediction.
+
+Development seeds 81001–81010 were inspected, then unchanged settings were evaluated on separate seeds 82001–82020. Each seed has 8, 16, or 32 stored sequences, 20 newly corrupted queries per sequence, 20% prefix-bit noise, and a limit of 20 evaluation sweeps. The experiment is exploratory and not preregistered; repeated queries share stored sequences and graphs. No hyperparameter search or formal significance analysis was performed.
+
+```sh
+nix-shell --run 'cargo test --manifest-path toolkit/Cargo.toml && cargo build --release --manifest-path toolkit/Cargo.toml --bin symmetric_feedback'
+nix-shell --run 'for group in dev test; do for k in 8 16 32; do toolkit/target/release/symmetric_feedback "toolkit/configs/symmetric/$group-$k.cfg" "toolkit/runs/symmetric-$group-$k-example"; done; done'
+```
+
+Mean missing-symbol accuracy over 20 test seeds:
+
+| Stored sequences | Directed | Symmetric | No feedback | One-pass Storkey | Lookup |
+|---:|---:|---:|---:|---:|---:|
+| 8 | 0.871 | 0.874 | 0.902 | 0.758 | 0.996 |
+| 16 | 0.686 | 0.681 | 0.706 | 0.607 | 0.993 |
+| 32 | 0.541 | 0.551 | 0.545 | 0.436 | 0.987 |
+
+For 32 sequences, the directed graph reached a no-change sweep within 20 sweeps on 0.572 of queries; both the symmetric and no-feedback graphs did so on 1.000. The symmetric model took a mean of 3.12 sweeps, with a maximum of 7, on these queries. These are observed counts, not a guarantee that every possible input settles within 20 sweeps. Across paired seeds at load 32, symmetric accuracy exceeded directed in 14 of 20 and no-feedback in 12 of 20, with two ties against no-feedback. The observed differences are small and no statistical superiority is claimed; at lower loads the no-feedback mean was higher.
+
+Thus symmetry addressed the observed non-settling in these runs, while leaving retrieval accuracy close to the controls and well below lookup. This does not establish that recurrent feedback is beneficial, nor that symmetry makes learning self-organizing. `predictions.csv` and `metrics.csv` record per-query outcomes and per-seed counts; `weights.csv` records learned symmetric output-row weights for inspection, not a complete restartable model. Source and Nix revisions are unrecorded; generated runs are ignored by Git.

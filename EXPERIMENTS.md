@@ -675,3 +675,29 @@ Pooled test accuracy across 20 paired seeds:
 Task feedback beat norm-matched unrelated feedback in 12/20 paired seeds at delay 4 (one tie) and 18/20 at delay 8. At delay 8, mean final absolute drift from initialization was 0.0406 for task feedback and 0.0277 for the matched control, despite equal per-step update norms. Across all test seeds, the maximum per-step norm mismatch was below `5e-17` and no edges were at the clipping limit at checkpoints. The unnormalized unrelated model again did better, but its updates and trajectory are different; this intervention supports investigating update magnitude, not a causal proof that magnitude alone explains its benefit. Examples within each stream are correlated, and these counts and accuracy differences are descriptive without confidence intervals. There are no measurements of compute, memory, changing tasks, generalization to language, or learned topology.
 
 The output directory contains resolved config, protocol, predictions, metrics, cumulative update-norm and displacement diagnostics at 1,000-step checkpoints, and status; it does not save restartable weights. Runs are ignored by Git. Source and Nix revisions are not recorded.
+
+## Fixed connection strength and memory persistence
+
+Does increasing recurrent connection strength improve memory, and could that help explain the earlier unrelated-feedback result? This experiment starts from the same random 128-unit, 512-edge graph per paired seed, multiplies every initial edge weight by 0.5, 1, 1.5, 2 or 3 and clamps it to [-0.5, 0.5]. The wiring, input weights, leak and reader size remain the same. Each graph stays frozen while its own readout trains online; there is no graph learning in the scaled conditions. At 3×, clipping changes the distribution as well as the scale: 170.9 of 512 edges on average are clipped in the test group. The 1× condition is checked against the prior fixed-graph runner on every prediction. Separately, the prior online task-feedback and unnormalized unrelated-feedback models and the causal, task-specific shift register use the same stream.
+
+The task again uses 6,000 training bits and 2,000 held-out test bits, resetting state at the boundary and freezing weights/readouts for testing. For an independent diagnostic, create two copies of each frozen scaled graph with zero state; feed one a 0 and the other a 1, then feed both the same pseudorandom continuation. Measure the root-mean-square distance between their states immediately and after 1–16 more inputs, averaging across 64 continuations. This is a finite-horizon perturbation response from a reset state, not a general stability guarantee or a direct measurement of the trained reader's information. Delays in the recall task count back from the current input, so impulse lag 8 is an illustrative comparable horizon, not the same test sequence.
+
+Development seeds 1391001–1391010 and held-out seeds 1591001–1591020 use graph `s`, train `s+31000`, test `s+32000`, feedback `s+33000`, random targets `s+34000`, and impulse continuation `s+35000`, with wrapping arithmetic. The runner checks within-config seed roles and tests check cross-group roles. The scales and delays were fixed before observing the development results; the overall study was not preregistered.
+
+```sh
+nix-shell --run 'cargo test --manifest-path toolkit/Cargo.toml --test connection_strength && cargo build --release --manifest-path toolkit/Cargo.toml --bin connection_strength'
+nix-shell --run 'for group in dev test; do toolkit/target/release/connection_strength "toolkit/configs/connection-strength/$group.cfg" "toolkit/runs/strength-$group-example"; done'
+```
+
+Pooled accuracy across 20 held-out seeds:
+
+| Delay | 0.5× | 1× | 1.5× | 2× | 3× | Online task | Online unrelated | Shift register |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 4 | 0.6120 | 0.6489 | 0.6554 | 0.6594 | 0.6649 | 0.6522 | 0.6593 | 1.0000 |
+| 8 | 0.5219 | 0.5417 | 0.5647 | 0.5978 | 0.6209 | 0.5482 | 0.5635 | 1.0000 |
+
+At delay eight, 3× beat 1× and each online learner in all 20 paired seeds. The mean initial impulse RMS distance was 0.2397 for all scales. After eight common inputs, it was 0.0110 for 1×, 0.0209 for 2× and 0.0308 for 3×; after 16 it was 0.00071, 0.00303 and 0.00690, respectively. Longer-lasting state differences are consistent with improved temporal memory, though the experiment does not establish the mechanism of the accuracy increase or show that every preserved difference is useful.
+
+As a post-hoc check of the *earlier* temporal-plasticity test's delay-eight `weights.csv`, mean absolute edge weight across its 20 seeds was 0.1241 at initialization, 0.1292 after task feedback and 0.1537 after unrelated feedback. Thus the unrelated learner happened to increase average edge magnitude in those runs. This comparison is descriptive, comes from a different seed group, and is not evidence that strength alone caused its advantage. A direct intervention on the trained graphs, or matched strength and trajectories, is needed. Neither the fixed scaling nor this diagnostic demonstrates graph self-organization, changing-task adaptation, language capability, statistical significance, or resource parity with a shift register. Adjacent query outcomes are correlated; no compute, peak memory, or confidence intervals are reported.
+
+The output directory records resolved config, protocol, predictions, per-seed metrics, and finite-horizon impulse curves with clip counts. It is not a restartable graph snapshot; runs are ignored by Git and source/Nix revisions are not recorded.

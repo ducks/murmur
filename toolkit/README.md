@@ -136,3 +136,11 @@ nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin ma
 ```sh
 nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin matched_online -- toolkit/configs/matched-online/test.cfg toolkit/runs/my-online-match'
 ```
+
+## Connection strength and impulse persistence
+
+`connection_strength` compares fixed graphs with scaled initial recurrent weights, online feedback learners, and a shift register. It also records finite-horizon responses to a one-bit difference. See [EXPERIMENTS.md](../EXPERIMENTS.md) for clipping, the probe protocol, and limits on interpretation.
+
+```sh
+nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin connection_strength -- toolkit/configs/connection-strength/test.cfg toolkit/runs/my-strength-run'
+```

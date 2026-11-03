@@ -218,3 +218,9 @@ For remembering eight steps back, the graph with the learned directions did a li
 We ran two graphs side by side. One used the real answer to nudge its connections; the other used a random answer. At every step, we resized the second graph's nudge so its total size matched the first graph's nudge. This needs information from both graphs, so it is a measuring tool, not a standalone learning method.
 
 On the eight-step test, the real-answer graph scored 55.6%, while the matched random graph scored 55.0%, close to the fixed graph's 54.9%. The real-answer graph won in 18 of 20 paired runs. The original random-answer graph with unrestricted nudges scored 57.3%. This supports the idea that the size of changes matters, but doesn't prove size alone explains the difference: the graphs end up with different weights, and our matching procedure changes the character of the random signal too.
+
+## Can stronger connections help the graph remember?
+
+We kept the graph's wiring fixed and made its connections weaker or stronger before training the reader. At an eight-step delay, the original graph answered correctly 54.2% of the time; tripling the starting connection weights, with a cap on their size, raised that to 62.1%. That stronger fixed graph beat the learned-connection versions on all 20 test runs.
+
+We also gave two copies of each graph different first bits, followed by the same inputs, and watched how long their internal states stayed different. The stronger graph kept a trace of that first bit longer. That fits the idea that stronger interactions can give the reader a longer memory, although it doesn't prove the whole explanation. In an earlier run, random feedback had increased connection magnitudes on average; checking that graph directly is a useful next step.

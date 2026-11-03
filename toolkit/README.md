@@ -170,3 +170,12 @@ nix-shell --run 'python3 toolkit/scripts/weight_organization_summary.py toolkit/
 nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin centered_feedback -- toolkit/configs/centered-feedback/test.cfg toolkit/runs/my-centered-run'
 nix-shell --run 'python3 toolkit/scripts/centered_feedback_summary.py toolkit/runs/my-centered-run/metrics.csv'
 ```
+
+## Reader-only feedback
+
+`reader_signal` compares the reader-dependent term `0.5 - probability` with centered random feedback, their original combined rule, and task-feedback baselines. `scripts/reader_signal_summary.py` reports seed-level paired bootstrap intervals and edge-change alignment; see [EXPERIMENTS.md](../EXPERIMENTS.md) for the full two-pass protocol and caveats.
+
+```sh
+nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin reader_signal -- toolkit/configs/reader-signal/test.cfg toolkit/runs/my-reader-run'
+nix-shell --run 'python3 toolkit/scripts/reader_signal_summary.py toolkit/runs/my-reader-run/metrics.csv toolkit/runs/my-reader-run/weights.csv'
+```

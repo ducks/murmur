@@ -242,3 +242,9 @@ For recalling a bit eight steps back, the trained graph scored 57.2%. The global
 We found an important detail in the earlier rule. The graph wasn't simply nudged by a random bit: its signal was `random bit − reader's prediction`. The reader was trained on correct answers, so the signal also contained information from that reader.
 
 We tried removing that part, using `random bit − 0.5` instead. On eight-step recall, the earlier rule scored 57.7%, while the centered random rule scored 53.3%, almost the same as the original graph's 53.2%. The earlier rule won in all 30 paired runs. Its connections also changed much more, so we still need to disentangle the signal's content from the amount of change. This corrects the earlier intuition that random nudges alone were responsible.
+
+## Can the reader signal work without randomness?
+
+Yes, in this task. We took away the random bit and used only `0.5 − reader's prediction` as the signal that nudges graph connections. On eight-step recall, the resulting graph scored 58.5% with a fresh reader; the original signal with the random bit scored 58.3%, and the original graph scored 53.6%. Reader-only feedback beat the original graph in all 30 test runs. The two learned graphs also changed their connections in very similar directions.
+
+This is a cleaner lead: a supervised reader can send a simple signal back into the graph, and the graph can become easier for a new reader to use. The reader learns from correct answers, so this isn't learning without supervision. We also haven't shown what happens on changing rules or language.

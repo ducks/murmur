@@ -822,3 +822,43 @@ Pooled accuracy across 30 held-out seeds:
 At delay eight, reader-only beat initial and centered on all 30 paired seeds. Its mean advantage over initial was 0.04911, with descriptive 95% seed-level percentile bootstrap interval [0.04088, 0.05763] from 10,000 resamples. Reader-only minus combined averaged 0.00186, interval [-0.00013, 0.00427] (16 wins, 13 losses, one tie). The latter interval includes zero and the experiment does not establish statistical equivalence; it shows the random component is not required to obtain a similar mean improvement in this tested setting. Adjacent query outcomes are correlated and are not treated as independent observations; intervals reflect seed variation on this task, not generalization to other tasks.
 
 At delay eight, mean absolute edge drift from initialization was 0.10385 for reader-only and 0.10673 for combined, versus 0.02562 for centered. The cosine similarity of the 512-edge change vectors for reader-only and combined averaged 0.9532 across seeds (range 0.7919–0.9997); these graph changes are similar, not identical. Mean impulse RMS at lag eight was 0.02433 reader-only, 0.02388 combined, 0.01131 centered and 0.01114 initial. The reader-only signal is a real feedback signal from a supervised reader, not an independent random or unsupervised rule. It does not directly transmit the correct answer at the current step, but the reader's weights depend on previous true targets. The result does not identify which graph pathways carry memory, prove causality for the impulse measurement, or demonstrate language learning, growth, generalization to changing tasks, or resource-matched superiority. Source and Nix revisions, runtime and peak memory are not recorded; output files are ignored by Git and are not restartable checkpoints.
+
+## Cross-delay transfer of reader-shaped graphs
+
+Does reader-only graph feedback produce features useful to another memory task on different data? First train the graph using the reader-only signal `0.5 - probability` and a true-label reader on delayed-bit recall, with source delay either 4 or 8. Freeze the resulting graph, reset its state, then train a **new** reader for target delay 4, 8 or 12 on a separate stream. Finally reset state and evaluate on a third stream, with all weights frozen. Target delay 12 was never a graph-training target. However, the new reader is explicitly supervised on delay 12, so this is representation transfer within a family of related tasks, not zero-shot recall, general language ability, or inference without task-specific training.
+
+Each source-delay group compares:
+
+- The original fixed graph.
+- The graph pretrained with reader feedback while its reader learns true delayed labels.
+- A control pretrained by the same rule while its reader learns separately seeded pseudorandom labels on the same input stream. These labels are not a permutation and may match true labels by chance.
+- The original graph scaled to match the true-pretrained graph's per-seed mean absolute edge strength, with clipping.
+- The original fixed graph with all weights multiplied by 2 and clipped to [-0.5, 0.5].
+- A causal shift register that knows the target delay and stores the required history; it is an exact reference and not resource-matched.
+
+All graphs share the initial wiring, input weights and leak. Each graph receives its own fresh target-specific reader trained on the same reader-training sequence. Pretraining sees an additional 6,000 inputs and supervised labels; the initial and fixed controls receive no comparable graph-training compute, so budgets are not matched. Separately seeded random streams provide reproducibility, not a mathematical proof of independence. A role-collision check rejects overlapping seeds within configs and tests compare development and test roles.
+
+Development seeds 3391001–3391010 and test seeds 3591001–3591020 use graph `s`, graph-pretraining inputs `s+31000`, evaluation inputs `s+32000`, feedback signs `s+33000`, random-label control `s+34000`, and fresh-reader training inputs `s+37000`, using wrapping `u64`. Graph pretraining and reader training each use 6,000 symbols; evaluation uses 2,000, with first `target_delay` steps unscored. Source delays and target delays were configured before development results. The overall investigation and reported comparisons were not preregistered; multiple source, target and control comparisons are exploratory.
+
+```sh
+nix-shell --run 'cargo test --manifest-path toolkit/Cargo.toml --test reader_transfer && cargo build --release --manifest-path toolkit/Cargo.toml --bin reader_transfer'
+nix-shell --run 'for group in dev test; do toolkit/target/release/reader_transfer "toolkit/configs/reader-transfer/$group.cfg" "toolkit/runs/transfer-$group-example"; done'
+nix-shell --run 'python3 toolkit/scripts/reader_transfer_summary.py toolkit/runs/transfer-test-example/metrics.csv'
+```
+
+Pooled held-out accuracy across 20 paired graph seeds:
+
+| Graph training delay | Reader target delay | Initial | True-label graph | Random-label graph | Strength-matched | Fixed 2× | Shift |
+|---:|---:|---:|---:|---:|---:|---:|---:|
+| 4 | 4 | 0.6463 | 0.6598 | 0.6471 | 0.6527 | 0.6535 | 1.0000 |
+| 4 | 8 | 0.5443 | 0.6258 | 0.5455 | 0.5890 | 0.5968 | 1.0000 |
+| 4 | 12 | 0.5015 | 0.5715 | 0.5018 | 0.5170 | 0.5249 | 1.0000 |
+| 8 | 4 | 0.6463 | 0.6526 | 0.6471 | 0.6505 | 0.6535 | 1.0000 |
+| 8 | 8 | 0.5443 | 0.5913 | 0.5456 | 0.5537 | 0.5968 | 1.0000 |
+| 8 | 12 | 0.5015 | 0.5194 | 0.5018 | 0.5035 | 0.5249 | 1.0000 |
+
+For source 4 and target 12, true-label pretraining beat initial, random-label and strength-matched controls in all 20 paired seeds. The mean advantage over strength-matched was 0.05455; a descriptive 10,000-resample seed-level percentile bootstrap interval was [0.04540, 0.06476]. It also beat fixed 2× in all 20 (mean 0.04658, interval [0.03697, 0.05755]). Per-symbol results are correlated, so the bootstrap samples graph seeds, not individual queries. These are exploratory intervals over seeds on this task family, not preregistered claims or uncertainty across tasks.
+
+Mean absolute graph drift for true-label pretraining was 0.2003 at source 4 and 0.1057 at source 8; the random-label control drifted about 0.0228 for either. The unequal changes prevent attributing results solely to the label *content* rather than its effect on weight-update magnitude or trajectory. At source 8, the fixed 2× graph exceeded the true-pretrained graph on average for targets 8 and 12, underscoring that the learned graph is not universally superior even here. The observed cross-delay benefit supports reusable temporal features within this bit-recall family; it does not establish continual-learning retention, robustness to distribution shifts, novel grammar generalization, or a language model.
+
+Run directories record the config, protocol, per-symbol predictions, per-seed metrics, graph edge weights and strength/clip diagnostics. Outputs are ignored by Git, do not contain restartable input weights/readers, and do not record source/Nix revisions, runtime or peak memory.

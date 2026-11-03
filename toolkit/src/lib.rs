@@ -418,3 +418,5 @@ pub mod weight_organization;
 pub mod centered_feedback;
 
 pub mod reader_signal;
+
+pub mod reader_transfer;

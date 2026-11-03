@@ -179,3 +179,12 @@ nix-shell --run 'python3 toolkit/scripts/centered_feedback_summary.py toolkit/ru
 nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin reader_signal -- toolkit/configs/reader-signal/test.cfg toolkit/runs/my-reader-run'
 nix-shell --run 'python3 toolkit/scripts/reader_signal_summary.py toolkit/runs/my-reader-run/metrics.csv toolkit/runs/my-reader-run/weights.csv'
 ```
+
+## Reader-trained graph transfer
+
+`reader_transfer` pretrains a graph with reader-only feedback on one delay, then trains a fresh reader on a different, separately generated stream and target delay. It includes random-label, strength-matched and fixed-strength controls; see [EXPERIMENTS.md](../EXPERIMENTS.md).
+
+```sh
+nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin reader_transfer -- toolkit/configs/reader-transfer/test.cfg toolkit/runs/my-transfer-run'
+nix-shell --run 'python3 toolkit/scripts/reader_transfer_summary.py toolkit/runs/my-transfer-run/metrics.csv'
+```

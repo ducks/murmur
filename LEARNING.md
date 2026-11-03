@@ -248,3 +248,9 @@ We tried removing that part, using `random bit − 0.5` instead. On eight-step r
 Yes, in this task. We took away the random bit and used only `0.5 − reader's prediction` as the signal that nudges graph connections. On eight-step recall, the resulting graph scored 58.5% with a fresh reader; the original signal with the random bit scored 58.3%, and the original graph scored 53.6%. Reader-only feedback beat the original graph in all 30 test runs. The two learned graphs also changed their connections in very similar directions.
 
 This is a cleaner lead: a supervised reader can send a simple signal back into the graph, and the graph can become easier for a new reader to use. The reader learns from correct answers, so this isn't learning without supervision. We also haven't shown what happens on changing rules or language.
+
+## Can the graph help with a different memory task?
+
+We trained the graph using feedback from a reader learning to remember four bits back. Then we froze the graph and trained a brand-new reader, on a different stream, to remember twelve bits back. That reader scored 57.2%, compared with 50.2% on the original graph. The trained graph beat a version matched for average connection strength and a graph trained with random answers in all 20 paired test runs.
+
+That suggests the graph acquired a useful memory representation that a different reader can use. The new reader was explicitly taught the twelve-step task, so this isn't a zero-shot ability. The result also depends on the setup: a simple fixed graph with stronger connections beat one of our other trained graphs, and a purpose-built buffer remains perfect.

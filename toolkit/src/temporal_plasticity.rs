@@ -71,6 +71,20 @@ impl PlasticModel {
         }
         self.readout.learn(&self.graph.state, true_target);
     }
+    /// Apply an externally specified signed scalar teaching signal to the
+    /// same eligibility and fixed feedback rule, then train the true reader.
+    pub fn learn_with_error(&mut self, true_target: usize, error: f64) {
+        assert!(true_target < 2 && error.is_finite());
+        for (edge, trace) in self.graph.edges.iter_mut().zip(&self.eligibility) {
+            edge.weight = (edge.weight + EDGE_RATE * error * self.feedback[edge.to] * trace)
+                .clamp(-WEIGHT_LIMIT, WEIGHT_LIMIT);
+        }
+        self.readout.learn(&self.graph.state, true_target);
+    }
+    pub fn class_one_probability(&self) -> f64 {
+        let score = self.readout.scores(&self.graph.state)[1].clamp(-40.0, 40.0);
+        1.0 / (1.0 + (-score).exp())
+    }
     /// Control intervention: normalize the proposed edge-update vector to a
     /// supplied L2 norm. Clipping may make the realized norm smaller. This
     /// cross-model matching is experimental instrumentation, not a local rule.

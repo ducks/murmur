@@ -236,3 +236,9 @@ On the eight-step test, the random-trained graph scored 58.0%. Turning its conne
 We took a trained graph and shuffled its connection weights while keeping the wiring and all the same weight values. We also tried a gentler shuffle that only swaps weights among connections entering the same unit. Each graph then got a freshly trained reader.
 
 For recalling a bit eight steps back, the trained graph scored 57.2%. The globally shuffled versions averaged 54.1%, and the gentler shuffles averaged 54.8%. The trained graph beat each kind of shuffle in 29 of 30 paired runs. This is a clearer result: on this small task, the particular placement of weights matters, not just the overall range of weights. It still doesn't tell us which pattern is useful, whether it transfers to language, or whether random feedback is the best learning method.
+
+## Was the random signal really random?
+
+We found an important detail in the earlier rule. The graph wasn't simply nudged by a random bit: its signal was `random bit − reader's prediction`. The reader was trained on correct answers, so the signal also contained information from that reader.
+
+We tried removing that part, using `random bit − 0.5` instead. On eight-step recall, the earlier rule scored 57.7%, while the centered random rule scored 53.3%, almost the same as the original graph's 53.2%. The earlier rule won in all 30 paired runs. Its connections also changed much more, so we still need to disentangle the signal's content from the amount of change. This corrects the earlier intuition that random nudges alone were responsible.

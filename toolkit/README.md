@@ -161,3 +161,12 @@ nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin tr
 nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin weight_organization -- toolkit/configs/weight-organization/test.cfg toolkit/runs/my-placement-run'
 nix-shell --run 'python3 toolkit/scripts/weight_organization_summary.py toolkit/runs/my-placement-run/metrics.csv'
 ```
+
+## Centered random feedback
+
+`centered_feedback` compares the original random-target-minus-reader-prediction edge signal against random-target-minus-0.5, with paired streams and true-label readers. It records training signals, edge drift, impulse curves and frozen/online recall; see [EXPERIMENTS.md](../EXPERIMENTS.md).
+
+```sh
+nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin centered_feedback -- toolkit/configs/centered-feedback/test.cfg toolkit/runs/my-centered-run'
+nix-shell --run 'python3 toolkit/scripts/centered_feedback_summary.py toolkit/runs/my-centered-run/metrics.csv'
+```

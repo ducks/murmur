@@ -414,3 +414,5 @@ pub mod connection_strength;
 pub mod trained_strength;
 
 pub mod weight_organization;
+
+pub mod centered_feedback;

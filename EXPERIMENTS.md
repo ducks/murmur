@@ -735,3 +735,34 @@ Pooled held-out accuracy, 20 paired seeds:
 At delay eight, random trained beat its normalized version in all 20 seeds (mean difference 0.0254), and beat the strength-matched initial graph in all 20 (0.0380). Random normalized beat initial in 19 seeds, with one tie (0.0243). The initial and normalized graphs had mean absolute weight 0.1244, and the strength-matched initial and random-trained graphs 0.1616. Mean impulse RMS after eight common inputs was 0.0116 initial, 0.0140 initial strength-matched, 0.0261 random trained, and 0.0189 random normalized. These findings support both a contribution from the scaling intervention and additional differences in the trained graph that a single average-strength statistic does not capture. They do not identify the additional property or prove that impulse persistence causes recall. Removing strength changes the entire graph uniformly, not only the portion learned during training; per-example outcomes within each stream are correlated and counts are descriptive, not formal significance tests.
 
 Per-seed metrics, predictions, impulse curves, scaling/clip diagnostics, and all five edge-weight sets are recorded in the ignored output directory. Input weights and readers are not saved as restartable snapshots, and source/Nix revisions are not recorded. No task-change retention, growth, language generalization, runtime or memory comparison is measured.
+
+## Where do the trained weights matter?
+
+The preceding intervention found that the graph trained with unrelated feedback retains an advantage after matching average weight strength. This experiment tests whether *where* its signed weights are placed matters. Each seed and delay trains the same online random-target-feedback graph and freezes it. We compare it with:
+
+- The original initial graph and the trained graph normalized to the initial graph's mean absolute edge weight.
+- Three **global shuffles**, each independently permuting all trained signed weights across the existing directed edge entries.
+- Three **destination shuffles**, each independently permuting trained weights only among edges entering the same destination unit. These preserve every destination's incoming signed-weight multiset in addition to the global multiset.
+
+All shuffle controls keep every edge's endpoints, the exact signed weight multiset, input weights, and leak; destination shuffles additionally keep each destination's incoming weight distribution. They can break relationships among edges, their source and destination units, input weights, and the original initialization. Duplicate/self edges are kept. Thus a difference establishes sensitivity to these placements under this intervention, not a specific learned circuit or a mechanism. Fisher–Yates shuffles use a modulo mapping of a 64-bit pseudorandom integer, with negligible modulo bias; three separately seeded shuffles are used per control. As in the previous experiment, the random-target edge update is modulated by a reader trained on true task targets, so this is not unsupervised or task-independent learning.
+
+After constructing each frozen graph, separately initialize and train a reader on the same 6,000-symbol stream, reset state, and evaluate its frozen weights on a separate 2,000-symbol stream. The trained graph has already seen that training stream during edge training; the initial graph has not. This is a two-pass protocol for trained graphs, and does not compare equal total training effort against the initial graph. A zero-state impulse probe measures mean RMS state distance between pairs given different first bits and then the same continuation for 16 inputs; it is not a direct measure of decodable memory or a stability guarantee.
+
+Development graph seeds 2191001–2191010 and held-out seeds 2391001–2391030 use offsets `s` for graph, `+31000` train, `+32000` test, `+33000` feedback, `+34000` unrelated targets, `+35000` impulse, `+36000/+38000/+40000` global shuffles and `+42000/+44000/+46000` destination shuffles (wrapping `u64`). Configuration validation rejects role collisions within a group; tests check within- and cross-group roles. Configurations and three shuffle replicates were fixed before viewing development results, but the broader investigation and bootstrap contrasts were not preregistered.
+
+```sh
+nix-shell --run 'cargo test --manifest-path toolkit/Cargo.toml --test weight_organization && cargo build --release --manifest-path toolkit/Cargo.toml --bin weight_organization'
+nix-shell --run 'for group in dev test; do toolkit/target/release/weight_organization "toolkit/configs/weight-organization/$group.cfg" "toolkit/runs/placement-$group-example"; done'
+nix-shell --run 'python3 toolkit/scripts/weight_organization_summary.py toolkit/runs/placement-test-example/metrics.csv'
+```
+
+Pooled accuracy across 30 held-out graph seeds; shuffle columns average three per seed:
+
+| Delay | Initial | Trained | Normalized | Globally shuffled | Shuffled within destination |
+|---:|---:|---:|---:|---:|---:|
+| 4 | 0.6524 | 0.6645 | 0.6558 | 0.6578 | 0.6592 |
+| 8 | 0.5262 | 0.5723 | 0.5462 | 0.5414 | 0.5477 |
+
+At delay eight, trained beat the average of the three global shuffles in 29/30 seeds, and beat the average of the destination shuffles in 29/30. Mean paired advantages were 0.03085 and 0.02451. A descriptive 10,000-resample percentile bootstrap, sampling entire graph seeds with replacement after averaging their three shuffles, gave 95% intervals [0.02426, 0.03775] and [0.01851, 0.03082]. At delay four the paired advantages were 0.00665 [0.00453, 0.00879] and 0.00533 [0.00336, 0.00730]. The deterministic analysis script reproduces these intervals. They quantify seed variation under this protocol, not uncertainty across tasks or a preregistered confirmatory claim; multiple contrasts were examined. Adjacent examples are correlated, so individual predictions are not treated as independent samples.
+
+For illustration, on delay-eight-trained graphs the mean impulse RMS at lag eight was 0.02183 trained, 0.01340 for global shuffle 0 and 0.01497 for destination shuffle 0; those are one of three shuffle replicates and don't establish causation. The result is evidence that the placement of trained weights contributes to performance on this delayed-bit task beyond the preserved weight multisets. It does not establish useful language representation, structural growth, biologically local learning, or that unrelated feedback itself is preferable to task feedback under matched resource and training budgets. Output includes all per-symbol predictions, per-seed metrics, impulse curves and edge-weight sets; runs are ignored by Git, are not restartable checkpoints, and do not record source/Nix revisions, runtime or peak memory.

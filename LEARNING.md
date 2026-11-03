@@ -230,3 +230,9 @@ We also gave two copies of each graph different first bits, followed by the same
 We took a graph after training it with random feedback and turned all its connections down until their average strength matched the original graph. We also took the original graph and turned its connections up to match the random-trained graph. Then we froze each graph and taught each a new reader.
 
 On the eight-step test, the random-trained graph scored 58.0%. Turning its connections down reduced it to 55.4%. But that was still better than the original graph's 53.0%, and turning the original graph up only reached 54.2%. So strength matters, but the way the individual connections changed also seems to matter. We don't yet know which property of those changes helps. The random-feedback graph's reader did learn correct answers while the graph was trained, so the whole training process wasn't independent of the task.
+
+## Does it matter which connection gets which weight?
+
+We took a trained graph and shuffled its connection weights while keeping the wiring and all the same weight values. We also tried a gentler shuffle that only swaps weights among connections entering the same unit. Each graph then got a freshly trained reader.
+
+For recalling a bit eight steps back, the trained graph scored 57.2%. The globally shuffled versions averaged 54.1%, and the gentler shuffles averaged 54.8%. The trained graph beat each kind of shuffle in 29 of 30 paired runs. This is a clearer result: on this small task, the particular placement of weights matters, not just the overall range of weights. It still doesn't tell us which pattern is useful, whether it transfers to language, or whether random feedback is the best learning method.

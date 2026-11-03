@@ -412,3 +412,5 @@ pub mod matched_online;
 pub mod connection_strength;
 
 pub mod trained_strength;
+
+pub mod weight_organization;

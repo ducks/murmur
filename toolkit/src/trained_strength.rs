@@ -50,7 +50,7 @@ pub fn match_strength(g: &Graph, target: f64) -> Result<(Graph, f64), String> {
     }
     Ok((result, factor))
 }
-fn predict(c: &StreamConfig, seed: u64, delay: usize, mut graph: Graph) -> Vec<usize> {
+pub fn predict(c: &StreamConfig, seed: u64, delay: usize, mut graph: Graph) -> Vec<usize> {
     let train = temporal_stream::stream(seed.wrapping_add(31000), c.train_tokens);
     let test = temporal_stream::stream(seed.wrapping_add(32000), c.test_tokens);
     let mut reader = Readout::new(c.units, c.learning_rate);

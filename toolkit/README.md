@@ -152,3 +152,12 @@ nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin co
 ```sh
 nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin trained_strength -- toolkit/configs/trained-strength/test.cfg toolkit/runs/my-trained-strength-run'
 ```
+
+## Weight placement interventions
+
+`weight_organization` compares a trained frozen graph with three global weight shuffles and three per-destination shuffles, preserving the exact signed-weight multiset and endpoints. `scripts/weight_organization_summary.py` reports paired seed-level bootstrap intervals. See [EXPERIMENTS.md](../EXPERIMENTS.md) for protocol and caveats.
+
+```sh
+nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin weight_organization -- toolkit/configs/weight-organization/test.cfg toolkit/runs/my-placement-run'
+nix-shell --run 'python3 toolkit/scripts/weight_organization_summary.py toolkit/runs/my-placement-run/metrics.csv'
+```

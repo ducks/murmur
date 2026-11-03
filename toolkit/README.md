@@ -144,3 +144,11 @@ nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin ma
 ```sh
 nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin connection_strength -- toolkit/configs/connection-strength/test.cfg toolkit/runs/my-strength-run'
 ```
+
+## Trained-graph strength intervention
+
+`trained_strength` scales trained random-feedback graphs back to their initial mean absolute edge weight and scales initial graphs up to match trained strength, then trains fresh readers. It logs weights, impulse curves and scaling diagnostics. See [EXPERIMENTS.md](../EXPERIMENTS.md) for the two-pass protocol and limitations.
+
+```sh
+nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin trained_strength -- toolkit/configs/trained-strength/test.cfg toolkit/runs/my-trained-strength-run'
+```

@@ -410,3 +410,5 @@ pub mod matched_perturbation;
 pub mod matched_online;
 
 pub mod connection_strength;
+
+pub mod trained_strength;

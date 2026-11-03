@@ -701,3 +701,37 @@ At delay eight, 3× beat 1× and each online learner in all 20 paired seeds. The
 As a post-hoc check of the *earlier* temporal-plasticity test's delay-eight `weights.csv`, mean absolute edge weight across its 20 seeds was 0.1241 at initialization, 0.1292 after task feedback and 0.1537 after unrelated feedback. Thus the unrelated learner happened to increase average edge magnitude in those runs. This comparison is descriptive, comes from a different seed group, and is not evidence that strength alone caused its advantage. A direct intervention on the trained graphs, or matched strength and trajectories, is needed. Neither the fixed scaling nor this diagnostic demonstrates graph self-organization, changing-task adaptation, language capability, statistical significance, or resource parity with a shift register. Adjacent query outcomes are correlated; no compute, peak memory, or confidence intervals are reported.
 
 The output directory records resolved config, protocol, predictions, per-seed metrics, and finite-horizon impulse curves with clip counts. It is not a restartable graph snapshot; runs are ignored by Git and source/Nix revisions are not recorded.
+
+## Intervention on trained graph strength
+
+The previous experiment showed that scaling fixed initial weights improves delayed recall, but did not intervene on a trained graph. Here each seed and delay first trains the same random-target-feedback graph as in temporal plasticity, while its readout learns the true delayed bit. From that run we create five frozen graphs:
+
+- **Initial**: original random graph.
+- **Initial strength-matched**: original graph scaled to the trained random-feedback graph's mean absolute edge weight.
+- **Random trained**: final random-target-feedback graph.
+- **Random normalized**: that same trained graph scaled back to the original graph's mean absolute edge weight.
+- **Task trained**: final task-feedback graph, included as an additional comparison.
+
+The two scaling interventions use a single nonnegative multiplier for all weights, with clipping to [-0.5, 0.5]; bisection finds the target mean per seed and delay. Signs and topology are preserved, but the full distribution, correlations, spectral properties and individual edge changes are not matched. The random target is unrelated, but the online reader that supplies the prediction score is trained on true targets, so the entire edge-learning process is not independent of task information.
+
+Each frozen graph gets a newly initialized readout trained on the same 6,000-symbol training stream; its state is reset before a frozen 2,000-symbol test stream. Thus the trained graphs have seen the training sequence during edge learning and again during readout training; the initial graph does not get the same graph-training pass. The online random learner and a causal shift register are also evaluated; unlike the frozen readers, the online learner's reader trained while its graph changed, and the shift register knows the delay and is not resource matched. The experiment measures whether the final frozen graph has useful properties after retraining the reader, not the direct effect of changing weights while keeping the original trained reader fixed.
+
+We additionally run the previous zero-state, one-bit impulse probe: 64 pairs per graph, with first inputs 0 and 1, then identical continuations, recording RMS state distance for lags 0–16. This is a finite-horizon response from a reset state, not a stability guarantee or a direct measure of decodable memory.
+
+Development seeds 1791001–1791010 and held-out seeds 1991001–1991020 use graph `s`, train `s+31000`, test `s+32000`, feedback signs `s+33000`, unrelated target `s+34000`, impulse continuation `s+35000` (wrapping `u64`). The runner rejects role collisions within a config and tests check cross-group roles. The experiment was not preregistered; the supplied settings did not change after the development run.
+
+```sh
+nix-shell --run 'cargo test --manifest-path toolkit/Cargo.toml --test trained_strength && cargo build --release --manifest-path toolkit/Cargo.toml --bin trained_strength'
+nix-shell --run 'for group in dev test; do toolkit/target/release/trained_strength "toolkit/configs/trained-strength/$group.cfg" "toolkit/runs/trained-strength-$group-example"; done'
+```
+
+Pooled held-out accuracy, 20 paired seeds:
+
+| Delay | Initial | Initial strength-matched | Random trained | Random normalized | Task trained | Online random | Shift |
+|---:|---:|---:|---:|---:|---:|---:|---:|
+| 4 | 0.6515 | 0.6582 | 0.6656 | 0.6568 | 0.6539 | 0.6566 | 1.0000 |
+| 8 | 0.5300 | 0.5417 | 0.5797 | 0.5543 | 0.5398 | 0.5577 | 1.0000 |
+
+At delay eight, random trained beat its normalized version in all 20 seeds (mean difference 0.0254), and beat the strength-matched initial graph in all 20 (0.0380). Random normalized beat initial in 19 seeds, with one tie (0.0243). The initial and normalized graphs had mean absolute weight 0.1244, and the strength-matched initial and random-trained graphs 0.1616. Mean impulse RMS after eight common inputs was 0.0116 initial, 0.0140 initial strength-matched, 0.0261 random trained, and 0.0189 random normalized. These findings support both a contribution from the scaling intervention and additional differences in the trained graph that a single average-strength statistic does not capture. They do not identify the additional property or prove that impulse persistence causes recall. Removing strength changes the entire graph uniformly, not only the portion learned during training; per-example outcomes within each stream are correlated and counts are descriptive, not formal significance tests.
+
+Per-seed metrics, predictions, impulse curves, scaling/clip diagnostics, and all five edge-weight sets are recorded in the ignored output directory. Input weights and readers are not saved as restartable snapshots, and source/Nix revisions are not recorded. No task-change retention, growth, language generalization, runtime or memory comparison is measured.

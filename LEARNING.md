@@ -224,3 +224,9 @@ On the eight-step test, the real-answer graph scored 55.6%, while the matched ra
 We kept the graph's wiring fixed and made its connections weaker or stronger before training the reader. At an eight-step delay, the original graph answered correctly 54.2% of the time; tripling the starting connection weights, with a cap on their size, raised that to 62.1%. That stronger fixed graph beat the learned-connection versions on all 20 test runs.
 
 We also gave two copies of each graph different first bits, followed by the same inputs, and watched how long their internal states stayed different. The stronger graph kept a trace of that first bit longer. That fits the idea that stronger interactions can give the reader a longer memory, although it doesn't prove the whole explanation. In an earlier run, random feedback had increased connection magnitudes on average; checking that graph directly is a useful next step.
+
+## Is the random-trained graph just stronger?
+
+We took a graph after training it with random feedback and turned all its connections down until their average strength matched the original graph. We also took the original graph and turned its connections up to match the random-trained graph. Then we froze each graph and taught each a new reader.
+
+On the eight-step test, the random-trained graph scored 58.0%. Turning its connections down reduced it to 55.4%. But that was still better than the original graph's 53.0%, and turning the original graph up only reached 54.2%. So strength matters, but the way the individual connections changed also seems to matter. We don't yet know which property of those changes helps. The random-feedback graph's reader did learn correct answers while the graph was trained, so the whole training process wasn't independent of the task.

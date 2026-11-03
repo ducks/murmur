@@ -170,3 +170,7 @@ A useful next test is whether a learned graph—not just a trained readout—can
 ## Temporal connection plasticity
 
 On the continuous delayed-bit task, a local eligibility trace modulated by a shared task error changed recurrent weights and slightly improved mean test accuracy over a fixed graph (0.6596 vs 0.6579 at delay 4; 0.5398 vs 0.5353 at delay 8). However, a control using unrelated edge-learning targets achieved 0.6657 and 0.5529. Its weight changes were much larger, so signal quality and perturbation magnitude are confounded. This is not evidence that the task-specific rule is useful, or that structure self-organizes; topology remained fixed and the adaptive graph had more trainable weights. See [EXPERIMENTS.md](EXPERIMENTS.md) for the protocol, paired counts and limitations.
+
+## Matched perturbation follow-up
+
+A frozen graph with task-trained edges outperformed a frozen graph with exactly matched per-edge displacement magnitudes and randomized signs in 17 of 20 new paired seeds at delay eight (0.5461 vs 0.5401), but only 10 of 20 at delay four (0.6547 vs 0.6538; three ties). This is limited evidence that the direction of learned changes matters under this intervention. The task-trained graph was built from the same training stream later used to train each frozen graph's new reader, and the matched control inherits its edge-specific displacement magnitudes. The earlier unrelated-feedback online learner still scored higher (0.5699 at delay eight), so this does not explain that result. See [EXPERIMENTS.md](EXPERIMENTS.md).

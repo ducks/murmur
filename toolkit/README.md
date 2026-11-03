@@ -120,3 +120,11 @@ nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin te
 ```
 
 The output directory must be new.
+
+## Matched frozen perturbations
+
+`matched_perturbation` compares task-trained connection directions against random directions with the same per-edge displacement, with new readouts trained on both frozen graphs. See [EXPERIMENTS.md](../EXPERIMENTS.md) for its two-stage training protocol and limitations.
+
+```sh
+nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin matched_perturbation -- toolkit/configs/matched-perturbation/test.cfg toolkit/runs/my-matched-run'
+```

@@ -206,3 +206,9 @@ The graph's connections were random and fixed. Only a separate reader learned fr
 Previously, the connections stayed random while the reader learned. We now let each connection keep a short trace of how active it has been, and use the reader's prediction error to nudge its weight. We compared this with frozen connections and with connections nudged using unrelated random answers. All three readers still trained on the correct answers.
 
 The graph did learn in the narrow sense that its weights changed. On new streams, it improved slightly over frozen connections, but random nudges did better. Those random nudges also moved the weights farther, so we can't yet tell whether their apparent benefit comes from the signal or simply the size of the changes. The next useful test would make those changes comparable in size and inspect what they do to memory. This is why a control matters: an improvement over doing nothing is not automatically evidence that our proposed teaching signal is working.
+
+## Does the direction of a connection change matter?
+
+We took the graph whose connections learned from the task. Then, for each connection, we made another graph that moved the connection by exactly the same amount but chose the direction randomly. We froze both graphs and taught a fresh reader to use each one.
+
+For remembering eight steps back, the graph with the learned directions did a little better: about 54.6% versus 54.0%, and it won on 17 of 20 paired runs. At four steps, the difference was much smaller. That is a hint that the direction of the updates carries some useful information, though the result is small and specific to this task. Also, our earlier graph trained with unrelated answers still did better, so we have not explained that surprising result.

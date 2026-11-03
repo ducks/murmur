@@ -629,3 +629,27 @@ Observed pooled accuracy on 20 final seeds (1,996 or 1,992 scored symbols per se
 Task feedback beat fixed in 12/20 seeds at delay 4 (one tie) and 17/20 at delay 8 (three ties), but beat unrelated feedback in only 4/20 (one tie) and 3/20 (one tie), respectively. At the end of training, mean absolute edge changes averaged 0.031 and 0.040 for task feedback, versus 0.193 and 0.100 for unrelated feedback, at delays 4 and 8. No task-feedback edges hit the clip limit; unrelated feedback averaged 11.45 and 0.05 clipped edges out of 512. The magnitude difference is a confound: this experiment does not isolate whether the unrelated signal or simply a larger perturbation helped. Adjacent test examples are correlated; these descriptive differences are not statistical significance claims. We do not measure runtime or peak memory here. The perfect shift register knows the delay and stores history; it is not resource-matched.
 
 The result does not establish useful task-specific recurrent learning: indiscriminate changes did better under this setup. A useful follow-up is to match edge-change magnitudes, include frozen random perturbations, and examine whether the signal changes memory persistence or readout conditioning before designing a more complex learning rule. The logs contain resolved config, protocol, per-symbol predictions, metrics, training checkpoints, edge weights, feedback signs, and run status. They are not restartable snapshots; source and Nix revisions are not recorded and `toolkit/runs` is ignored by Git.
+
+## Matched frozen perturbations
+
+This follow-up asks whether the directions of the task-trained edge changes matter when their sizes are held constant. For each seed and delay, run the earlier online task-feedback and unrelated-feedback learners. Take the task learner's final graph and build a second graph from the same initialization: for each edge use the *absolute value of that edge's trained displacement* with a separately sampled random sign. If the chosen sign would exceed the existing weight limit, flip it; no flips were needed in these final runs. Thus each edge has exactly the same absolute displacement in the two frozen graphs, while its direction may differ. Magnitudes are derived from task training, so the control is not independent of the trained model. Signs are separately seeded, not guaranteed statistically independent.
+
+Freeze both final graphs, reset their state, and train a fresh readout on the same 6,000-symbol training stream before evaluation on the separate 2,000-symbol stream. The fixed baseline also trains a fresh readout on that stream. This gives both frozen graph conditions the same readout procedure, but the task-trained graph has already seen the training stream once during edge learning: this is a two-stage training process, not a matched total-compute or data-exposure comparison with the fixed graph. The online models learn edges and readouts together in one pass. Evaluation always resets state and freezes graph and readout weights. The shift register is an exact task-specific, non-resource-matched reference.
+
+Development seeds 591001–591010 and final test seeds 791001–791020 are distinct from the previous experiment's seed ranges. Seed roles are graph `s`, training `s+31000`, evaluation `s+32000`, feedback signs `s+33000`, unrelated targets `s+34000`, and perturbation signs `s+35000`, using wrapping arithmetic. Tests check cross-group role collisions. We held settings fixed between the development and test runs, but did not preregister the overall protocol.
+
+```sh
+nix-shell --run 'cargo test --manifest-path toolkit/Cargo.toml --test matched_perturbation && cargo build --release --manifest-path toolkit/Cargo.toml --bin matched_perturbation'
+nix-shell --run 'for group in dev test; do toolkit/target/release/matched_perturbation "toolkit/configs/matched-perturbation/$group.cfg" "toolkit/runs/matched-$group-example"; done'
+```
+
+Pooled test accuracy across 20 paired seeds:
+
+| Delay | Fixed graph | Online task | Online unrelated | Frozen task | Frozen matched random | Shift register |
+|---:|---:|---:|---:|---:|---:|---:|
+| 4 | 0.6523 | 0.6537 | 0.6596 | 0.6547 | 0.6538 | 1.0000 |
+| 8 | 0.5346 | 0.5401 | 0.5699 | 0.5461 | 0.5401 | 1.0000 |
+
+The frozen task graph beat its matched random-direction partner in 10 of 20 seeds at delay 4 (three ties), and 17 of 20 at delay 8. The mean paired advantages were 0.0009 and 0.0059 accuracy, respectively. Mean absolute per-edge changes were 0.0323 and 0.0405. This suggests the directions of task-trained changes may contribute a small benefit at delay 8 under this particular control, but no confidence intervals or causal mechanism are established; adjacent queries are correlated. The online unrelated-feedback learner still performed better on average, with a different, substantially larger weight displacement in the preceding experiment. This frozen intervention therefore does not resolve why online unrelated feedback helped or match its training trajectory and displacement. No growth, continual learning, language generalization, timing, or peak-memory claims follow.
+
+Run directories contain resolved configuration, protocol, per-query predictions, per-seed accuracy, original/learned/random edge weights, displacement diagnostics and status. Runs are ignored by Git, are not restartable checkpoints, and source and Nix revisions are not recorded.

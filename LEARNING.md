@@ -212,3 +212,9 @@ The graph did learn in the narrow sense that its weights changed. On new streams
 We took the graph whose connections learned from the task. Then, for each connection, we made another graph that moved the connection by exactly the same amount but chose the direction randomly. We froze both graphs and taught a fresh reader to use each one.
 
 For remembering eight steps back, the graph with the learned directions did a little better: about 54.6% versus 54.0%, and it won on 17 of 20 paired runs. At four steps, the difference was much smaller. That is a hint that the direction of the updates carries some useful information, though the result is small and specific to this task. Also, our earlier graph trained with unrelated answers still did better, so we have not explained that surprising result.
+
+## What if the random nudges aren't bigger?
+
+We ran two graphs side by side. One used the real answer to nudge its connections; the other used a random answer. At every step, we resized the second graph's nudge so its total size matched the first graph's nudge. This needs information from both graphs, so it is a measuring tool, not a standalone learning method.
+
+On the eight-step test, the real-answer graph scored 55.6%, while the matched random graph scored 55.0%, close to the fixed graph's 54.9%. The real-answer graph won in 18 of 20 paired runs. The original random-answer graph with unrestricted nudges scored 57.3%. This supports the idea that the size of changes matters, but doesn't prove size alone explains the difference: the graphs end up with different weights, and our matching procedure changes the character of the random signal too.

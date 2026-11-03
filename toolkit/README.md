@@ -128,3 +128,11 @@ The output directory must be new.
 ```sh
 nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin matched_perturbation -- toolkit/configs/matched-perturbation/test.cfg toolkit/runs/my-matched-run'
 ```
+
+## Matched online feedback
+
+`matched_online` compares task feedback with unrelated feedback whose global edge-update norm is matched to the task model at each step. This cross-model normalization is a diagnostic intervention; see [EXPERIMENTS.md](../EXPERIMENTS.md).
+
+```sh
+nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin matched_online -- toolkit/configs/matched-online/test.cfg toolkit/runs/my-online-match'
+```

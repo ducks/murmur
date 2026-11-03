@@ -653,3 +653,25 @@ Pooled test accuracy across 20 paired seeds:
 The frozen task graph beat its matched random-direction partner in 10 of 20 seeds at delay 4 (three ties), and 17 of 20 at delay 8. The mean paired advantages were 0.0009 and 0.0059 accuracy, respectively. Mean absolute per-edge changes were 0.0323 and 0.0405. This suggests the directions of task-trained changes may contribute a small benefit at delay 8 under this particular control, but no confidence intervals or causal mechanism are established; adjacent queries are correlated. The online unrelated-feedback learner still performed better on average, with a different, substantially larger weight displacement in the preceding experiment. This frozen intervention therefore does not resolve why online unrelated feedback helped or match its training trajectory and displacement. No growth, continual learning, language generalization, timing, or peak-memory claims follow.
 
 Run directories contain resolved configuration, protocol, per-query predictions, per-seed accuracy, original/learned/random edge weights, displacement diagnostics and status. Runs are ignored by Git, are not restartable checkpoints, and source and Nix revisions are not recorded.
+
+## Matching online update sizes
+
+The prior frozen-graph intervention matched final per-edge displacement, but the original unrelated-feedback learner changed connections online and moved them farther overall. Here the task-feedback learner and unrelated-feedback control train concurrently on the same stream. At each scored step, first measure the L2 norm of the task learner's realized 512-edge update. Rescale the unrelated control's proposed update vector to that norm before applying it. Each graph has its own state, weights, eligibility traces and separately trained true-target readout; both use the same initial graph and fixed destination feedback signs. Clipping at ±0.5 could prevent exact matching. The control depends on the other model's update size, so this is a nonlocal experimental intervention, not an implementable independent local learning rule. Since the unrelated target is a bit and its prediction is strictly between 0 and 1, normalization effectively removes the magnitude of its scalar error, retaining its sign; this intervention changes more than a single fixed learning rate. Matching per-step global L2 norms does not match each edge, update direction, accumulated trajectory, or final weight displacement.
+
+We also run the original fixed graph, task-feedback, and unnormalized unrelated-feedback learners and the causal shift register on identical streams. All models see 6,000 training symbols, are reset, and then evaluated with frozen weights on a distinct 2,000-symbol stream. The shift register knows the delay and is not resource matched. Development seeds 991001–991010 and held-out test seeds 1191001–1191020 use graph `s`, train `s+31000`, test `s+32000`, feedback `s+33000`, and unrelated targets `s+34000` (wrapping arithmetic). Distinct seed roles are checked within and across the provided groups. The protocol was not preregistered; configuration was not changed after observing development results.
+
+```sh
+nix-shell --run 'cargo test --manifest-path toolkit/Cargo.toml --test matched_online && cargo build --release --manifest-path toolkit/Cargo.toml --bin matched_online'
+nix-shell --run 'for group in dev test; do toolkit/target/release/matched_online "toolkit/configs/matched-online/$group.cfg" "toolkit/runs/online-matched-$group-example"; done'
+```
+
+Pooled test accuracy across 20 paired seeds:
+
+| Delay | Fixed | Task feedback | Unrelated feedback | Norm-matched unrelated | Shift register |
+|---:|---:|---:|---:|---:|---:|
+| 4 | 0.6566 | 0.6579 | 0.6646 | 0.6565 | 1.0000 |
+| 8 | 0.5490 | 0.5556 | 0.5733 | 0.5496 | 1.0000 |
+
+Task feedback beat norm-matched unrelated feedback in 12/20 paired seeds at delay 4 (one tie) and 18/20 at delay 8. At delay 8, mean final absolute drift from initialization was 0.0406 for task feedback and 0.0277 for the matched control, despite equal per-step update norms. Across all test seeds, the maximum per-step norm mismatch was below `5e-17` and no edges were at the clipping limit at checkpoints. The unnormalized unrelated model again did better, but its updates and trajectory are different; this intervention supports investigating update magnitude, not a causal proof that magnitude alone explains its benefit. Examples within each stream are correlated, and these counts and accuracy differences are descriptive without confidence intervals. There are no measurements of compute, memory, changing tasks, generalization to language, or learned topology.
+
+The output directory contains resolved config, protocol, predictions, metrics, cumulative update-norm and displacement diagnostics at 1,000-step checkpoints, and status; it does not save restartable weights. Runs are ignored by Git. Source and Nix revisions are not recorded.

@@ -71,6 +71,41 @@ impl PlasticModel {
         }
         self.readout.learn(&self.graph.state, true_target);
     }
+    /// Control intervention: normalize the proposed edge-update vector to a
+    /// supplied L2 norm. Clipping may make the realized norm smaller. This
+    /// cross-model matching is experimental instrumentation, not a local rule.
+    pub fn learn_with_update_norm(
+        &mut self,
+        true_target: usize,
+        feedback_target: usize,
+        desired_norm: f64,
+    ) -> f64 {
+        assert!(
+            true_target < 2
+                && feedback_target < 2
+                && desired_norm.is_finite()
+                && desired_norm >= 0.0
+        );
+        let score = self.readout.scores(&self.graph.state)[1].clamp(-40.0, 40.0);
+        let error = feedback_target as f64 - 1.0 / (1.0 + (-score).exp());
+        let proposal: Vec<f64> = self
+            .graph
+            .edges
+            .iter()
+            .zip(&self.eligibility)
+            .map(|(edge, trace)| error * self.feedback[edge.to] * trace)
+            .collect();
+        let norm = proposal.iter().map(|x| x * x).sum::<f64>().sqrt();
+        let scale = if norm > 0.0 { desired_norm / norm } else { 0.0 };
+        let mut actual_squared = 0.0;
+        for (edge, value) in self.graph.edges.iter_mut().zip(proposal) {
+            let old = edge.weight;
+            edge.weight = (old + scale * value).clamp(-WEIGHT_LIMIT, WEIGHT_LIMIT);
+            actual_squared += (edge.weight - old).powi(2);
+        }
+        self.readout.learn(&self.graph.state, true_target);
+        actual_squared.sqrt()
+    }
     pub fn reset_state(&mut self) {
         self.graph.reset();
         self.eligibility.fill(0.0);

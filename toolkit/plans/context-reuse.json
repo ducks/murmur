@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "id": "context-reuse-coordinator-example",
+  "question": "Does the two-slot mixture retain the previously seen B rule better than a single memory without a large stationary-stream penalty?",
+  "hypothesis": "Two fixed memory slots with unlabeled posterior routing retain B after A returns, while remaining close to the single model on stationary streams.",
+  "falsification": "The paired B-probe gain is below 0.10, fewer than 60 percent of seeds improve, or stationary online accuracy falls more than two percentage points.",
+  "adapter": "unlabeled_context",
+  "development_config": "toolkit/configs/coordinator/dev.cfg",
+  "evaluation_config": "toolkit/configs/coordinator/evaluation.cfg",
+  "comparison": {
+    "candidate": "mixture",
+    "baseline": "single",
+    "required_models": ["single", "mixture", "known_filter", "oracle"],
+    "metric": "accuracy",
+    "regime": "aba",
+    "noise": "0.25",
+    "checkpoint": "3",
+    "probe_rule": "1"
+  },
+  "criteria": {
+    "min_mean_difference": 0.10,
+    "min_paired_win_fraction": 0.60,
+    "max_stationary_accuracy_drop": 0.02
+  },
+  "budget": {
+    "max_seeds_per_split": 20,
+    "max_logical_transitions_per_split": 1200000,
+    "max_wall_seconds": 120
+  }
+}

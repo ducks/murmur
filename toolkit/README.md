@@ -216,3 +216,23 @@ nix-shell --run 'python3 toolkit/scripts/continual_rule_change_summary.py toolki
 nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin unlabeled_context -- toolkit/configs/unlabeled-context/test.cfg toolkit/runs/my-unlabeled-run'
 nix-shell --run 'python3 toolkit/scripts/unlabeled_context_summary.py toolkit/runs/my-unlabeled-run/probes.csv toolkit/runs/my-unlabeled-run/windows.csv toolkit/runs/my-unlabeled-run/slots.csv'
 ```
+
+## Manifest-driven coordinator
+
+The local coordinator is the first slice of an agent-facing research workflow. It freezes a JSON plan and separate development/evaluation configs; checks required models, comparison fields, seed-role separation, budgets and source fingerprint; runs the registered Rust adapter offline; validates complete paired evidence; and reports whether the **declared operational criteria** were met. It currently registers only `unlabeled_context`. It does not generate hypotheses or modify code itself: an agent can use `next` to decide whether to run development, run evaluation, revise the plan, inspect a failure, or review completed evidence.
+
+```sh
+nix-shell --run 'python3 -B -m unittest discover -s toolkit/coordinator/tests -v'
+nix-shell --run 'python3 -B -m toolkit.coordinator.runner prepare toolkit/plans/context-reuse.json toolkit/runs/my-coordinated-study'
+nix-shell --run 'python3 -B -m toolkit.coordinator.runner next toolkit/runs/my-coordinated-study'
+nix-shell --run 'python3 -B -m toolkit.coordinator.runner run toolkit/runs/my-coordinated-study development'
+nix-shell --run 'python3 -B -m toolkit.coordinator.runner next toolkit/runs/my-coordinated-study'
+# If development criteria are met:
+nix-shell --run 'python3 -B -m toolkit.coordinator.runner run toolkit/runs/my-coordinated-study evaluation'
+```
+
+The output directory must be new and, if inside the repository, Git-ignored. Preparation copies and hashes the manifest and configs, captures Git HEAD, working-tree status, a hash of tracked/non-ignored source, tool versions and Nix environment. Running rechecks the source and frozen files before and after execution. Each stage preserves stdout/stderr, status, a machine-readable decision and the original adapter evidence; completed stage files are hashed and checked when the workflow resumes. Changed source requires preparing a new plan; failed or interrupted stage directories are retained and never overwritten.
+
+The lock and local artifacts can be edited by anyone with filesystem access; they are not tamper-proof. The evaluation config is visible from preparation onward, and nothing prevents a researcher or agent from inspecting it or repeatedly designing new plans around prior results. Seed separation and frozen criteria are safeguards, not holdout secrecy, preregistration, statistical significance, or scientific correctness. The example tests an already-known model comparison, rather than discovering a new model. Logical-transition and wall-time limits are declared resource safeguards, not peak-memory measurements or fair-compute matching. Nixpkgs is not pinned. Source status is recorded, but dirty source content is fingerprinted rather than archived; commit code before preparing a study if a reconstructible revision is needed.
+
+An agent using this workflow should write the scientific plan first, keep development results and failed runs, avoid altering the frozen plan, and treat `criteria_met` as a prompt to inspect evidence rather than a claim of success. If criteria fail, document the result and prepare a new plan with fresh evaluation seeds when a new hypothesis is ready. See [EXPERIMENTS.md](../EXPERIMENTS.md) for the underlying adapter's design and limitations.

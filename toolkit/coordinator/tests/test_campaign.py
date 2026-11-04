@@ -1,5 +1,7 @@
 import json
+import os
 from pathlib import Path
+import subprocess
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -67,5 +69,64 @@ class CampaignTests(unittest.TestCase):
             path=Path(tmp);(path/'.running.lock').mkdir()
             with self.assertRaisesRegex(runner.PlanError,'locked'):
                 campaign.run(path)
+
+    def test_cache_is_shared_owned_and_does_not_change_parent_environment(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = {'campaign_id': 'test'}
+            previous = os.environ.get('CARGO_TARGET_DIR')
+            first = campaign.build_environment(root, config)
+            second = campaign.build_environment(root, config)
+            self.assertEqual(first['CARGO_TARGET_DIR'], second['CARGO_TARGET_DIR'])
+            self.assertEqual(os.environ.get('CARGO_TARGET_DIR'), previous)
+            with self.assertRaisesRegex(runner.PlanError, 'not owned'):
+                campaign.build_environment(root, {'campaign_id': 'other'})
+            args = campaign.agent_command({'local_provider': None, 'model': None}, root / 'worktree', root / 'idea-001' / 'idea.json', root / 'schema.json')
+            self.assertEqual(args[args.index('--add-dir') + 1], str(root / 'build-cache'))
+
+    def test_cleanup_preserves_changes_and_only_removes_completed_worktree(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            repo = root / 'repo'; repo.mkdir()
+            def git(*args):
+                return subprocess.run(['git', *args], cwd=repo, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode().strip()
+            git('init'); git('config', 'user.name', 'Test'); git('config', 'user.email', 'test@example.com')
+            (repo / '.gitignore').write_text('/target\n/private\n')
+            (repo / 'source').write_text('model\n')
+            git('add', '.'); git('commit', '-m', 'candidate')
+            commit = git('rev-parse', 'HEAD')
+            directory = root / 'campaign'; directory.mkdir()
+            round_dir = directory / 'idea-001'; round_dir.mkdir()
+            worktree = round_dir / 'worktree'
+            branch = 'toolkit/campaign-test-001'
+            git('worktree', 'add', '-b', branch, str(worktree))
+            result = {'status': 'complete', 'commit': commit, 'branch': branch, 'evaluation': None}
+            runner.write_json(round_dir / 'result.json', result)
+            study = round_dir / 'study'; stage = study / 'development'; stage.mkdir(parents=True)
+            runner.write_json(stage / 'report.json', {'outcome': 'criteria_not_met'})
+            runner.write_json(stage / 'status.json', {'state': 'complete', 'outcome': 'criteria_not_met', 'artifacts_sha256': runner.stage_hashes(stage)})
+            item = {'index': 1, 'status': 'complete', 'commit': commit}
+            config = {'campaign_id': 'test', 'max_ideas': 1}
+            state = {'status': 'ready', 'completed': [item]}
+            campaign.build_environment(directory, config)
+            with patch.object(runner, 'ROOT', repo):
+                (stage / 'report.json').write_text('{}')
+                self.assertEqual(campaign.cleanup_completed(directory, config, state)['rounds'][0]['status'], 'retained')
+                runner.write_json(stage / 'report.json', {'outcome': 'criteria_not_met'})
+                (worktree / 'private').write_text('keep')
+                self.assertEqual(campaign.cleanup_completed(directory, config, state)['rounds'][0]['status'], 'retained')
+                self.assertTrue((directory / 'build-cache').exists())
+                (worktree / 'private').unlink()
+                (worktree / 'source').write_text('unsaved')
+                self.assertEqual(campaign.cleanup_completed(directory, config, state)['rounds'][0]['status'], 'retained')
+                git('-C', str(worktree), 'checkout', '--', 'source')
+                (worktree / 'target').mkdir()
+                (worktree / 'target' / 'build').write_text('generated')
+                outcome = campaign.cleanup_completed(directory, config, state)
+            self.assertEqual(outcome['rounds'][0]['status'], 'removed')
+            self.assertEqual(outcome['cache'], 'removed')
+            self.assertFalse(worktree.exists())
+            self.assertEqual(git('rev-parse', branch), commit)
+            self.assertTrue((stage / 'report.json').exists())
 
 if __name__=='__main__':unittest.main()

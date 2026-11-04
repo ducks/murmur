@@ -245,6 +245,12 @@ For a quick integration smoke check of both stages, `toolkit/plans/coordinator-s
 
 The first autonomous campaign lets Codex propose, implement, test and evaluate its own model candidates against the existing hidden-context controls. It is bounded by a maximum number of ideas and per-agent/test wall times. Each idea gets an isolated Git worktree and branch, an agent transcript, a proposed hypothesis and falsification, independent deterministic development/evaluation seeds, tests, a versioned candidate commit, and a coordinator study. Failed development criteria stop that idea's evaluation; later ideas receive the recorded outcome. A failed agent, test or infrastructure step stops the campaign for inspection rather than discarding its work. Nothing is automatically merged.
 
+Ideas in the same campaign share a campaign-owned Cargo target directory for agent commands, tests, and evaluation. Cargo decides which builds can be reused; different source paths or changes may still require recompilation. A completed round's worktree is removed only when its branch still points to the recorded commit, its sealed evidence is intact, and it contains no changes or unexpected ignored files. The candidate branch, commits, logs, and study remain. The shared build cache is removed when the whole campaign completes; it is kept for paused or failed campaigns. Cleanup decisions are recorded in `cleanup.json`. To inspect a candidate again, check out its recorded branch or commit into a new worktree. To apply the same checks to an older campaign, run:
+
+```sh
+nix-shell --run 'python3 -B -m toolkit.coordinator.campaign cleanup toolkit/runs/my-campaign'
+```
+
 ```sh
 nix-shell --run 'python3 -B -m toolkit.coordinator.campaign init toolkit/runs/my-campaign --max-ideas 3 --agent-seconds 600'
 nix-shell --run 'python3 -B -m toolkit.coordinator.campaign run toolkit/runs/my-campaign'

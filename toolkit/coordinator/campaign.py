@@ -10,6 +10,7 @@ import argparse
 import csv
 import json
 import os
+import shutil
 import signal
 from pathlib import Path
 import subprocess
@@ -151,7 +152,8 @@ def checked_agent_output(path):
 
 def agent_command(config, worktree, response, schema):
     args = ['codex', '-a', 'never', 'exec', '--sandbox', 'workspace-write', '--ephemeral', '--json',
-            '--cd', str(worktree), '--output-schema', str(schema), '--output-last-message', str(response)]
+            '--cd', str(worktree), '--add-dir', str(response.parent.parent / 'build-cache'),
+            '--output-schema', str(schema), '--output-last-message', str(response)]
     if config['local_provider']:
         args += ['--oss', '--local-provider', config['local_provider']]
     if config['model']:
@@ -159,10 +161,10 @@ def agent_command(config, worktree, response, schema):
     return args + ['-']
 
 
-def bounded_process(args, *, cwd, stdout, stderr, timeout, input_bytes=None):
+def bounded_process(args, *, cwd, stdout, stderr, timeout, input_bytes=None, env=None):
     """Stop the process group on timeout; preserve logs for inspection."""
     proc = subprocess.Popen(args, cwd=cwd, stdin=subprocess.PIPE if input_bytes is not None else None,
-                            stdout=stdout, stderr=stderr, start_new_session=True)
+                            stdout=stdout, stderr=stderr, start_new_session=True, env=env)
     try:
         proc.communicate(input=input_bytes, timeout=timeout)
     except subprocess.TimeoutExpired:
@@ -182,12 +184,13 @@ def bounded_process(args, *, cwd, stdout, stderr, timeout, input_bytes=None):
 
 
 def call_agent(config, worktree, round_dir, history):
+    env = build_environment(round_dir.parent, config)
     args = agent_command(config, worktree, round_dir / 'idea.json', round_dir.parent / 'agent-output-schema.json')
     (round_dir / 'prompt.txt').write_text(prompt_for(config, history), encoding='utf-8')
     try:
         with (round_dir / 'agent-events.jsonl').open('wb') as stdout, (round_dir / 'agent-stderr.log').open('wb') as stderr:
             result = bounded_process(args, cwd=worktree, input_bytes=(round_dir / 'prompt.txt').read_bytes(), stdout=stdout,
-                                     stderr=stderr, timeout=config['agent_seconds'])
+                                     stderr=stderr, timeout=config['agent_seconds'], env=env)
     except (OSError, subprocess.TimeoutExpired) as exc:
         raise runner.PlanError(f'coding agent could not complete: {exc}') from exc
     if result != 0:
@@ -239,6 +242,91 @@ def verify_agent_changes(worktree, base):
         raise runner.PlanError('candidate test file contains no Rust test')
 
 
+def build_environment(directory, config):
+    """Use a campaign-owned target directory, without changing the caller's environment."""
+    cache = directory / 'build-cache'
+    marker = cache / '.murmur-campaign'
+    if not cache.exists() and not cache.is_symlink():
+        cache.mkdir()
+        marker.write_text(config['campaign_id'], encoding='utf-8')
+    if cache.is_symlink() or not marker.is_file() or marker.is_symlink() or marker.read_text(encoding='utf-8') != config['campaign_id']:
+        raise runner.PlanError(f'build cache is not owned by this campaign: {cache}')
+    return {**os.environ, 'CARGO_TARGET_DIR': str(cache.resolve())}
+
+
+def cleanup_round(directory, config, item):
+    """Remove only a clean completed worktree whose branch and sealed evidence survive."""
+    index = item['index']
+    round_dir = directory / f'idea-{index:03d}'
+    worktree = round_dir / 'worktree'
+    result = runner.read_json(round_dir / 'result.json')
+    expected_branch = f"toolkit/campaign-{config['campaign_id']}-{index:03d}"
+    if (item.get('status') != 'complete' or result.get('status') != 'complete'
+            or result.get('commit') != item.get('commit') or result.get('branch') != expected_branch):
+        raise runner.PlanError('round metadata does not identify a completed candidate')
+    if git(runner.ROOT, 'rev-parse', '--verify', f'refs/heads/{expected_branch}') != item['commit']:
+        raise runner.PlanError('candidate branch no longer points to the recorded commit')
+    study = round_dir / 'study'
+    if runner.stage_state(study, 'development') != 'complete':
+        raise runner.PlanError('development evidence is incomplete')
+    evaluation = runner.stage_state(study, 'evaluation')
+    if evaluation != ('complete' if result.get('evaluation') is not None else 'pending'):
+        raise runner.PlanError('evaluation evidence does not match the recorded result')
+    if not worktree.exists() and not worktree.is_symlink():
+        return {'index': index, 'status': 'already_absent'}
+    if worktree.is_symlink() or git(worktree, 'rev-parse', 'HEAD') != item['commit']:
+        raise runner.PlanError('worktree is symlinked or its commit changed')
+    if git(worktree, 'status', '--porcelain=v1', '--untracked-files=all'):
+        raise runner.PlanError('worktree contains uncommitted or untracked files')
+    raw = subprocess.run(['git', 'status', '--porcelain=v1', '-z', '--ignored=matching', '--untracked-files=normal'],
+                         cwd=worktree, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True).stdout
+    ignored = [os.fsdecode(entry[3:]) for entry in raw.split(b'\0') if entry]
+    if any(path not in ('target/', 'toolkit/target/') for path in ignored):
+        raise runner.PlanError(f'worktree contains other ignored files: {ignored}')
+    git(runner.ROOT, 'worktree', 'remove', str(worktree))
+    return {'index': index, 'status': 'removed'}
+
+
+def cleanup_completed(directory, config, state):
+    results = []
+    for item in state.get('completed', []):
+        if item.get('status') != 'complete':
+            continue
+        try:
+            outcome = cleanup_round(directory, config, item)
+        except (runner.PlanError, OSError, subprocess.SubprocessError) as exc:
+            outcome = {'index': item.get('index'), 'status': 'retained', 'reason': str(exc)}
+        results.append(outcome)
+    cache_status = 'retained'
+    cache = directory / 'build-cache'
+    if state.get('status') == 'ready' and len(state.get('completed', [])) >= config['max_ideas'] and all(x['status'] != 'retained' for x in results):
+        if not cache.exists() and not cache.is_symlink():
+            cache_status = 'absent'
+        else:
+            try:
+                build_environment(directory, config)  # verifies the ownership marker and symlinks
+                shutil.rmtree(cache)
+                cache_status = 'removed'
+            except (runner.PlanError, OSError) as exc:
+                cache_status = f'retained: {exc}'
+    outcome = {'rounds': results, 'cache': cache_status}
+    runner.write_json(directory / 'cleanup.json', outcome)
+    return outcome
+
+
+def cleanup(directory):
+    directory = Path(directory).resolve()
+    lock = directory / '.running.lock'
+    try:
+        lock.mkdir()
+    except OSError as exc:
+        raise runner.PlanError(f'campaign is locked or unavailable; inspect {lock}: {exc}') from exc
+    try:
+        return cleanup_completed(directory, runner.read_json(directory / 'campaign.json'), runner.read_json(directory / 'state.json'))
+    finally:
+        lock.rmdir()
+
+
 def execute_round(directory, config, state, agent=call_agent):
     index = state['next_index']
     round_dir = directory / f'idea-{index:03d}'
@@ -269,7 +357,8 @@ def execute_round(directory, config, state, agent=call_agent):
         with (round_dir / 'tests.log').open('wb') as out:
             tests = bounded_process(['cargo', 'test', '--offline', '--manifest-path', 'toolkit/Cargo.toml',
                                      '--test', 'candidate_context', '--test', 'agent_generated'],
-                                    cwd=worktree, stdout=out, stderr=subprocess.STDOUT, timeout=config['test_seconds'])
+                                    cwd=worktree, stdout=out, stderr=subprocess.STDOUT, timeout=config['test_seconds'],
+                                    env=build_environment(directory, config))
         if tests:
             raise runner.PlanError(f'candidate tests failed ({tests}); see tests.log')
         unexpected = changed_paths(worktree) - ALLOWED - GENERATED
@@ -283,7 +372,7 @@ def execute_round(directory, config, state, agent=call_agent):
             for args in (('prepare', 'toolkit/plans/agent-candidate.json', str(study)), ('cycle', str(study))):
                 code = bounded_process([sys.executable, '-B', '-m', 'toolkit.coordinator.runner', *args],
                                        cwd=worktree, stdout=out, stderr=subprocess.STDOUT,
-                                       timeout=config['test_seconds'] + 200)
+                                       timeout=config['test_seconds'] + 200, env=build_environment(directory, config))
                 if code:
                     raise runner.PlanError(f'coordinator {args[0]} failed ({code}); inspect coordinator.log')
         development = runner.read_json(study / 'development/report.json')
@@ -300,6 +389,8 @@ def execute_round(directory, config, state, agent=call_agent):
     state['next_index'] += 1
     state['status'] = 'ready' if result['status'] == 'complete' else 'inspect_failure'
     runner.write_json(directory / 'state.json', state)
+    if result['status'] == 'complete':
+        cleanup_completed(directory, config, state)
     return result
 
 
@@ -347,10 +438,13 @@ def main(argv=None):
     p.add_argument('--test-seconds', type=int, default=180); p.add_argument('--local-provider', choices=('ollama', 'lmstudio'))
     p.add_argument('--model'); p.add_argument('--prior-campaign', help='include prior campaign outcomes in the agent context')
     p = sub.add_parser('run'); p.add_argument('directory'); p.add_argument('--ideas', type=int)
+    p = sub.add_parser('cleanup'); p.add_argument('directory')
     args = parser.parse_args(argv)
     try:
         if args.command == 'init':
             result = init(args.directory, args.goal, args.max_ideas, args.agent_seconds, args.test_seconds, args.local_provider, args.model, args.prior_campaign)
+        elif args.command == 'cleanup':
+            result = cleanup(args.directory)
         else:
             if args.ideas is not None and args.ideas < 1:
                 raise runner.PlanError('--ideas must be positive')

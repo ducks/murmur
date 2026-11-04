@@ -276,3 +276,9 @@ We tried a simpler model with two memory slots. Each slot keeps its own guesses 
 With 10% noise, after seeing A, then B, then A, it scored about 89% on a frozen A test and 88% on a frozen B test. A single-memory model mostly remembered A and scored about 10% on B. At 25% noise, the two-slot model's B score fell to 42% after A returned. Interestingly, when A and B alternated more often, it scored about 72% on B at that same noise level.
 
 So the pivot gives us a clearer lead and a clearer failure. Separate memories plus inferred context can preserve both rules under some conditions, but these slots can still blur together or lose a rule. The next question is why the long, noisy phases are harder. We haven't implemented growing memories here, and this result doesn't show the original graph learned to organize itself.
+
+## An experiment coordinator
+
+The toolkit now has a small coordinator that can freeze an experiment plan, check separate seed groups and required controls, run a registered experiment, and compare the result with criteria written in advance. It records a source fingerprint, configurations, logs and machine-readable reports. An agent can ask it what to do next, but the coordinator does not invent or implement research ideas by itself.
+
+In its first real run, the candidate met the average improvement threshold but won on only four of ten development seeds. The declared requirement was six, so the coordinator stopped and left the evaluation stage unused. That's the kind of result we want the workflow to preserve, even when the average looks promising. The evaluation files are still visible to an agent, so this is a separation check, not a truly blind holdout.

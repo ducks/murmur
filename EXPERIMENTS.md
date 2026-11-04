@@ -862,3 +862,60 @@ For source 4 and target 12, true-label pretraining beat initial, random-label an
 Mean absolute graph drift for true-label pretraining was 0.2003 at source 4 and 0.1057 at source 8; the random-label control drifted about 0.0228 for either. The unequal changes prevent attributing results solely to the label *content* rather than its effect on weight-update magnitude or trajectory. At source 8, the fixed 2× graph exceeded the true-pretrained graph on average for targets 8 and 12, underscoring that the learned graph is not universally superior even here. The observed cross-delay benefit supports reusable temporal features within this bit-recall family; it does not establish continual-learning retention, robustness to distribution shifts, novel grammar generalization, or a language model.
 
 Run directories record the config, protocol, per-symbol predictions, per-seed metrics, graph edge weights and strength/clip diagnostics. Outputs are ignored by Git, do not contain restartable input weights/readers, and do not record source/Nix revisions, runtime or peak memory.
+
+## Transfer to pattern detection
+
+This experiment asks whether a graph shaped by reader-only feedback on four-step bit recall helps on a different sequence objective: after seeing the current bit, predict whether the last three bits are exactly `101`. Every window after the first two is scored, including overlapping windows. Independent fair bits make positives occur about one eighth of the time. Accuracy alone is therefore misleading; report confusion counts, positive recall, specificity, balanced accuracy and F1 as well. The exact-pattern reference keeps the last three bits and applies the known rule; the always-negative reference always predicts no match. Both use task-specific knowledge and are not resource-matched.
+
+The graph is pretrained on the earlier four-step recall task using 6,000 bits, then frozen. A fresh logistic reader is trained online on `101` labels from a separately seeded 6,000-bit stream, and tested on another 2,000-bit stream after clearing state; the graph and reader are frozen in evaluation. Compare the original graph, the true-label-pretrained graph, a graph pretrained while its reader received separately seeded random labels, the initial graph scaled to match true-pretrained mean absolute weight, and the initial graph with weights scaled 2×. Each graph has its own reader and sees the same pattern-training and evaluation inputs. Pretrained graphs use additional training and compute. The two output logits learn independently; classification chooses the higher of the two output scores. No threshold tuning, positive weighting, or repeated examples were used in this first test.
+
+Development seeds 3791001–3791010 and test seeds 3991001–3991030 use graph `s`, graph pretraining stream `s+31000`, evaluation `s+32000`, feedback signs `s+33000`, random-label control `s+34000`, and pattern-reader training `s+37000`, wrapping `u64`. Streams are deterministically seeded and seed-role collisions are checked; this is not a proof of statistical independence. The task and settings were fixed before running development and test, though the broader research was exploratory and not preregistered.
+
+```sh
+nix-shell --run 'cargo test --manifest-path toolkit/Cargo.toml --test pattern_recognition && cargo build --release --manifest-path toolkit/Cargo.toml --bin pattern_recognition'
+nix-shell --run 'for group in dev test; do toolkit/target/release/pattern_recognition "toolkit/configs/pattern-recognition/$group.cfg" "toolkit/runs/pattern-$group-example"; done'
+nix-shell --run 'python3 toolkit/scripts/pattern_summary.py original toolkit/runs/pattern-test-example/metrics.csv'
+```
+
+Pooled results across 30 held-out seeds:
+
+| Model | Accuracy | Recall | Specificity | Balanced accuracy | F1 |
+|---|---:|---:|---:|---:|---:|
+| Initial graph | 0.8598 | 0.0000 | 0.9820 | 0.4910 | 0.0000 |
+| True-label-pretrained graph | 0.8585 | 0.0007 | 0.9805 | 0.4906 | 0.0012 |
+| Random-label-pretrained graph | 0.8588 | 0.0000 | 0.9808 | 0.4904 | 0.0000 |
+| Strength-matched initial graph | 0.8600 | 0.0000 | 0.9823 | 0.4911 | 0.0000 |
+| Fixed 2× graph | 0.8600 | 0.0000 | 0.9823 | 0.4911 | 0.0000 |
+| Always negative | 0.8755 | 0.0000 | 1.0000 | 0.5000 | 0.0000 |
+| Exact pattern detector | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+
+The graph readers failed to detect almost all positives under this training protocol; the always-negative baseline had higher accuracy. The development run had 0.0505 true-pretrained recall, but this did not replicate on the first held-out group. This is a negative result for the original reader setup, not proof that the graph states contain no pattern information.
+
+### Follow-up: rare-class training
+
+After observing the failed result, we ran a separate, exploratory intervention on fresh seed groups: keep the same binary task and graph pretraining but repeat each positive reader update seven consecutive times (negative windows receive one update). The reader's weights change between repeats, so this is sequential replay, not exactly a single gradient multiplied by seven. Compare that schedule with one update per window for the true-pretrained and initial graphs. Add a reader with the same two-output logistic rule given the three actual observed bits directly, trained under both schedules. The direct-history model has only 8 reader weights and an explicit buffer of three bits; graph readers have 258 reader weights and 128 state units plus 512 edges, so they are not matched in memory or compute. The direct model is an important task-specific baseline, not a general model.
+
+The follow-up was chosen after inspecting the first test and is not a confirmation of its original protocol. New development seeds 4191001–4191010 and test seeds 4391001–4391030 use the same seed offsets and disjoint groups. The seven-update choice was fixed before running these new groups; no threshold tuning was performed. Graph-pretraining, reader-training and test streams are distinct in the same way as above.
+
+```sh
+nix-shell --run 'cargo test --manifest-path toolkit/Cargo.toml --test pattern_reweight && cargo build --release --manifest-path toolkit/Cargo.toml --bin pattern_reweight'
+nix-shell --run 'for group in dev test; do toolkit/target/release/pattern_reweight "toolkit/configs/pattern-reweight/$group.cfg" "toolkit/runs/reweight-$group-example"; done'
+nix-shell --run 'python3 toolkit/scripts/pattern_summary.py reweight toolkit/runs/reweight-test-example/metrics.csv'
+```
+
+Pooled follow-up accuracy over 30 new held-out seeds:
+
+| Model | Accuracy | Recall | Specificity | Balanced accuracy | F1 |
+|---|---:|---:|---:|---:|---:|
+| Initial graph, one update | 0.8338 | 0.0000 | 0.9528 | 0.4764 | 0.0000 |
+| Pretrained graph, one update | 0.8491 | 0.0304 | 0.9659 | 0.4982 | 0.0480 |
+| Initial graph, seven positive updates | 0.6285 | 0.6537 | 0.6249 | 0.6393 | 0.3054 |
+| Pretrained graph, seven positive updates | 0.6737 | 0.6771 | 0.6732 | 0.6751 | 0.3414 |
+| Direct three-bit reader, one update | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| Direct three-bit reader, seven positive updates | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| Always negative | 0.8751 | 0.0000 | 1.0000 | 0.5000 | 0.0000 |
+| Exact pattern detector | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+
+Extra positive updates let the graph readers detect many matches, with substantial false positives. On balanced accuracy, the true-pretrained graph beat the initial graph in 18/30 paired seeds (two ties) under the seven-update schedule; mean per-seed advantage 0.03608, descriptive 10,000-resample seed bootstrap 95% interval [0.00336, 0.06805]. F1 advantage was 0.03731 [0.00669, 0.06800], 18 wins, seven losses and five ties. These are exploratory comparisons after a failed initial protocol; intervals describe seed variation and do not make individual, overlapping windows independent. The new schedule uses more training updates and changes the recall/false-positive tradeoff. The direct-history reader's perfect result shows a simple supervised model solves this task with access to the last three bits. The result does not demonstrate language generalization, meaningful semantic representations, or a competitive pattern detector.
+
+Both runners log resolved config, protocol, per-seed confusion metrics and per-window predictions; the first also logs graph weights and strength diagnostics. These ignored outputs are not restartable checkpoints; source/Nix revisions, runtime and peak memory are not recorded.

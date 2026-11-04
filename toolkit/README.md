@@ -188,3 +188,13 @@ nix-shell --run 'python3 toolkit/scripts/reader_signal_summary.py toolkit/runs/m
 nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin reader_transfer -- toolkit/configs/reader-transfer/test.cfg toolkit/runs/my-transfer-run'
 nix-shell --run 'python3 toolkit/scripts/reader_transfer_summary.py toolkit/runs/my-transfer-run/metrics.csv'
 ```
+
+## Pattern detection transfer
+
+`pattern_recognition` tests graphs pretrained on delayed recall with a new `101` detection reader, recording confusion metrics and exact/majority controls. `pattern_reweight` follows up with seven sequential positive reader updates and a direct three-bit reader; this follow-up was selected after the original protocol failed. See [EXPERIMENTS.md](../EXPERIMENTS.md).
+
+```sh
+nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin pattern_recognition -- toolkit/configs/pattern-recognition/test.cfg toolkit/runs/my-pattern-run'
+nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin pattern_reweight -- toolkit/configs/pattern-reweight/test.cfg toolkit/runs/my-reweight-run'
+nix-shell --run 'python3 toolkit/scripts/pattern_summary.py reweight toolkit/runs/my-reweight-run/metrics.csv'
+```

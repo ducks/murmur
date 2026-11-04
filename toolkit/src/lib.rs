@@ -420,3 +420,7 @@ pub mod centered_feedback;
 pub mod reader_signal;
 
 pub mod reader_transfer;
+
+pub mod pattern_recognition;
+
+pub mod pattern_reweight;

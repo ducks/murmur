@@ -254,3 +254,9 @@ This is a cleaner lead: a supervised reader can send a simple signal back into t
 We trained the graph using feedback from a reader learning to remember four bits back. Then we froze the graph and trained a brand-new reader, on a different stream, to remember twelve bits back. That reader scored 57.2%, compared with 50.2% on the original graph. The trained graph beat a version matched for average connection strength and a graph trained with random answers in all 20 paired test runs.
 
 That suggests the graph acquired a useful memory representation that a different reader can use. The new reader was explicitly taught the twelve-step task, so this isn't a zero-shot ability. The result also depends on the setup: a simple fixed graph with stronger connections beat one of our other trained graphs, and a purpose-built buffer remains perfect.
+
+## Can it spot a pattern?
+
+We asked the graph to say when the latest three bits are `101`. On the first test it almost never recognized a match. Saying “no” every time actually had better overall accuracy, because most windows aren't `101`. That is why we also measure **recall**—the fraction of real matches found—and **balanced accuracy**, which gives matches and non-matches equal weight.
+
+We then tried teaching the reader more often when it saw a match. On fresh test streams, the pretrained graph found about 68% of matches, but also raised many false alarms. Its balanced accuracy was 67.5%, compared with 63.9% for the original graph trained the same way. A simple reader that could see the last three bits directly got every answer right. So the graph shows a modest benefit under this second training setup, but it is still a poor way to solve this small task. The second setup was chosen after we saw the first one fail.

@@ -270,7 +270,7 @@ A possible longer-term direction for volunteer compute, and the additional verif
 
 ### Automated prior and adaptation comparison
 
-Run the fixed matched-seed prior ablation and write per-seed metrics, 100-step online windows, aggregate summaries, configuration, and a source-hash manifest with one command:
+Run the fixed matched-seed prior ablation and write per-seed metrics, 100-step online windows, aggregate summaries, a readable report, configuration, and a source-hash manifest with one command:
 
 ```sh
 nix-shell --run 'python3 toolkit/scripts/run_candidate_ablation.py toolkit/configs/candidate-ablation/matched.cfg toolkit/runs/prior-ablation'

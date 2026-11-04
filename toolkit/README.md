@@ -207,3 +207,12 @@ nix-shell --run 'python3 toolkit/scripts/pattern_summary.py reweight toolkit/run
 nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin continual_rule_change -- toolkit/configs/continual-rule-change/test.cfg toolkit/runs/my-continual-run'
 nix-shell --run 'python3 toolkit/scripts/continual_rule_change_summary.py toolkit/runs/my-continual-run/probes.csv toolkit/runs/my-continual-run/windows.csv toolkit/runs/my-continual-run/training_tail_probes.csv'
 ```
+
+## Unlabeled context reuse
+
+`unlabeled_context` compares a fixed two-slot online hidden-state mixture with a single recency Markov model, a known-rule filter and a labelled-context oracle across stationary, A–B–A, and regularly switching streams at two noise levels. It logs prior/posterior beliefs, slot snapshots, frozen probes and online log loss. See [EXPERIMENTS.md](../EXPERIMENTS.md) for additional baseline knowledge and limitations.
+
+```sh
+nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin unlabeled_context -- toolkit/configs/unlabeled-context/test.cfg toolkit/runs/my-unlabeled-run'
+nix-shell --run 'python3 toolkit/scripts/unlabeled_context_summary.py toolkit/runs/my-unlabeled-run/probes.csv toolkit/runs/my-unlabeled-run/windows.csv toolkit/runs/my-unlabeled-run/slots.csv'
+```

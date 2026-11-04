@@ -268,3 +268,11 @@ We trained on rule A, where the next bit usually repeats, then rule B, where it 
 After learning B, both graphs performed poorly on A: the fixed graph scored 18.5% and the feedback-trained graph 19.0%. The feedback graph had also scored lower on A before the switch, so that small difference is not a convincing retention advantage. A simple Markov model adapted and forgot too. A version given the correct rule label kept separate memories and retained both, but it had information the other models didn't.
 
 The graphs sometimes looked better during online training than in the frozen tests. Replaying part of the training stream with the final weights gave similar results to the independent frozen test, so the particular test stream doesn't appear to explain that gap. Continued reader updates may help, but we haven't isolated the cause. This experiment is a reason to rethink the current learning rule or how the model handles context, rather than claim we solved continual learning.
+
+## Pivot: can separate memories infer the rule?
+
+We tried a simpler model with two memory slots. Each slot keeps its own guesses about the next bit. The model watches the stream and maintains a probability for which slot fits, without being told whether rule A or B is active. It updates both slots in proportion to how likely they were responsible. This is a familiar hidden-state model, and we give it two slots from the beginning.
+
+With 10% noise, after seeing A, then B, then A, it scored about 89% on a frozen A test and 88% on a frozen B test. A single-memory model mostly remembered A and scored about 10% on B. At 25% noise, the two-slot model's B score fell to 42% after A returned. Interestingly, when A and B alternated more often, it scored about 72% on B at that same noise level.
+
+So the pivot gives us a clearer lead and a clearer failure. Separate memories plus inferred context can preserve both rules under some conditions, but these slots can still blur together or lose a rule. The next question is why the long, noisy phases are harder. We haven't implemented growing memories here, and this result doesn't show the original graph learned to organize itself.

@@ -954,3 +954,46 @@ Online windows show a different aspect of adaptation. During the first 200 trans
 **Post-hoc probe diagnostic.** The final online A-window accuracy looked better than frozen A-probe accuracy, so after observing the original test we added a frozen replay of the last 2,000 training transitions at each checkpoint and reran the same seeds. For example, after A, fixed graph scored 0.7570 on the frozen training tail and 0.7578 on the independent A probe; feedback scored 0.6841 and 0.6846. That makes a difference between the two streams an unlikely explanation for this gap in these runs; continuing online updates or other dynamics may matter, but this intervention does not isolate the cause. The replay is in-sample and is not a new held-out result.
 
 `predictions.csv` records online guesses, `windows.csv` summarizes 200-step windows, `probes.csv` records frozen probe results, `training_tail_probes.csv` records the post-hoc replay, and `weights.csv` saves edge weights at checkpoints. Output is ignored by Git and is not a restartable checkpoint; source/Nix revisions, runtime and peak memory are not recorded.
+
+## Pivot: unlabeled context reuse
+
+The previous graph feedback rule did not retain rule A after training on B. This experiment pivots to an established hidden-state mixture of transition models, to measure how much context inference and separated memories can do before designing a graph mechanism. It is **not** a new architecture, a graph experiment, a growth mechanism, or proof of self-organized units. It uses two fixed memory slots from the start, a fixed switch hazard and global Bayesian responsibilities.
+
+For each input bit, each slot has a learned probability of the next bit being 1. Before the next bit arrives, the model mixes the slots according to their current inferred context probabilities, adjusted by a fixed 0.01 switching hazard. After seeing the bit, it updates the context probabilities and changes each slot's relevant row in proportion to its posterior responsibility (rate 0.05, probabilities clipped to [0.001, 0.999]). The two tables are independently initialized from seeded random values in [0.2, 0.8), breaking symmetry without supplying rule labels. The model receives the input and target symbols, not the true context. Predictions and log loss use the prior before the target; logs also record the posterior after observation.
+
+Each model sees a continuous 3,000-transition stream. A normally repeats the current bit and B normally flips it; independent per-transition noise flips the intended outcome with probability 0.10 or 0.25. Test three regimes: A–B–A with 1,000 transitions per phase; stationary A; and switches between A and B every 200 transitions. The mixture is not told block boundaries or reset between phases. Compare a single recency Markov model; the two-slot mixture; a **known-rule filter** that gets the exact A/B transition probabilities and the correct noise level but not the current context; and an **oracle-context Markov model** that is told the true context and keeps separate learned tables. The two references have additional information. The known-rule filter also uses the same 0.01 hazard, which does not match deterministic switch timing. Models have different parameter and compute costs; the comparison is not budget matched.
+
+After each 1,000 transitions, frozen probes use separate 1,000-transition A and B streams, resetting beliefs to uniform before each probe. Slot probabilities remain frozen while context beliefs update after observed transitions. Thus the mixture can infer context during a probe but cannot use the true rule label; the oracle does receive the label. The same probe streams are reused across checkpoints and conditions for paired comparisons. The stationary B probe is deliberately a counterfactual on an unobserved rule, not a retention test. A second B memory in this fixed-capacity model is not a growth event, and slot disagreement is not a calibrated false-alarm metric.
+
+Development seeds 4991001–4991010 and test seeds 5191001–5191030 use `s+40000` for training stream, `s+46000` for A probe, `s+48000` for B probe and `s+51000` for initial slot weights; `s` is reserved as a seed role, all offsets wrap `u64`. Seed-role collisions are rejected and tests check role separation between supplied configs. Conditions share corresponding seeds and random draws; different deterministic seeds do not prove statistical independence. The settings were held fixed between development and test but are exploratory and not preregistered.
+
+```sh
+nix-shell --run 'cargo test --manifest-path toolkit/Cargo.toml --test unlabeled_context && cargo build --release --manifest-path toolkit/Cargo.toml --bin unlabeled_context'
+nix-shell --run 'for group in dev test; do toolkit/target/release/unlabeled_context "toolkit/configs/unlabeled-context/$group.cfg" "toolkit/runs/unlabeled-$group-example"; done'
+nix-shell --run 'python3 toolkit/scripts/unlabeled_context_summary.py toolkit/runs/unlabeled-test-example/probes.csv toolkit/runs/unlabeled-test-example/windows.csv toolkit/runs/unlabeled-test-example/slots.csv'
+```
+
+Pooled frozen-probe accuracy after all three phases, 30 held-out seeds:
+
+| Training regime | Noise | Probe | Single Markov | Unlabeled two-slot | Known-rule filter | Context oracle |
+|---|---:|---|---:|---:|---:|---:|
+| A–B–A | 10% | A | 0.8997 | 0.8916 | 0.8893 | 0.8997 |
+| A–B–A | 10% | B | 0.1046 | 0.8778 | 0.8849 | 0.8954 |
+| A–B–A | 25% | A | 0.7439 | 0.7383 | 0.7338 | 0.7439 |
+| A–B–A | 25% | B | 0.2535 | 0.4245 | 0.7376 | 0.7465 |
+| Stationary A | 10% | A | 0.8997 | 0.8997 | 0.8893 | 0.8997 |
+| Stationary A | 10% | B, unseen | 0.1046 | 0.1046 | 0.8849 | 0.5005 |
+| Stationary A | 25% | A | 0.7439 | 0.7439 | 0.7338 | 0.7439 |
+| Stationary A | 25% | B, unseen | 0.2535 | 0.2535 | 0.7376 | 0.5003 |
+| Switching every 200 | 10% | A | 0.8997 | 0.8922 | 0.8893 | 0.8997 |
+| Switching every 200 | 10% | B | 0.1046 | 0.8891 | 0.8849 | 0.8954 |
+| Switching every 200 | 25% | A | 0.7439 | 0.7289 | 0.7338 | 0.7439 |
+| Switching every 200 | 25% | B | 0.2535 | 0.7191 | 0.7376 | 0.7465 |
+
+On A–B–A with 10% noise, final frozen B recall exceeded 0.65 in 29/30 two-slot seeds (the threshold is a post-hoc descriptive count). It was near the known-rule filter's mean, while the single model mostly predicted the last A rule. At 25% noise, it exceeded 0.65 in only 4/30 seeds. Mean B-probe accuracy was 0.7461 immediately after B training but fell to 0.4245 after A returned. Mean per-seed absolute difference between the two slot transition-probability rows was 0.0534 after the first noisy A phase, 0.1344 after B, and 0.2401 after A returned. These diagnostics are consistent with the slots becoming similar early and later learning an imperfect separation, but they do not establish the cause of lost B recall. More frequent 200-step alternation at the same noise produced 0.7191 final B accuracy; the mean slot difference was 0.4459. Under stationary A, mean final slot differences were 0.015 at 10% noise and 0.004 at 25%, and both slots predicted the seen rule; no B rule was demonstrated to be learned. These fixed slots should not be mistaken for correct model selection or calibrated detection of a new context.
+
+Online prediction tells a different story from a final counterfactual probe. At 10% noise in the 200-step-switching regime, single and mixture mean online accuracy were 0.7961 and 0.8787; mean log loss was 0.4820 and 0.3761. At 25% noise they were 0.6812 and 0.7209 accuracy, with log loss 0.6253 and 0.5990. On the long A–B–A stream, the single model had time to adapt, scoring 0.8840 versus 0.8854 at 10% noise and 0.7392 versus 0.7326 at 25%. These are exploratory comparisons on simple streams and fixed hyperparameters, with no formal significance or compute claim. The reference filter has knowledge of both rules and noise, and the oracle has true context.
+
+The outcome provides a useful baseline for this pivot: explicit hidden-state inference and two preallocated memories can preserve and reuse the low-noise rules without context labels, but can collapse or forget under a noisier long-block schedule. The task does not require local graph computation, structural growth, language generalization or unknown numbers of contexts. A next experiment should study the noisy long-block failure and compare fixed-capacity mixture initialization/learning against a truly independent baseline before adding growth.
+
+Output records per-step prediction probabilities, prior/posterior belief, window accuracy/log loss, frozen probes and slot snapshots. Outputs are ignored by Git, are not restartable checkpoints, and do not record source/Nix revisions, runtime or peak memory.

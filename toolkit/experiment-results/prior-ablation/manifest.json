@@ -1,0 +1,17 @@
+{
+  "config_sha256": "690f567d53dfe4f88078890feb00de6fb7425b9f399a7462902f15d61eb7f5d1",
+  "metrics_sha256": "8c38e65078efeb2c809ffc52559b2c82628669312426bd7ff561687c7435442d",
+  "report_sha256": "9d83f4b10d568ffc573d7048c5ed257198ad271c511ace307586d2fc4756559a",
+  "revision": "a2920396e561b2988ef036b3341eb64cbdf81486",
+  "source_sha256": {
+    "toolkit/scripts/candidate_ablation_report.py": "a55a84ca5c5d8e31bb40af48c0cc79ae4612d90cdd9549f0ccff52f6072020d6",
+    "toolkit/scripts/candidate_transfer_summary.py": "7a53d6c389b905b0de41bc54be17bc0ee98397225ee812c0dd8431c0b2074cfe",
+    "toolkit/scripts/run_candidate_ablation.py": "f8049fa335bb344bdb2fbb4bf177f142c3b40eb48c25cabddcb710df74b5b7f5",
+    "toolkit/src/bin/candidate_ablation.rs": "fafaf7f6f1901ce8996fb44a3083598fccaa4f2cd2644206f3a78eb28b270888",
+    "toolkit/src/candidate_transfer/neutral.rs": "68ad10d16cb4c9e74d32cdf82f478b47fa9e807afe639c196bba47d94d951591",
+    "toolkit/src/candidate_transfer/posterior.rs": "c9efd2ba5bdf433303568f7884584a82b78c9f63fd46fc5aba61596fda1c4308",
+    "toolkit/src/candidate_transfer/predictive.rs": "2e019f579b8c7df05daa920a4cc7e27f9b8cc2a4e2db94d6cd2745ec5e17c7e4"
+  },
+  "summary_sha256": "b1710b9a591020ebc7aed620cdebd802b89f3c96e9fadb0f13da00c1d357db60",
+  "working_tree_dirty": false
+}

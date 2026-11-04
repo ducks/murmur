@@ -111,6 +111,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<_> = env::args().skip(1).collect();
     if args.len()!=2 { return Err("usage: candidate_ablation <config> <new-output-directory>".into()); }
     let c = StreamConfig::parse(&fs::read_to_string(&args[0])?)?;
+    if c.train_tokens < 100 { return Err("train_tokens must be at least 100 for switch windows".into()); }
     execute(&c, Path::new(&args[1]))?;
     Ok(())
 }

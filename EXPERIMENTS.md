@@ -1066,3 +1066,27 @@ python3 toolkit/scripts/candidate_transfer_summary.py toolkit/runs/candidate-tra
 ```
 
 The committed [per-seed metrics](toolkit/experiment-results/candidate-transfer/metrics.csv) and [aggregate summary](toolkit/experiment-results/candidate-transfer/summary.csv) capture the observed run. Candidate snapshots are byte-identical to the recorded commits. The simulation config and rule definitions are versioned; the Nix shell's nixpkgs is not pinned and wall time/memory were not measured.
+
+## Automated neutral-prior and switching-window ablation
+
+A follow-up uses the matched A–B–A protocol and same four rule families as the preceding transfer study, with 30 new configured seeds. The original candidates and baselines see identical streams alongside four ablations. Two start both memory tables at identical neutral `[2,2]` counts. Two start each context/input row with independently seeded `2±offset` counts, offset uniformly selected between -0.4 and 0.4; the row's total remains four, matching the originals. Decay in all four variants targets `[2,2]` rather than the task-informed opposing repeat/flip priors. The posterior and predictive variants retain their respective original update/forgetting rules. This simultaneously removes both initialization and persistent decay priors; it does not isolate those two effects individually. All receive no context label; the oracle alone does.
+
+Selected mean accuracies (30 matched seeds):
+
+| Family / measure | Mixture | Original posterior | Equal neutral posterior | Random neutral posterior | Original predictive | Equal neutral predictive | Random neutral predictive |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Complementary: final frozen B | 0.3963 | 0.7421 | 0.2498 | 0.7445 | 0.7435 | 0.2498 | 0.7447 |
+| Asymmetric: final frozen B | 0.3536 | 0.6848 | 0.3053 | 0.6692 | 0.6844 | 0.3445 | 0.6773 |
+| Constant bias: final frozen B | 0.8733 | 0.8294 | 0.8198 | 0.8236 | 0.8366 | 0.8198 | 0.8573 |
+| Unequal noise: final frozen B | 0.3365 | 0.6880 | 0.3013 | 0.6875 | 0.6882 | 0.3013 | 0.6827 |
+| Complementary: first 100 steps after A → B | 0.5817 | 0.5177 | 0.2390 | 0.2397 | 0.2590 | 0.2390 | 0.2390 |
+
+Equal neutral slots remain exactly equal by construction under these deterministic, symmetric updates; they cannot develop two distinct memories without some symmetry-breaking mechanism. The seeded random initial differences permit different memories and substantially restore final recall on the repeat/flip-like tasks, without explicitly encoding those rules. They also adapt very poorly in the first 100 steps after the complementary switch. Constant bias has different input frequencies and is not explained solely by that final-recall pattern. The windows are descriptive online averages, not causal proof or a general result about symmetry breaking. The random-offset scale is a single design choice, no compute matching or statistical claim was made, and all tasks remain public two-context binary processes.
+
+Run the entire local experiment and generate per-seed metrics, aggregate summaries, switch-window tables, and a provenance manifest with:
+
+```sh
+nix-shell --run 'python3 toolkit/scripts/run_candidate_ablation.py toolkit/configs/candidate-ablation/matched.cfg toolkit/runs/prior-ablation-reproduction'
+```
+
+The [generated report](toolkit/experiment-results/prior-ablation/report.md), [summary](toolkit/experiment-results/prior-ablation/summary.csv), [compressed per-seed metrics](toolkit/experiment-results/prior-ablation/metrics.csv.gz), and [manifest](toolkit/experiment-results/prior-ablation/manifest.json) are versioned. The recorded run was generated from clean commit `a292039`; the metrics matched an earlier independent invocation byte-for-byte. The manifest hashes uncompressed metrics and source/config files, but does not pin nixpkgs or measure time and memory. The runner does not invent experiments or apply a success threshold.

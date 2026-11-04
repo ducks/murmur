@@ -1034,3 +1034,35 @@ nix-shell --run 'python3 -B -m toolkit.coordinator.campaign run toolkit/runs/cac
 ```
 
 The first worktree was removed after its completed round, while the shared Cargo target directory remained at 310 MiB. After the second round, both worktrees and the shared cache were absent; the campaign retained 147 MiB of logs and evidence, and both candidate branches remain. The agent's first Cargo test compiled the workspace in 7.07 seconds and the second in 5.18 seconds, but both logs show workspace crates recompiling from their different worktree paths. This is not a controlled timing comparison or proof of cross-worktree build reuse. The supervisor's subsequent tests finished in 0.02 and 0.03 seconds after the agent's tests in each respective worktree. CLI usage was 357,172 input tokens including 282,624 cached and 3,361 output tokens; categories may overlap, and no cost cap or monetary estimate was applied. Raw artifacts are under the ignored `toolkit/runs/autonomous-cache-check/`.
+
+## Matched candidate transfer and adaptation
+
+This exploratory follow-up compares the two exact source snapshots from `abdeb10` (posterior-routed learning) and `376d4c0` (predictive-belief-gated learning) side by side against the original mixture, single online Markov model, and an oracle Markov model given the true context. All models see identical observations per seed. Every prediction precedes its target; only the oracle sees the context. After A–B–A training with 1,000 transitions per phase, separate A and B probes each use 1,000 new transitions, cloned model parameters, reset context beliefs, and frozen parameter learning; beliefs may update on probe observations. Online accuracy includes learning during each phase. Thirty deterministic seeds were selected before this run; each model sees the same stream and no agent participates or tunes on the result.
+
+The transition pairs below list `P(next=1 | current=0), P(next=1 | current=1)` for A then B. Complementary is the original 25% noise condition; the other three were selected as simple tests of the candidates' opposing repeat/flip priors, not sampled from a distribution of tasks:
+
+- Complementary: A `(0.25, 0.75)`, B `(0.75, 0.25)`.
+- Asymmetric: A `(0.15, 0.70)`, B `(0.65, 0.25)`.
+- Constant bias: A `(0.10, 0.10)`, B `(0.90, 0.90)`.
+- Unequal noise: A `(0.05, 0.90)`, B `(0.70, 0.30)`.
+
+Final frozen B-probe accuracy after A–B–A, mean across the same 30 seeds:
+
+| Family | Single | Mixture | Posterior learning | Predictive gating | Context oracle |
+|---|---:|---:|---:|---:|---:|
+| Complementary | 0.2477 | 0.4630 | 0.7452 | 0.7463 | 0.7523 |
+| Asymmetric | 0.2995 | 0.4177 | 0.6897 | 0.6899 | 0.7005 |
+| Constant bias | 0.0995 | 0.8257 | 0.8213 | 0.8323 | 0.9005 |
+| Unequal noise | 0.2987 | 0.3199 | 0.6905 | 0.6911 | 0.7013 |
+
+Frozen recall alone hides the adaptation cost. Mean online accuracy in the B phase for those same families was respectively 0.7360/0.7272/0.7199/0.6798, 0.6818/0.6704/0.6608/0.6277, 0.8781/0.8708/0.7910/0.7980, and 0.6832/0.6711/0.6742/0.6735 for single/mixture/posterior/predictive. On constant bias, both candidates lost around eight percentage points against the mixture during B, while their final B probes were near it. Predictive gating in particular also lagged the mixture by about 4.7 and 4.3 points during B on complementary and asymmetric streams. These observations describe averages, not a causal explanation of the lag.
+
+On the final B probes, predictive minus posterior mean paired accuracy was +0.0011, +0.00027, +0.01093 and +0.00063 respectively; wins/losses/ties across seeds were 16/4/10, 12/9/9, 18/0/12 and 13/7/10. These exploratory contrasts do not establish statistical significance or that predictive gating is generally superior. The asymmetric and unequal-noise pairs still resemble repeat versus flip, while constant bias is a more substantial departure. All are binary first-order Markov tasks with two fixed contexts and known phase lengths; the candidates still start with task-informed priors and are not compared at matched compute. Future tests should add neutral-prior ablations, more than two contexts, non-Markov structure, and switching-speed curves with matched resources.
+
+```sh
+nix-shell --run 'cargo test --offline --manifest-path toolkit/Cargo.toml --bin candidate_transfer'
+nix-shell --run 'cargo run --offline --release --manifest-path toolkit/Cargo.toml --bin candidate_transfer -- toolkit/configs/candidate-transfer/matched.cfg toolkit/runs/candidate-transfer-reproduction'
+python3 toolkit/scripts/candidate_transfer_summary.py toolkit/runs/candidate-transfer-reproduction/metrics.csv
+```
+
+The committed [per-seed metrics](toolkit/experiment-results/candidate-transfer/metrics.csv) and [aggregate summary](toolkit/experiment-results/candidate-transfer/summary.csv) capture the observed run. Candidate snapshots are byte-identical to the recorded commits. The simulation config and rule definitions are versioned; the Nix shell's nixpkgs is not pinned and wall time/memory were not measured.

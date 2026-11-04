@@ -198,3 +198,12 @@ nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin pa
 nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin pattern_reweight -- toolkit/configs/pattern-reweight/test.cfg toolkit/runs/my-reweight-run'
 nix-shell --run 'python3 toolkit/scripts/pattern_summary.py reweight toolkit/runs/my-reweight-run/metrics.csv'
 ```
+
+## Continual A–B–A rule changes
+
+`continual_rule_change` compares fixed and reader-feedback graphs with recency Markov and oracle-context Markov models as noisy binary transition rules change and return. Frozen probes test retention without updating weights, and 200-step windows show online adaptation. See [EXPERIMENTS.md](../EXPERIMENTS.md) for context asymmetry, reset behavior and post-hoc training-tail probes.
+
+```sh
+nix-shell --run 'cargo run --release --manifest-path toolkit/Cargo.toml --bin continual_rule_change -- toolkit/configs/continual-rule-change/test.cfg toolkit/runs/my-continual-run'
+nix-shell --run 'python3 toolkit/scripts/continual_rule_change_summary.py toolkit/runs/my-continual-run/probes.csv toolkit/runs/my-continual-run/windows.csv toolkit/runs/my-continual-run/training_tail_probes.csv'
+```

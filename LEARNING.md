@@ -260,3 +260,11 @@ That suggests the graph acquired a useful memory representation that a different
 We asked the graph to say when the latest three bits are `101`. On the first test it almost never recognized a match. Saying “no” every time actually had better overall accuracy, because most windows aren't `101`. That is why we also measure **recall**—the fraction of real matches found—and **balanced accuracy**, which gives matches and non-matches equal weight.
 
 We then tried teaching the reader more often when it saw a match. On fresh test streams, the pretrained graph found about 68% of matches, but also raised many false alarms. Its balanced accuracy was 67.5%, compared with 63.9% for the original graph trained the same way. A simple reader that could see the last three bits directly got every answer right. So the graph shows a modest benefit under this second training setup, but it is still a poor way to solve this small task. The second setup was chosen after we saw the first one fail.
+
+## What happens when the rule changes?
+
+We trained on rule A, where the next bit usually repeats, then rule B, where it usually flips, then A again. After each phase we froze copies of the models and tested both rules on separate streams. This tells us what survived the switch without teaching the model during the test.
+
+After learning B, both graphs performed poorly on A: the fixed graph scored 18.5% and the feedback-trained graph 19.0%. The feedback graph had also scored lower on A before the switch, so that small difference is not a convincing retention advantage. A simple Markov model adapted and forgot too. A version given the correct rule label kept separate memories and retained both, but it had information the other models didn't.
+
+The graphs sometimes looked better during online training than in the frozen tests. Replaying part of the training stream with the final weights gave similar results to the independent frozen test, so the particular test stream doesn't appear to explain that gap. Continued reader updates may help, but we haven't isolated the cause. This experiment is a reason to rethink the current learning rule or how the model handles context, rather than claim we solved continual learning.

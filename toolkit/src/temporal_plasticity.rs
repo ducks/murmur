@@ -7,6 +7,7 @@ pub const TRACE_DECAY: f64 = 0.8;
 pub const EDGE_RATE: f64 = 0.02;
 pub const WEIGHT_LIMIT: f64 = 0.5;
 
+#[derive(Clone)]
 pub struct PlasticModel {
     pub graph: Graph,
     pub readout_weights_marker: usize,

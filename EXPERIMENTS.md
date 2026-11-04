@@ -919,3 +919,38 @@ Pooled follow-up accuracy over 30 new held-out seeds:
 Extra positive updates let the graph readers detect many matches, with substantial false positives. On balanced accuracy, the true-pretrained graph beat the initial graph in 18/30 paired seeds (two ties) under the seven-update schedule; mean per-seed advantage 0.03608, descriptive 10,000-resample seed bootstrap 95% interval [0.00336, 0.06805]. F1 advantage was 0.03731 [0.00669, 0.06800], 18 wins, seven losses and five ties. These are exploratory comparisons after a failed initial protocol; intervals describe seed variation and do not make individual, overlapping windows independent. The new schedule uses more training updates and changes the recall/false-positive tradeoff. The direct-history reader's perfect result shows a simple supervised model solves this task with access to the last three bits. The result does not demonstrate language generalization, meaningful semantic representations, or a competitive pattern detector.
 
 Both runners log resolved config, protocol, per-seed confusion metrics and per-window predictions; the first also logs graph weights and strength diagnostics. These ignored outputs are not restartable checkpoints; source/Nix revisions, runtime and peak memory are not recorded.
+
+## A–B–A rule changes and retention
+
+Can the reader-feedback graph adapt to a new sequence rule and retain the old one? This experiment uses two noisy binary transition processes. In A, the next bit repeats the current bit with probability 0.9; in B, it flips with probability 0.9. A model predicts the next bit, then receives the correct answer and updates. It sees 4,000 transitions of A, 4,000 of B, then 4,000 of A again, each from a separately seeded stream. Graph state and eligibility traces are cleared at each phase boundary, while learned edge and reader weights persist. This isolates weight retention; it does not test a continuously running graph that infers an unannounced switch without reset. Models other than the oracle do not receive the rule label.
+
+Compare the fixed recurrent graph and its online true-label reader with the same graph and reader trained with reader-only graph feedback `0.5 - class1_probability`; the graph-feedback model has 512 additional trainable edge weights. Both readers update from the true next bit. A recency-weighted Markov model updates one transition row with the same numerical rate 0.05, though its update and parameter count differ, so this is not a matched-compute or matched-learning-rate comparison. A second, **oracle-context Markov** model is given the correct rule label and keeps separate transition tables; it has extra information unavailable to the other models. Prediction always occurs before the corresponding update.
+
+After each phase, clone each model, reset its state, and evaluate frozen weights on two independently generated 2,000-transition probe streams, one for A and one for B. The exact same A and B probes are reused at each checkpoint to make paired comparisons. The probes never update model parameters or feed information into later training; their repeated use during exploratory research is not an untouched final benchmark. Evaluating rule B immediately after A is a counterfactual before B training, not retention of a learned B. Oracle probes receive their true rule labels. Unlike ordinary training, frozen probes do not update the reader, though the graph's unit state continues to evolve within the probe.
+
+Development seeds 4591001–4591010 and held-out test seeds 4791001–4791020 use `s` for graph, `s+33000` feedback, `s+40000` phase A, `s+42000` phase B, `s+44000` returning A, `s+46000` A probe and `s+48000` B probe, using wrapping `u64`. Within-config seed collisions are rejected and tests check cross-group role collisions. Seeded pseudorandom streams are reproducible but do not prove statistical independence. Model and protocol settings were fixed before development and held-out runs; the study and the comparisons were exploratory, not preregistered.
+
+```sh
+nix-shell --run 'cargo test --manifest-path toolkit/Cargo.toml --test continual_rule_change && cargo build --release --manifest-path toolkit/Cargo.toml --bin continual_rule_change'
+nix-shell --run 'for group in dev test; do toolkit/target/release/continual_rule_change "toolkit/configs/continual-rule-change/$group.cfg" "toolkit/runs/continual-$group-example"; done'
+nix-shell --run 'python3 toolkit/scripts/continual_rule_change_summary.py toolkit/runs/continual-test-example/probes.csv toolkit/runs/continual-test-example/windows.csv toolkit/runs/continual-test-example/training_tail_probes.csv'
+```
+
+Pooled frozen-probe accuracy across 20 held-out seeds:
+
+| Checkpoint | Probe rule | Fixed graph | Feedback graph | Markov | Oracle-context Markov |
+|---|---|---:|---:|---:|---:|
+| After A | A | 0.7578 | 0.6846 | 0.9016 | 0.9016 |
+| After A | B | 0.2682 | 0.3466 | 0.0975 | 0.4991 |
+| After B | A | 0.1853 | 0.1898 | 0.0984 | 0.9016 |
+| After B | B | 0.8429 | 0.8528 | 0.9024 | 0.9024 |
+| After A returns | A | 0.7736 | 0.6662 | 0.9016 | 0.9016 |
+| After A returns | B | 0.2822 | 0.3276 | 0.0975 | 0.9024 |
+
+Both graph models' A accuracy dropped substantially after B; the feedback graph was 0.00445 above the fixed graph on that probe, with descriptive 10,000-resample paired-seed bootstrap 95% interval [-0.00005, 0.00860] and 13 wins, six losses and one tie. It had already scored 0.07315 *below* the fixed graph on A after A training, and it scored 0.10740 below after A returned. These observations do not meet the proposed criterion of a clear retention and learning advantage. The oracle retains both rules because it is given the rule identity and separate tables; this is not evidence that an unlabelled graph discovered context. With 10% transition noise, a model that knows the active rule has 90% expected next-bit accuracy, rather than 100%.
+
+Online windows show a different aspect of adaptation. During the first 200 transitions of B, mean accuracy was 0.6522 for feedback, 0.6205 fixed, 0.7853 Markov and 0.8895 oracle; during the last 200 it was 0.8972, 0.8760, 0.8982 and 0.8982. In the first 200 after A returned, feedback scored 0.7358 versus 0.7770 fixed, 0.7893 Markov and 0.9055 oracle. Online predictions keep updating their readers and graph where applicable; they are not directly equivalent to frozen probes. Counts and intervals describe exploratory seed variation on this task; overlapping transition windows and multiple inspected comparisons are not independent preregistered tests.
+
+**Post-hoc probe diagnostic.** The final online A-window accuracy looked better than frozen A-probe accuracy, so after observing the original test we added a frozen replay of the last 2,000 training transitions at each checkpoint and reran the same seeds. For example, after A, fixed graph scored 0.7570 on the frozen training tail and 0.7578 on the independent A probe; feedback scored 0.6841 and 0.6846. That makes a difference between the two streams an unlikely explanation for this gap in these runs; continuing online updates or other dynamics may matter, but this intervention does not isolate the cause. The replay is in-sample and is not a new held-out result.
+
+`predictions.csv` records online guesses, `windows.csv` summarizes 200-step windows, `probes.csv` records frozen probe results, `training_tail_probes.csv` records the post-hoc replay, and `weights.csv` saves edge weights at checkpoints. Output is ignored by Git and is not a restartable checkpoint; source/Nix revisions, runtime and peak memory are not recorded.

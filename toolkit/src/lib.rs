@@ -424,3 +424,5 @@ pub mod reader_transfer;
 pub mod pattern_recognition;
 
 pub mod pattern_reweight;
+
+pub mod continual_rule_change;

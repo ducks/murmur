@@ -1,5 +1,6 @@
 /// Online delta rule: each output synapse uses its presynaptic state and the
 /// broadcast prediction error for that output. The graph itself is not trained.
+#[derive(Clone)]
 pub struct Readout {
     pub weights: Vec<Vec<f64>>,
     pub rate: f64,

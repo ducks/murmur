@@ -117,6 +117,19 @@ class CoordinatorTests(unittest.TestCase):
             (target / 'development' / 'evidence' / 'probes.csv').write_text('tampered')
             with self.assertRaisesRegex(runner.PlanError, 'evidence changed'):
                 runner.next_action(target)
+    def test_cycle_runs_eligible_stages_and_stops(self):
+        with patch.object(runner, 'config_path', side_effect=[self.dev, self.evaluation]), patch.object(runner, 'source_fingerprint', return_value=('head', 'same')):
+            target = runner.prepare(self.manifest, self.root / 'cycle')
+        def fake_process(args, **kwargs):
+            stage = Path(args[-1]); split = stage.parent.name
+            evidence(stage, [1, 2] if split == 'development' else [100001, 100002])
+            return subprocess.CompletedProcess(args, 0)
+        with patch.object(runner, 'source_fingerprint', return_value=('head', 'same')), patch.object(runner.subprocess, 'run', side_effect=fake_process):
+            result = runner.cycle(target)
+            self.assertEqual(result['action'], 'review_results')
+            self.assertEqual([x['split'] for x in result['stages_run']], ['development', 'evaluation'])
+            self.assertEqual(runner.cycle(target)['stages_run'], [])
+
     def test_failed_development_stops_evaluation(self):
         with patch.object(runner, 'config_path', side_effect=[self.dev, self.evaluation]), patch.object(runner, 'source_fingerprint', return_value=('head', 'same')):
             target = runner.prepare(self.manifest, self.root / 'run')
@@ -126,6 +139,7 @@ class CoordinatorTests(unittest.TestCase):
         with patch.object(runner, 'source_fingerprint', return_value=('head', 'same')), patch.object(runner.subprocess, 'run', side_effect=fake_process):
             self.assertEqual(runner.run_stage(target, 'development')['outcome'], 'criteria_not_met')
             self.assertEqual(runner.next_action(target)['action'], 'revise_plan')
+            self.assertEqual(runner.cycle(target)['action'], 'revise_plan')
             with self.assertRaisesRegex(runner.PlanError, 'not met'):
                 runner.run_stage(target, 'evaluation')
             self.assertFalse((target / 'evaluation').exists())

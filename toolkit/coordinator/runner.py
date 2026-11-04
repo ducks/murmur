@@ -446,6 +446,20 @@ def next_action(directory):
     return {'action': 'review_results', 'reason': f'Both stages finished; evaluation outcome: {result}.'}
 
 
+def cycle(directory):
+    """Advance a frozen plan through eligible stages, then stop for review."""
+    completed = []
+    for _ in range(3):
+        action = next_action(directory)
+        if action['action'] in ('run_development', 'run_evaluation'):
+            split = 'development' if action['action'] == 'run_development' else 'evaluation'
+            result = run_stage(directory, split)
+            completed.append({'split': split, 'outcome': result['outcome']})
+            continue
+        return {**action, 'stages_run': completed}
+    raise PlanError('workflow did not reach a stopping state')
+
+
 def main(argv=None):
     import argparse
     parser = argparse.ArgumentParser(description=__doc__)
@@ -456,12 +470,16 @@ def main(argv=None):
     p.add_argument('directory'); p.add_argument('split', choices=('development', 'evaluation'))
     p = sub.add_parser('next', help='show the next bounded workflow action')
     p.add_argument('directory')
+    p = sub.add_parser('cycle', help='run eligible stages until a review or revision is needed')
+    p.add_argument('directory')
     args = parser.parse_args(argv)
     try:
         if args.command == 'prepare':
             print(f'Prepared: {prepare(args.manifest, args.directory)}')
         elif args.command == 'run':
             print(json.dumps(run_stage(args.directory, args.split), indent=2, sort_keys=True))
+        elif args.command == 'cycle':
+            print(json.dumps(cycle(args.directory), indent=2, sort_keys=True))
         else:
             print(json.dumps(next_action(args.directory), indent=2, sort_keys=True))
     except (PlanError, OSError) as exc:

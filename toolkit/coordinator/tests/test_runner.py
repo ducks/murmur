@@ -27,7 +27,8 @@ def plan():
         'budget': {'max_seeds_per_split': 4, 'max_logical_transitions_per_split': 10000, 'max_wall_seconds': 10}}
 
 
-def evidence(path, seeds, mixture=7, single=4):
+def evidence(path, seeds, mixture=7, single=4, models=None):
+    models = runner.MODELS if models is None else models
     path.mkdir()
     (path / 'status.txt').write_text('complete\n')
     with (path / 'probes.csv').open('w', newline='') as f:
@@ -37,15 +38,15 @@ def evidence(path, seeds, mixture=7, single=4):
                 for noise in ('0.1', '0.25'):
                     for checkpoint in ('1', '2', '3'):
                         for rule in ('0', '1'):
-                            for model in sorted(runner.MODELS):
-                                correct = mixture if model == 'mixture' else single
+                            for model in sorted(models):
+                                correct = mixture if model in ('mixture', 'candidate') else single
                                 w.writerow([seed, regime, noise, checkpoint, rule, model, correct, 8, correct/8, 0.5])
     with (path / 'windows.csv').open('w', newline='') as f:
         w = csv.writer(f); w.writerow(['seed','regime','noise','window_start','window_end','model','correct','trials','accuracy','mean_logloss'])
         for seed in seeds:
             for regime in ('aba', 'stationary', 'switching'):
                 for noise in ('0.1', '0.25'):
-                    for model in sorted(runner.MODELS):
+                    for model in sorted(models):
                         correct = 15
                         w.writerow([seed, regime, noise, 0, 30, model, correct, 30, correct/30, 0.5])
 
@@ -80,6 +81,7 @@ class CoordinatorTests(unittest.TestCase):
         with self.assertRaisesRegex(runner.PlanError, 'all adapter'):
             runner.validate_plan(p, self.dev, self.evaluation)
         p['comparison']['required_models'].append('candidate')
+        p['criteria']['max_other_probe_accuracy_drop'] = 0.03
         runner.validate_plan(p, self.dev, self.evaluation)
 
     def test_budget_and_unknown_fields_rejected(self):
@@ -98,6 +100,26 @@ class CoordinatorTests(unittest.TestCase):
         (dest / 'probes.csv').write_text('\n'.join(content[:-1]) + '\n')
         with self.assertRaisesRegex(runner.PlanError, 'incomplete'):
             runner.analyze(plan(), cfg, dest)
+    def test_candidate_cross_condition_regression_fails_criteria(self):
+        p = plan(); p['adapter'] = 'candidate_context'
+        p['comparison']['candidate'] = 'candidate'
+        p['comparison']['required_models'].append('candidate')
+        p['criteria']['max_other_probe_accuracy_drop'] = 0.03
+        dest = self.root / 'candidate-evidence'
+        evidence(dest, [1, 2], models=runner.ADAPTERS['candidate_context'])
+        path = dest / 'probes.csv'
+        with path.open(newline='') as f:
+            reader = csv.DictReader(f); fields = reader.fieldnames; rows = list(reader)
+        for row in rows:
+            if (row['regime'], row['noise'], row['checkpoint'], row['rule'], row['model']) == ('aba', '0.1', '3', '1', 'candidate'):
+                row['correct'] = '0'; row['accuracy'] = '0'
+        with path.open('w', newline='') as f:
+            writer = csv.DictWriter(f, fieldnames=fields); writer.writeheader(); writer.writerows(rows)
+        report = runner.analyze(p, runner.config_parse(self.dev), dest)
+        self.assertTrue(report['checks']['mean_difference'])
+        self.assertFalse(report['checks']['other_probe_regressions'])
+        self.assertEqual(report['outcome'], 'criteria_not_met')
+
     def test_frozen_plan_refuses_tampering_and_source_changes(self):
         with patch.object(runner, 'config_path', side_effect=[self.dev, self.evaluation]), patch.object(runner, 'source_fingerprint', return_value=('head', 'original')):
             target = runner.prepare(self.manifest, self.root / 'run')

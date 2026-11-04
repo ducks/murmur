@@ -45,6 +45,17 @@ class CampaignTests(unittest.TestCase):
             self.assertEqual(result['action'],'inspect_failure');self.assertEqual(len(result['rounds']),1)
             self.assertEqual(campaign.run(path)['action'],'inspect_failure')
             self.assertFalse((path/'.running.lock').exists())
+    def test_prior_history_keeps_full_probe_regressions(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            runner.write_json(root/'state.json', {'completed': [{'index': 1, 'status': 'complete', 'evaluation': {'outcome': 'criteria_met'}}]})
+            evidence = root/'idea-001'/'study'/'evaluation'/'evidence'
+            evidence.mkdir(parents=True)
+            (evidence/'probes.csv').write_text('seed,regime,noise,checkpoint,rule,model,accuracy\n1,aba,0.1,3,1,candidate,0.4\n1,aba,0.1,3,1,mixture,0.9\n')
+            history = campaign.prior_history(root)
+            self.assertEqual(history[0]['final_probe_matrix']['aba:0.1:rule_1']['candidate'], 0.4)
+            self.assertEqual(history[0]['final_probe_matrix']['aba:0.1:rule_1']['mixture'], 0.9)
+
     def test_concurrent_campaign_run_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
             path=Path(tmp);(path/'.running.lock').mkdir()

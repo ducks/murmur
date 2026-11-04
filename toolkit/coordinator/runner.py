@@ -125,10 +125,15 @@ def validate_plan(plan, dev_text, evaluation_text):
     if comparison['metric'] != 'accuracy' or comparison['regime'] not in ('aba', 'stationary', 'switching') or comparison['noise'] not in ('0.1', '0.25') or comparison['checkpoint'] not in ('1', '2', '3') or comparison['probe_rule'] not in ('0', '1'):
         raise PlanError('unsupported comparison filter')
     criteria = plan['criteria']
-    exact_keys(criteria, {'min_mean_difference', 'min_paired_win_fraction', 'max_stationary_accuracy_drop'}, 'criteria')
+    required_criteria = {'min_mean_difference', 'min_paired_win_fraction', 'max_stationary_accuracy_drop'}
+    if plan['adapter'] == 'candidate_context':
+        required_criteria.add('max_other_probe_accuracy_drop')
+    exact_keys(criteria, required_criteria, 'criteria')
     finite_number(criteria['min_mean_difference'], 'min_mean_difference', -1.0, 1.0)
     finite_number(criteria['min_paired_win_fraction'], 'min_paired_win_fraction', 0.0, 1.0)
     finite_number(criteria['max_stationary_accuracy_drop'], 'max_stationary_accuracy_drop', 0.0, 1.0)
+    if 'max_other_probe_accuracy_drop' in criteria:
+        finite_number(criteria['max_other_probe_accuracy_drop'], 'max_other_probe_accuracy_drop', 0.0, 1.0)
     budget = plan['budget']
     exact_keys(budget, {'max_seeds_per_split', 'max_logical_transitions_per_split', 'max_wall_seconds'}, 'budget')
     for key in budget:
@@ -338,12 +343,26 @@ def analyze(plan, cfg, evidence):
     checks = {'mean_difference': mean >= criteria['min_mean_difference'],
               'paired_win_fraction': win_fraction >= criteria['min_paired_win_fraction'],
               'stationary_accuracy': all(v >= -criteria['max_stationary_accuracy_drop'] for v in stationary.values())}
+    other_probes = {}
+    if 'max_other_probe_accuracy_drop' in criteria:
+        for regime in ('aba', 'switching', 'stationary'):
+            for noise in ('0.1', '0.25'):
+                # B is unseen under stationary A, so that counterfactual is logged
+                # by the adapter but is not a retention criterion.
+                for rule in (('0',) if regime == 'stationary' else ('0', '1')):
+                    values = []
+                    for seed in sorted(seeds, key=int):
+                        prefix = (seed, regime, noise, '3', rule)
+                        values.append(lookup[prefix + (cmp['candidate'],)] - lookup[prefix + (cmp['baseline'],)])
+                    other_probes[f'{regime}:{noise}:rule_{rule}'] = sum(values) / len(values)
+        checks['other_probe_regressions'] = all(v >= -criteria['max_other_probe_accuracy_drop'] for v in other_probes.values())
     return {'outcome': 'criteria_met' if all(checks.values()) else 'criteria_not_met',
             'checks': checks, 'candidate': cmp['candidate'], 'baseline': cmp['baseline'],
             'filter': {k: cmp[k] for k in ('regime', 'noise', 'checkpoint', 'probe_rule', 'metric')},
             'seeds': len(diffs), 'mean_paired_difference': mean, 'paired_win_fraction': win_fraction,
             'wins': sum(x > 0 for x in diffs), 'losses': sum(x < 0 for x in diffs),
             'ties': sum(x == 0 for x in diffs), 'stationary_online_difference': stationary,
+            'final_probe_differences': other_probes,
             'limitations': ['Thresholds are operational criteria, not a statistical guarantee.',
                             'Oracle and known-rule controls have extra information.',
                             'Evaluation seeds are visible locally; holdout secrecy is not enforced.',
@@ -419,6 +438,7 @@ def run_stage(directory, split):
             f"{report['candidate']} minus {report['baseline']} mean paired accuracy: {report['mean_paired_difference']:.4f}; "
             f"wins/losses/ties: {report['wins']}/{report['losses']}/{report['ties']} across {report['seeds']} seeds.\n\n"
             f"Stationary online accuracy differences: {report['stationary_online_difference']}.\n\n"
+            f"Final probe differences across regimes: {report['final_probe_differences']}.\n\n"
             f"Checks: {report['checks']}.\n\n"
             "The oracle and known-rule controls have extra information. Evaluation seeds are visible locally; "
             "these criteria are not a statistical guarantee. See report.json and evidence/ for details.\n", encoding='utf-8')

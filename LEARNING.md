@@ -282,3 +282,9 @@ So the pivot gives us a clearer lead and a clearer failure. Separate memories pl
 The toolkit now has a small coordinator that can freeze an experiment plan, check separate seed groups and required controls, run a registered experiment, and compare the result with criteria written in advance. It records a source fingerprint, configurations, logs and machine-readable reports. An agent can ask it what to do next, but the coordinator does not invent or implement research ideas by itself.
 
 In its first real run, the candidate met the average improvement threshold but won on only four of ten development seeds. The declared requirement was six, so the coordinator stopped and left the evaluation stage unused. That's the kind of result we want the workflow to preserve, even when the average looks promising. The evaluation files are still visible to an agent, so this is a separation check, not a truly blind holdout.
+
+## Letting an agent propose a model
+
+The toolkit can now ask a coding agent to propose a model, write it in a separate Git worktree, add a test, and run it against fixed controls. Each idea gets its own branch, seed groups, plan, logs and results. The first campaign is still limited to the binary context task; it's a starting point for the factory, not a machine that can explore every possible model.
+
+In the first live run, the agent tried a model that pooled evidence about whether a bit repeats or flips and protected the less-active memory. It met the originally declared noisy-task criteria. A review of all the results found that it performed much worse on a lower-noise condition, and its design assumed the repeat/flip structure. That was a useful failure of the *evaluation criteria*. The original report stays intact, and future campaigns now check for large regressions across the other tested conditions too.

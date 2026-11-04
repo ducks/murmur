@@ -7,6 +7,7 @@ candidate model and experiment runners use no model APIs.
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import os
 import signal
@@ -55,12 +56,12 @@ def make_plan(index, idea):
         'comparison': {'candidate': 'candidate', 'baseline': 'mixture',
                        'required_models': ['single', 'mixture', 'candidate', 'known_filter', 'oracle'],
                        'metric': 'accuracy', 'regime': 'aba', 'noise': '0.25', 'checkpoint': '3', 'probe_rule': '1'},
-        'criteria': {'min_mean_difference': 0.05, 'min_paired_win_fraction': 0.6, 'max_stationary_accuracy_drop': 0.02},
+        'criteria': {'min_mean_difference': 0.05, 'min_paired_win_fraction': 0.6, 'max_stationary_accuracy_drop': 0.02, 'max_other_probe_accuracy_drop': 0.03},
         'budget': {'max_seeds_per_split': 20, 'max_logical_transitions_per_split': 1_200_000, 'max_wall_seconds': 180},
     }
 
 
-def init(directory, goal, max_ideas, agent_seconds, test_seconds, local_provider=None, model=None):
+def init(directory, goal, max_ideas, agent_seconds, test_seconds, local_provider=None, model=None, prior_campaign=None):
     runner.text_field(goal, 'goal')
     if not (1 <= max_ideas <= 100 and 10 <= agent_seconds <= 7200 and 10 <= test_seconds <= 7200):
         raise runner.PlanError('limits outside supported ranges')
@@ -70,6 +71,7 @@ def init(directory, goal, max_ideas, agent_seconds, test_seconds, local_provider
         runner.text_field(model, 'model')
     if git(runner.ROOT, 'status', '--porcelain=v1', '--untracked-files=all'):
         raise runner.PlanError('commit or otherwise clean the starting worktree before creating a campaign')
+    prior = prior_history(prior_campaign) if prior_campaign else []
     dest = runner.output_location(directory)
     try:
         dest.mkdir(parents=True, exist_ok=False)
@@ -80,13 +82,43 @@ def init(directory, goal, max_ideas, agent_seconds, test_seconds, local_provider
     config = {'schema_version': 1, 'campaign_id': campaign_id, 'seed_base': seed_base, 'goal': goal,
               'max_ideas': max_ideas, 'agent_seconds': agent_seconds, 'test_seconds': test_seconds,
               'local_provider': local_provider, 'model': model,
-              'base_commit': git(runner.ROOT, 'rev-parse', 'HEAD'),
+              'base_commit': git(runner.ROOT, 'rev-parse', 'HEAD'), 'prior_history': prior,
               'scope': 'binary hidden-context sequence task; candidate Rust model only',
               'limits': 'LLM token/cost limits and blind holdouts are not enforced.'}
     runner.write_json(dest / 'campaign.json', config)
     runner.write_json(dest / 'state.json', {'schema_version': 1, 'completed': [], 'next_index': 1, 'base_commit': config['base_commit'], 'status': 'ready'})
     runner.write_json(dest / 'agent-output-schema.json', SCHEMA)
     return config
+
+
+def probe_matrix(path):
+    """Summarize all final frozen probes so narrow wins don't hide regressions."""
+    if not Path(path).is_file():
+        return {}
+    groups = {}
+    with Path(path).open(newline='', encoding='utf-8') as f:
+        for row in csv.DictReader(f):
+            if row['checkpoint'] != '3':
+                continue
+            key = f"{row['regime']}:{row['noise']}:rule_{row['rule']}"
+            groups.setdefault(key, {}).setdefault(row['model'], []).append(float(row['accuracy']))
+    return {key: {name: sum(values) / len(values) for name, values in models.items()}
+            for key, models in groups.items()}
+
+
+def prior_history(path):
+    """Import previous outcomes; later seeds remain fresh but no longer blind."""
+    root = Path(path).resolve()
+    state = runner.read_json(root / 'state.json')
+    history = []
+    for item in state.get('completed', []):
+        entry = dict(item)
+        stage = 'evaluation' if item.get('evaluation') else 'development'
+        evidence = root / f"idea-{item['index']:03d}" / 'study' / stage / 'evidence' / 'probes.csv'
+        entry['final_probe_matrix'] = probe_matrix(evidence)
+        entry['previous_campaign'] = str(root)
+        history.append(entry)
+    return history
 
 
 def prompt_for(config, history):
@@ -100,7 +132,7 @@ Previous campaign results (may be empty):
 
 Edit ONLY toolkit/src/agent_candidate.rs and toolkit/tests/agent_generated.rs. The latter must contain at least one meaningful Rust test for your proposed mechanism. Do not alter evaluator, baseline, configs, docs, Git metadata, or any other file; do not commit. The supervisor rejects other changes. Preserve Candidate's Clone, new(seed, rate), reset(), predict(x)->f64 and observe(x,y,learn) interface. `predict` must happen without seeing y; output must be finite in [0,1]. In `observe(..., false)`, do not change learned parameters, though context inference state may update. reset clears transient inference state without erasing learned parameters. Candidate may use local Rust standard library and existing local crates only; no network, pretrained weights, external APIs, hidden future data, environment data, or provided true context. Model-code restrictions are reviewed/tested, not a complete security boundary.
 
-The supervisor independently generates separate fresh deterministic development and evaluation configs, validates all controls and runs the evaluator. It will test candidate vs the unchanged original mixture on the noisiest ABA B retention, with stationary penalties and fixed criteria. You must not read, generate, inspect, or tune against evaluation data. You may run targeted tests and small development-only experiments, but do not alter their declared criteria or claim statistical significance. The coding-agent service may be remote; the candidate itself must be local.
+The supervisor independently generates separate fresh deterministic development and evaluation configs, validates all controls and runs the evaluator. It will test candidate vs the unchanged original mixture on the noisiest ABA B retention, with stationary penalties, a maximum 3 percentage-point mean regression on the other final A/B probes, and fixed criteria. You must not read, generate, inspect, or tune against evaluation data. You may run targeted tests and small development-only experiments, but do not alter their declared criteria or claim statistical significance. The coding-agent service may be remote; the candidate itself must be local.
 
 Run: cargo test --offline --manifest-path toolkit/Cargo.toml --test candidate_context --test agent_generated
 Then provide a JSON object matching the supplied schema: question, hypothesis, falsification, approach, limitations. Each field must be a nonempty single-line string. Explain why the idea could fail. Do not claim results you have not measured. Do not ask for input; stop on an actual blocker.
@@ -202,7 +234,7 @@ def execute_round(directory, config, state, agent=call_agent):
     runner.write_json(round_dir / 'result.json', result)
     try:
         git(runner.ROOT, 'worktree', 'add', '-b', branch, str(worktree), base)
-        idea = agent(config, worktree, round_dir, state['completed'])
+        idea = agent(config, worktree, round_dir, config.get('prior_history', []) + state['completed'])
         verify_agent_changes(worktree, base)
         dev, evaluation = seed_configs(index, config['seed_base'])
         plan = make_plan(index, idea)
@@ -235,12 +267,14 @@ def execute_round(directory, config, state, agent=call_agent):
         development = runner.read_json(study / 'development/report.json')
         evaluation_path = study / 'evaluation/report.json'
         evaluation = runner.read_json(evaluation_path) if evaluation_path.exists() else None
-        result.update(status='complete', commit=commit, idea=idea, development=development, evaluation=evaluation)
+        evidence_stage = 'evaluation' if evaluation is not None else 'development'
+        matrix = probe_matrix(study / evidence_stage / 'evidence' / 'probes.csv')
+        result.update(status='complete', commit=commit, idea=idea, development=development, evaluation=evaluation, final_probe_matrix=matrix)
         state['base_commit'] = commit
     except (runner.PlanError, OSError, subprocess.SubprocessError) as exc:
         result.update(status='failed', error=str(exc))
     runner.write_json(round_dir / 'result.json', result)
-    state['completed'].append({k: result.get(k) for k in ('index', 'status', 'commit', 'idea', 'development', 'evaluation', 'error')})
+    state['completed'].append({k: result.get(k) for k in ('index', 'status', 'commit', 'idea', 'development', 'evaluation', 'final_probe_matrix', 'error')})
     state['next_index'] += 1
     state['status'] = 'ready' if result['status'] == 'complete' else 'inspect_failure'
     runner.write_json(directory / 'state.json', state)
@@ -289,12 +323,12 @@ def main(argv=None):
     p = sub.add_parser('init'); p.add_argument('directory'); p.add_argument('--goal', default=GOAL)
     p.add_argument('--max-ideas', type=int, default=3); p.add_argument('--agent-seconds', type=int, default=600)
     p.add_argument('--test-seconds', type=int, default=180); p.add_argument('--local-provider', choices=('ollama', 'lmstudio'))
-    p.add_argument('--model')
+    p.add_argument('--model'); p.add_argument('--prior-campaign', help='include prior campaign outcomes in the agent context')
     p = sub.add_parser('run'); p.add_argument('directory'); p.add_argument('--ideas', type=int)
     args = parser.parse_args(argv)
     try:
         if args.command == 'init':
-            result = init(args.directory, args.goal, args.max_ideas, args.agent_seconds, args.test_seconds, args.local_provider, args.model)
+            result = init(args.directory, args.goal, args.max_ideas, args.agent_seconds, args.test_seconds, args.local_provider, args.model, args.prior_campaign)
         else:
             if args.ideas is not None and args.ideas < 1:
                 raise runner.PlanError('--ideas must be positive')

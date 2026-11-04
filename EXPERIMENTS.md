@@ -1012,4 +1012,25 @@ The fixed criterion required a mean accuracy improvement of at least 0.05 and wi
 
 All three met the fixed development and evaluation criteria. Inspection matters: every candidate hard-coded complementary repeat/flip hypotheses and initialized shared reliability to `0.75`, which matches the 25%-noise target condition before learning. They thus exploit the structure of this benchmark, and none demonstrates discovering an unknown model family. The agents could inspect previous rounds' complete results; fresh per-round seeds reduce direct reuse but do not eliminate adaptive benchmark overfitting. The third model tracks 256 age/context masses and is not compute-matched to the two-slot baseline. Before making a broader claim, evaluate on asymmetric transitions, unequal or unseen noise, additional rules, and tasks whose structure was not exposed during candidate design; include fair priors and resource costs.
 
-The three agent attempts took approximately 134 seconds in total according to the driver. The CLI reported 305,952 input tokens including 234,496 cached input tokens and 4,901 output tokens; reported token categories may overlap, and no monetary cost is calculated or capped. The campaign directory occupied approximately 1.2 GiB at inspection, including three worktrees and build artifacts; this is not a model-memory benchmark. The campaign completed without a reported agent, test or coordinator failure. It created local candidate branches but did not merge them. Raw logs, per-seed results and worktrees are under the ignored `toolkit/runs/autonomous-three-ideas/`; source/Nix reproducibility, untrusted-code review and holdout limitations remain as described in the toolkit README.
+The three agent attempts took approximately 134 seconds in total according to the driver. The CLI reported 305,952 input tokens including 234,496 cached input tokens and 4,901 output tokens; reported token categories may overlap, and no monetary cost is calculated or capped. The campaign directory occupied approximately 1.2 GiB at inspection, including three worktrees and build artifacts; this is not a model-memory benchmark. The campaign completed without a reported agent, test or coordinator failure. It created local candidate branches but did not merge them. Raw logs and per-seed results remain under the ignored `toolkit/runs/autonomous-three-ideas/`; the worktrees were subsequently cleaned up and can be recreated from the candidate branches. Source/Nix reproducibility, untrusted-code review and holdout limitations remain as described in the toolkit README.
+
+## Two-idea shared-cache workflow check
+
+A two-idea campaign starting at `fdf358d` imported the previous three-idea campaign's results. Each sequential agent saw earlier results, and each round used fresh, different development and evaluation seeds with the same fixed criteria and public task generator described above. This was an operational check and exploratory comparison, not a blind or independent test of general model discovery.
+
+| Idea | Commit | Approach | Evaluation noisy B accuracy | Mixture accuracy | Paired wins/losses/ties |
+|---:|---|---|---:|---:|---:|
+| 1 | `abdeb10` | Two independently learned transition tables with opposing priors and soft routing | 0.7375 | 0.3245 | 20/0/0 |
+| 2 | `376d4c0` | Prior candidate with predictive-belief-gated learning and forgetting | 0.7475 | 0.4522 | 18/2/0 |
+
+Both met development and evaluation criteria. Different evaluation seeds mean these numbers do not establish which candidate is better. The agents explicitly used opposing repeat/flip priors tailored to the task, so success does not establish that either discovers the rules from neutral assumptions. Future comparisons need matched seeds, neutral or equally informative priors, and tasks with different rule structures.
+
+Reproduce the protocol with a fresh campaign identifier and hence different seeds:
+
+```sh
+nix-shell --run 'python3 -B -m toolkit.coordinator.campaign init toolkit/runs/cache-check-reproduction --max-ideas 2 --agent-seconds 600 --prior-campaign toolkit/runs/autonomous-three-ideas'
+nix-shell --run 'python3 -B -m toolkit.coordinator.campaign run toolkit/runs/cache-check-reproduction --ideas 1'
+nix-shell --run 'python3 -B -m toolkit.coordinator.campaign run toolkit/runs/cache-check-reproduction --ideas 1'
+```
+
+The first worktree was removed after its completed round, while the shared Cargo target directory remained at 310 MiB. After the second round, both worktrees and the shared cache were absent; the campaign retained 147 MiB of logs and evidence, and both candidate branches remain. The agent's first Cargo test compiled the workspace in 7.07 seconds and the second in 5.18 seconds, but both logs show workspace crates recompiling from their different worktree paths. This is not a controlled timing comparison or proof of cross-worktree build reuse. The supervisor's subsequent tests finished in 0.02 and 0.03 seconds after the agent's tests in each respective worktree. CLI usage was 357,172 input tokens including 282,624 cached and 3,361 output tokens; categories may overlap, and no cost cap or monetary estimate was applied. Raw artifacts are under the ignored `toolkit/runs/autonomous-cache-check/`.

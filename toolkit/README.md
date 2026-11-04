@@ -267,3 +267,13 @@ To start a separate campaign with the evidence from a previous one in the agent'
 Campaign round results include the coding agent's wall time and, when the CLI reports it, token-usage fields extracted from its event log. They are usage records, not a cost estimate or an enforced token budget. Detailed event logs may include code and experiment information sent to the configured agent provider.
 
 A possible longer-term direction for volunteer compute, and the additional verification and isolation it would need, is described in [DISTRIBUTED_VISION.md](coordinator/DISTRIBUTED_VISION.md). Distributed execution is not implemented.
+
+### Automated prior and adaptation comparison
+
+Run the fixed matched-seed prior ablation and write per-seed metrics, 100-step online windows, aggregate summaries, configuration, and a source-hash manifest with one command:
+
+```sh
+nix-shell --run 'python3 toolkit/scripts/run_candidate_ablation.py toolkit/configs/candidate-ablation/matched.cfg toolkit/runs/prior-ablation'
+```
+
+The output directory must not exist. The script uses the local Rust runner and no coding-agent API; it does not search ideas or declare success automatically. It compares both original candidate snapshots, neutral equal-slot and seeded random-slot versions, the mixture and single-memory baselines, and a labelled-context oracle. Only the oracle receives context labels. Equal slots test exact symmetry; random offsets test symmetry breaking without encoding repeat/flip rules, while decay targets the neutral prior. Windows are measured from each phase boundary, including the two switches. The tasks remain the four fixed binary transition families; see `EXPERIMENTS.md` for interpretation and limitations.

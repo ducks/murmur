@@ -67,6 +67,11 @@ class CoordinatorTests(unittest.TestCase):
         bad = plan(); bad['comparison']['required_models'].remove('oracle')
         with self.assertRaisesRegex(runner.PlanError, 'all four'):
             runner.validate_plan(bad, self.dev, self.evaluation)
+    def test_repo_output_must_be_ignored(self):
+        self.assertEqual(runner.output_location(runner.ROOT / 'toolkit/runs/coordinator-test-location'),
+                         runner.ROOT / 'toolkit/runs/coordinator-test-location')
+        with self.assertRaisesRegex(runner.PlanError, 'must be git-ignored'):
+            runner.output_location(runner.ROOT / 'not-ignored-coordinator-test')
     def test_budget_and_unknown_fields_rejected(self):
         p = plan(); p['budget']['max_logical_transitions_per_split'] = 1
         with self.assertRaisesRegex(runner.PlanError, 'exceeds'):

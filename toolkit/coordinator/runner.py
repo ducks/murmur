@@ -182,7 +182,6 @@ def output_location(path):
     if dest.is_relative_to(ROOT):
         rel = dest.relative_to(ROOT)
         result = command('git', 'check-ignore', '-q', '--', str(rel), check=False)
-        load_lock(directory)  # Fail closed if source or frozen plan changed during execution.
         if result.returncode != 0:
             raise PlanError('run directory inside repository must be git-ignored (e.g. toolkit/runs/...)')
     return dest

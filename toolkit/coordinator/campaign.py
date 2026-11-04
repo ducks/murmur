@@ -195,6 +195,25 @@ def call_agent(config, worktree, round_dir, history):
     return checked_agent_output(round_dir / 'idea.json')
 
 
+def agent_usage(path):
+    """Sum usage fields reported by completed CLI turns, if available."""
+    if not Path(path).is_file():
+        return None
+    totals = {}
+    with Path(path).open(encoding='utf-8') as f:
+        for line in f:
+            try:
+                event = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if event.get('type') != 'turn.completed' or not isinstance(event.get('usage'), dict):
+                continue
+            for key, value in event['usage'].items():
+                if isinstance(value, int) and not isinstance(value, bool) and value >= 0:
+                    totals[key] = totals.get(key, 0) + value
+    return totals or None
+
+
 def changed_paths(worktree):
     # -z avoids ambiguity from spaces and unusual path names.
     paths = set()
@@ -234,7 +253,10 @@ def execute_round(directory, config, state, agent=call_agent):
     runner.write_json(round_dir / 'result.json', result)
     try:
         git(runner.ROOT, 'worktree', 'add', '-b', branch, str(worktree), base)
+        agent_started = time.monotonic()
         idea = agent(config, worktree, round_dir, config.get('prior_history', []) + state['completed'])
+        result['agent_elapsed_seconds'] = time.monotonic() - agent_started
+        result['agent_usage'] = agent_usage(round_dir / 'agent-events.jsonl')
         verify_agent_changes(worktree, base)
         dev, evaluation = seed_configs(index, config['seed_base'])
         plan = make_plan(index, idea)
@@ -274,7 +296,7 @@ def execute_round(directory, config, state, agent=call_agent):
     except (runner.PlanError, OSError, subprocess.SubprocessError) as exc:
         result.update(status='failed', error=str(exc))
     runner.write_json(round_dir / 'result.json', result)
-    state['completed'].append({k: result.get(k) for k in ('index', 'status', 'commit', 'idea', 'development', 'evaluation', 'final_probe_matrix', 'error')})
+    state['completed'].append({k: result.get(k) for k in ('index', 'status', 'commit', 'idea', 'agent_elapsed_seconds', 'agent_usage', 'development', 'evaluation', 'final_probe_matrix', 'error')})
     state['next_index'] += 1
     state['status'] = 'ready' if result['status'] == 'complete' else 'inspect_failure'
     runner.write_json(directory / 'state.json', state)

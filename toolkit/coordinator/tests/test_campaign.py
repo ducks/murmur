@@ -16,6 +16,12 @@ class CampaignTests(unittest.TestCase):
             all_roles.update(a['role_seeds'] | b['role_seeds'])
             self.assertEqual(p['comparison']['baseline'], 'mixture')
             self.assertEqual(p['comparison']['candidate'], 'candidate')
+    def test_usage_sums_completed_turns_only(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp)/'events.jsonl'
+            path.write_text('not-json\n'+json.dumps({'type':'turn.completed','usage':{'input_tokens':10,'output_tokens':2}})+'\n'+json.dumps({'type':'turn.completed','usage':{'input_tokens':5,'output_tokens':3}})+'\n')
+            self.assertEqual(campaign.agent_usage(path), {'input_tokens':15,'output_tokens':5})
+
     def test_scope_rejects_untrusted_evaluator_edits(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp)

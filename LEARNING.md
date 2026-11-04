@@ -288,3 +288,9 @@ In its first real run, the candidate met the average improvement threshold but w
 The toolkit can now ask a coding agent to propose a model, write it in a separate Git worktree, add a test, and run it against fixed controls. Each idea gets its own branch, seed groups, plan, logs and results. The first campaign is still limited to the binary context task; it's a starting point for the factory, not a machine that can explore every possible model.
 
 In the first live run, the agent tried a model that pooled evidence about whether a bit repeats or flips and protected the less-active memory. It met the originally declared noisy-task criteria. A review of all the results found that it performed much worse on a lower-noise condition, and its design assumed the repeat/flip structure. That was a useful failure of the *evaluation criteria*. The original report stays intact, and future campaigns now check for large regressions across the other tested conditions too.
+
+## Running several ideas unattended
+
+We let the campaign try three ideas in sequence. Each one wrote a candidate, passed its tests, and met the checks on its own new evaluation seeds. That confirms the loop can make it through multiple rounds without a person running every command.
+
+The code review is just as important as the scores: all three ideas assumed the task's two rules were opposites and started with a reliability value that exactly matched one of the tested noise levels. They were refinements of the same idea, not three independent discoveries. The next test needs unfamiliar rule structures and a fair comparison of computation. The three worktrees and build files also used about 1.2 GiB, and the system records token usage but cannot enforce a spending cap yet.

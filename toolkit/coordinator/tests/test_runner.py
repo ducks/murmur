@@ -65,13 +65,23 @@ class CoordinatorTests(unittest.TestCase):
         with self.assertRaisesRegex(runner.PlanError, 'differ only in seeds'):
             runner.validate_plan(plan(), self.dev, config([100001], train=11))
         bad = plan(); bad['comparison']['required_models'].remove('oracle')
-        with self.assertRaisesRegex(runner.PlanError, 'all four'):
+        with self.assertRaisesRegex(runner.PlanError, 'all adapter'):
             runner.validate_plan(bad, self.dev, self.evaluation)
     def test_repo_output_must_be_ignored(self):
         self.assertEqual(runner.output_location(runner.ROOT / 'toolkit/runs/coordinator-test-location'),
                          runner.ROOT / 'toolkit/runs/coordinator-test-location')
         with self.assertRaisesRegex(runner.PlanError, 'must be git-ignored'):
             runner.output_location(runner.ROOT / 'not-ignored-coordinator-test')
+    def test_candidate_adapter_requires_original_baselines(self):
+        p = plan()
+        p['adapter'] = 'candidate_context'
+        p['comparison']['candidate'] = 'candidate'
+        p['comparison']['baseline'] = 'mixture'
+        with self.assertRaisesRegex(runner.PlanError, 'all adapter'):
+            runner.validate_plan(p, self.dev, self.evaluation)
+        p['comparison']['required_models'].append('candidate')
+        runner.validate_plan(p, self.dev, self.evaluation)
+
     def test_budget_and_unknown_fields_rejected(self):
         p = plan(); p['budget']['max_logical_transitions_per_split'] = 1
         with self.assertRaisesRegex(runner.PlanError, 'exceeds'):

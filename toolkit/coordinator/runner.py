@@ -12,8 +12,11 @@ import sys
 import time
 
 ROOT = Path(__file__).resolve().parents[2]
-ADAPTER = 'unlabeled_context'
-MODELS = {'single', 'mixture', 'known_filter', 'oracle'}
+ADAPTERS = {
+    'unlabeled_context': {'single', 'mixture', 'known_filter', 'oracle'},
+    'candidate_context': {'single', 'mixture', 'candidate', 'known_filter', 'oracle'},
+}
+MODELS = ADAPTERS['unlabeled_context']
 OFFSETS = (0, 40000, 46000, 48000, 51000)
 MASK64 = (1 << 64) - 1
 
@@ -109,15 +112,16 @@ def validate_plan(plan, dev_text, evaluation_text):
         raise PlanError('unsupported plan schema')
     for key in ('id', 'question', 'hypothesis', 'falsification'):
         text_field(plan[key], key)
-    if plan['adapter'] != ADAPTER:
-        raise PlanError(f'unsupported adapter; registered: {ADAPTER}')
+    if plan['adapter'] not in ADAPTERS:
+        raise PlanError(f'unsupported adapter; registered: {sorted(ADAPTERS)}')
+    model_names = ADAPTERS[plan['adapter']]
     comparison = plan['comparison']
     exact_keys(comparison, {'candidate', 'baseline', 'required_models', 'metric', 'regime', 'noise', 'checkpoint', 'probe_rule'}, 'comparison')
-    if comparison['candidate'] not in MODELS or comparison['baseline'] not in MODELS or comparison['candidate'] == comparison['baseline']:
+    if comparison['candidate'] not in model_names or comparison['baseline'] not in model_names or comparison['candidate'] == comparison['baseline']:
         raise PlanError('candidate and baseline must be distinct registered models')
     models = comparison['required_models']
-    if not isinstance(models, list) or not all(isinstance(model, str) for model in models) or len(models) != len(set(models)) or set(models) != MODELS:
-        raise PlanError('required_models must list all four adapter models exactly once')
+    if not isinstance(models, list) or not all(isinstance(model, str) for model in models) or len(models) != len(set(models)) or set(models) != model_names:
+        raise PlanError('required_models must list all adapter models exactly once')
     if comparison['metric'] != 'accuracy' or comparison['regime'] not in ('aba', 'stationary', 'switching') or comparison['noise'] not in ('0.1', '0.25') or comparison['checkpoint'] not in ('1', '2', '3') or comparison['probe_rule'] not in ('0', '1'):
         raise PlanError('unsupported comparison filter')
     criteria = plan['criteria']
@@ -270,6 +274,7 @@ def parse_counts(row, location):
 
 
 def analyze(plan, cfg, evidence):
+    model_names = ADAPTERS[plan['adapter']]
     probe_fields = ['seed', 'regime', 'noise', 'checkpoint', 'rule', 'model', 'correct', 'trials', 'accuracy', 'mean_logloss']
     window_fields = ['seed', 'regime', 'noise', 'window_start', 'window_end', 'model', 'correct', 'trials', 'accuracy', 'mean_logloss']
     probe_rows = load_csv(evidence / 'probes.csv', probe_fields)
@@ -279,7 +284,7 @@ def analyze(plan, cfg, evidence):
     for row in probe_rows:
         key = tuple(row[k] for k in ('seed', 'regime', 'noise', 'checkpoint', 'rule', 'model'))
         seed, regime, noise, checkpoint, rule, model = key
-        if seed not in seeds or regime not in ('aba', 'stationary', 'switching') or noise not in ('0.1', '0.25') or checkpoint not in ('1', '2', '3') or rule not in ('0', '1') or model not in MODELS or key in lookup:
+        if seed not in seeds or regime not in ('aba', 'stationary', 'switching') or noise not in ('0.1', '0.25') or checkpoint not in ('1', '2', '3') or rule not in ('0', '1') or model not in model_names or key in lookup:
             raise PlanError(f'unexpected or duplicate probe: {key}')
         correct, trials = parse_counts(row, f'probe {key}')
         if trials != cfg['test_tokens']:
@@ -291,7 +296,7 @@ def analyze(plan, cfg, evidence):
         if not math.isfinite(logloss) or logloss < 0:
             raise PlanError(f'invalid probe log loss: {key}')
         lookup[key] = correct / trials
-    if len(lookup) != len(seeds) * 3 * 2 * 3 * 2 * len(MODELS):
+    if len(lookup) != len(seeds) * 3 * 2 * 3 * 2 * len(model_names):
         raise PlanError('probe evidence is incomplete')
     windows = {}
     total_steps = cfg['train_tokens'] * 3
@@ -302,7 +307,7 @@ def analyze(plan, cfg, evidence):
         except ValueError as exc:
             raise PlanError('invalid window boundaries') from exc
         key = (row['seed'], row['regime'], row['noise'], str(start), row['model'])
-        if row['seed'] not in seeds or row['regime'] not in ('aba', 'stationary', 'switching') or row['noise'] not in ('0.1', '0.25') or row['model'] not in MODELS or start not in expected_starts or end != min(start + 200, total_steps) or key in windows:
+        if row['seed'] not in seeds or row['regime'] not in ('aba', 'stationary', 'switching') or row['noise'] not in ('0.1', '0.25') or row['model'] not in model_names or start not in expected_starts or end != min(start + 200, total_steps) or key in windows:
             raise PlanError(f'unexpected or duplicate window: {key}')
         correct, trials = parse_counts(row, f'window {key}')
         if trials != end - start:
@@ -314,7 +319,7 @@ def analyze(plan, cfg, evidence):
         if not math.isfinite(logloss) or logloss < 0:
             raise PlanError(f'invalid window log loss: {key}')
         windows[key] = (correct, trials)
-    if len(windows) != len(seeds) * 3 * 2 * len(expected_starts) * len(MODELS):
+    if len(windows) != len(seeds) * 3 * 2 * len(expected_starts) * len(model_names):
         raise PlanError('window evidence is incomplete')
     cmp = plan['comparison']
     diffs = []
@@ -394,7 +399,7 @@ def run_stage(directory, split):
     status = {'state': 'running', 'split': split}
     write_json(stage / 'status.json', status)
     try:
-        args = ['cargo', 'run', '--offline', '--quiet', '--release', '--manifest-path', str(ROOT / 'toolkit/Cargo.toml'), '--bin', ADAPTER, '--', str(directory / f'{split}.cfg'), str(stage / 'evidence')]
+        args = ['cargo', 'run', '--offline', '--quiet', '--release', '--manifest-path', str(ROOT / 'toolkit/Cargo.toml'), '--bin', plan['adapter'], '--', str(directory / f'{split}.cfg'), str(stage / 'evidence')]
         with (stage / 'stdout.log').open('wb') as stdout, (stage / 'stderr.log').open('wb') as stderr:
             result = subprocess.run(args, cwd=ROOT, stdout=stdout, stderr=stderr, timeout=plan['budget']['max_wall_seconds'], check=False)
         load_lock(directory)  # Fail closed if source or frozen plan changed during execution.

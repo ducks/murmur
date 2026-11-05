@@ -18,7 +18,7 @@ import sys
 import time
 import uuid
 
-from . import runner
+from . import memory, runner
 
 GOAL = 'Find a model that retains earlier rules and adapts to rule changes at least as well as the mixture baseline.'
 ALLOWED = {'toolkit/src/agent_candidate.rs', 'toolkit/tests/agent_generated.rs'}
@@ -133,7 +133,7 @@ def prior_history(path):
     return history
 
 
-def prompt_for(config, history):
+def prompt_for(config, history, research_memory=None):
     if config.get('protocol', 'legacy') == 'milestone':
         criteria_text = 'The supervisor checks final frozen B recall and the first 100 online predictions after each A→B and B→A switch, on each of four binary task families. The candidate must be within 2 percentage points of the unchanged mixture on each mean paired accuracy. Resource budgets apply to the entire stage; inline size and per-model training time are diagnostic only and heap memory is not measured.'
     else:
@@ -145,6 +145,11 @@ Propose and implement ONE genuinely motivated candidate model for the existing h
 
 Previous campaign results (may be empty):
 {json.dumps(history, indent=2)}
+
+Research memory (observations are not proven explanations; campaign evidence is not reverified here):
+{json.dumps(research_memory or {}, indent=2)}
+
+For an apparent failure, distinguish observations from possible explanations and propose a discriminating test in your hypothesis and falsification. The full index for this round is saved alongside the agent logs as research-memory.json; the prompt may include only recent campaign rounds.
 
 Edit ONLY toolkit/src/agent_candidate.rs and toolkit/tests/agent_generated.rs. The latter must contain at least one meaningful Rust test for your proposed mechanism. Do not alter evaluator, baseline, configs, docs, Git metadata, or any other file; do not commit. The supervisor rejects other changes. Preserve Candidate's Clone, new(seed, rate), reset(), predict(x)->f64 and observe(x,y,learn) interface. `predict` must happen without seeing y; output must be finite in [0,1]. In `observe(..., false)`, do not change learned parameters, though context inference state may update. reset clears transient inference state without erasing learned parameters. Candidate may use local Rust standard library and existing local crates only; no network, pretrained weights, external APIs, hidden future data, environment data, or provided true context. Model-code restrictions are reviewed/tested, not a complete security boundary.
 
@@ -201,7 +206,8 @@ def bounded_process(args, *, cwd, stdout, stderr, timeout, input_bytes=None, env
 def call_agent(config, worktree, round_dir, history):
     env = build_environment(round_dir.parent, config)
     args = agent_command(config, worktree, round_dir / 'idea.json', round_dir.parent / 'agent-output-schema.json')
-    (round_dir / 'prompt.txt').write_text(prompt_for(config, history), encoding='utf-8')
+    index = runner.read_json(round_dir / 'research-memory.json')
+    (round_dir / 'prompt.txt').write_text(prompt_for(config, history, index['agent_context']), encoding='utf-8')
     try:
         with (round_dir / 'agent-events.jsonl').open('wb') as stdout, (round_dir / 'agent-stderr.log').open('wb') as stderr:
             result = bounded_process(args, cwd=worktree, input_bytes=(round_dir / 'prompt.txt').read_bytes(), stdout=stdout,
@@ -356,6 +362,10 @@ def execute_round(directory, config, state, agent=call_agent):
     runner.write_json(round_dir / 'result.json', result)
     try:
         git(runner.ROOT, 'worktree', 'add', '-b', branch, str(worktree), base)
+        research_index = memory.build_index()
+        research_index['agent_context'] = memory.snapshot_for_agent(research_index, config['campaign_id'])
+        research_index['agent_context']['full_snapshot_path'] = str(round_dir / 'research-memory.json')
+        runner.write_json(round_dir / 'research-memory.json', research_index)
         agent_started = time.monotonic()
         idea = agent(config, worktree, round_dir, config.get('prior_history', []) + state['completed'])
         result['agent_elapsed_seconds'] = time.monotonic() - agent_started

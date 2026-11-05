@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "findings": [
+    {
+      "id": "slot-symmetry-2026-11",
+      "question": "Can two initially identical neutral memories develop distinct roles under these deterministic updates?",
+      "observation": "Identically initialized neutral slots stayed identical; task-neutral random initial differences restored much of frozen B recall on the tested repeat/flip-like tasks.",
+      "hypothesis": "Symmetry prevents the two deterministic slots from specializing; random initialization can break that symmetry.",
+      "next_test": "Compare controlled symmetry-breaking mechanisms on fresh seeds and rule families, with equal prior strength and matched compute.",
+      "limitations": "The ablation also changed the persistent decay target, so initialization and decay effects were not isolated; tasks were public and synthetic.",
+      "evidence": [
+        "EXPERIMENTS.md",
+        "toolkit/experiment-results/prior-ablation/report.md"
+      ],
+      "related_findings": [],
+      "candidate_commits": []
+    },
+    {
+      "id": "matched-idea2-2026-11",
+      "question": "Does posterior-discounted plasticity improve the retention and switch tradeoff compared with the earlier predictive-gated candidate?",
+      "observation": "On matched 30-seed development and 30-seed separate-rule comparisons, idea 2 met all 12 non-inferiority checks; idea 1 met 8 and 9 respectively. Idea 2 had lower B recall than idea 1 in one unequal-noise development condition.",
+      "hypothesis": "Posterior-discounted learning can reduce interference while retaining enough adaptation on some rule families.",
+      "next_test": "Vary switch rate and task structure on matched seeds; separately compare update weights without altering inference.",
+      "limitations": "The rules were visible and hand-selected; both ideas modify an existing mixture. Non-inferiority does not demonstrate novelty or significance.",
+      "evidence": [
+        "EXPERIMENTS.md",
+        "toolkit/experiment-results/milestone-matched/development/summary.json",
+        "toolkit/experiment-results/milestone-matched/evaluation/summary.json"
+      ],
+      "related_findings": [
+        "slot-symmetry-2026-11"
+      ],
+      "candidate_commits": [
+        "e22d28cf8a64a3719b1be31521ee37bcb61a7e71",
+        "9c8f02b9551aa59b52f2f59400329783bad5514b"
+      ]
+    },
+    {
+      "id": "uneven-bias-forgetting-2026-11",
+      "question": "Why does idea 2 lose B recall after A returns on the uneven-bias condition?",
+      "observation": "With 400 transitions per phase, frozen B recall for mixture and idea 2 was about 0.81 immediately after B; after A it was 0.786 and 0.686. In a post-hoc slot heuristic, 7/30 idea-2 runs crossed a 0.5 conditional-probability threshold and accounted for most of its average deficit.",
+      "hypothesis": "Updates during the final A phase may corrupt a B-like memory or its routing; the correlation does not identify a cause.",
+      "next_test": "Freeze or restore the identified memory after B and compare against a sham intervention on fresh paired seeds, measuring both B retention and A adaptation.",
+      "limitations": "The slot heuristic and threshold were selected post-hoc, ignore probe-time beliefs, and were measured on one public task; phase length also changes exposure.",
+      "evidence": [
+        "EXPERIMENTS.md",
+        "toolkit/experiment-results/update-rule-sweep/drift-analysis.json",
+        "toolkit/experiment-results/update-rule-sweep/states.csv.gz"
+      ],
+      "related_findings": [
+        "matched-idea2-2026-11"
+      ],
+      "candidate_commits": [
+        "9c8f02b9551aa59b52f2f59400329783bad5514b"
+      ]
+    }
+  ]
+}

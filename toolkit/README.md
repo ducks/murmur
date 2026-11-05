@@ -270,6 +270,19 @@ Campaign round results include the coding agent's wall time and, when the CLI re
 
 A possible longer-term direction for volunteer compute, and the additional verification and isolation it would need, is described in [DISTRIBUTED_VISION.md](coordinator/DISTRIBUTED_VISION.md). Distributed execution is not implemented.
 
+### Research memory
+
+Each campaign round snapshots a local research-memory index into `idea-NNN/research-memory.json` before the agent starts. The agent sees the curated findings and up to 20 recently modified other-campaign rounds, with the total and shown counts; the current campaign's own earlier rounds are supplied separately. Findings keep observations, hypotheses, possible next tests, limitations, related findings, candidate commits and evidence links distinct. The agent is instructed to propose a discriminating test, but the workflow does not autonomously establish causes or automatically create new investigation records.
+
+The index reads completed and in-progress round metadata from campaigns immediately under `toolkit/runs/`, plus versioned notes in `toolkit/research-memory/findings.json`. It reports malformed campaigns as warnings and labels the campaign records as not independently reverified. Round metadata remains the source of truth. Only manually curated standalone findings are indexed; arbitrary experiment directories and campaigns outside the runs root are not discovered automatically. Campaign artifacts are ignored by Git and can be lost if deleted; versioned findings are not backups of raw evidence. To inspect the index or save a new portable snapshot:
+
+```sh
+nix-shell --run 'python3 -B -m toolkit.coordinator.memory'
+nix-shell --run 'python3 -B -m toolkit.coordinator.memory --output toolkit/runs/research-memory-snapshot.json'
+```
+
+Snapshots contain local evidence paths and do not copy the referenced artifacts. For broader datasets, [NVIDIA Auto-Ontology](https://github.com/NVIDIA/auto-ontology) is a possible external semantic layer, and [LangGraph](https://docs.langchain.com/oss/python/langgraph/persistence) is a possible workflow and checkpointing layer. Neither is integrated; this local index requires no model or external service. LangGraph checkpoints do not substitute for validated evidence, scientific controls, or a causal investigation.
+
 ### Automated prior and adaptation comparison
 
 Run the fixed matched-seed prior ablation and write per-seed metrics, 100-step online windows, aggregate summaries, a readable report, configuration, and a source-hash manifest with one command:

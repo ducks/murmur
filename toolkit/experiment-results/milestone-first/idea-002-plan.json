@@ -1,0 +1,29 @@
+{
+  "adapter": "milestone_context",
+  "budget": {
+    "max_logical_transitions_per_split": 1200000,
+    "max_seeds_per_split": 20,
+    "max_wall_seconds": 180
+  },
+  "comparison": {
+    "baseline": "mixture",
+    "candidate": "candidate",
+    "metric": "accuracy",
+    "required_models": [
+      "single",
+      "mixture",
+      "candidate",
+      "oracle"
+    ]
+  },
+  "criteria": {
+    "max_accuracy_drop": 0.02
+  },
+  "development_config": "toolkit/configs/agent/dev.cfg",
+  "evaluation_config": "toolkit/configs/agent/evaluation.cfg",
+  "falsification": "The candidate fails the operational criteria if its mean paired accuracy falls more than two percentage points below the mixture on any required final B probe or first 100 predictions after a switch.",
+  "hypothesis": "Discounting uncertain memory assignments may reduce interference while posterior-based routing preserves responsiveness to rule changes.",
+  "id": "agent-idea-002",
+  "question": "Can uncertainty-discounted plasticity improve rule retention while matching the mixture's adaptation across the four binary task families?",
+  "schema_version": 1
+}

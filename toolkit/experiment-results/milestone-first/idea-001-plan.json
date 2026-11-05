@@ -1,0 +1,29 @@
+{
+  "adapter": "milestone_context",
+  "budget": {
+    "max_logical_transitions_per_split": 1200000,
+    "max_seeds_per_split": 20,
+    "max_wall_seconds": 180
+  },
+  "comparison": {
+    "baseline": "mixture",
+    "candidate": "candidate",
+    "metric": "accuracy",
+    "required_models": [
+      "single",
+      "mixture",
+      "candidate",
+      "oracle"
+    ]
+  },
+  "criteria": {
+    "max_accuracy_drop": 0.02
+  },
+  "development_config": "toolkit/configs/agent/dev.cfg",
+  "evaluation_config": "toolkit/configs/agent/evaluation.cfg",
+  "falsification": "The candidate fails the operational criteria if its mean paired accuracy falls more than two percentage points below the mixture on any required final B probe or first 100 predictions after a switch.",
+  "hypothesis": "Gating plasticity by predictive context belief will reduce interference between rule memories while retaining enough flexibility to adapt to different binary rule families.",
+  "id": "agent-idea-001",
+  "question": "Can predictive-belief-gated plasticity preserve earlier rules and adapt to switches at least as well as the fixed mixture across the four task families?",
+  "schema_version": 1
+}

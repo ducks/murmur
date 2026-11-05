@@ -69,5 +69,22 @@ class MilestoneTests(unittest.TestCase):
         self.assertIn('foo', prompt)
         self.assertIn('2 percentage points', prompt)
 
+    def test_development_and_evaluation_rule_families_are_distinct(self):
+        self.assertTrue(set(runner.MILESTONE_FAMILIES).isdisjoint(runner.MILESTONE_EVAL_FAMILIES))
+        self.assertEqual(len(runner.MILESTONE_EVAL_FAMILIES), 4)
+
+    def test_two_percentage_point_boundary_passes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            path = self.evidence(root)
+            with path.open(newline='') as f:
+                rows = list(csv.DictReader(f))
+            for row in rows:
+                if row['model'] == 'candidate' and row['family'] == 'complementary' and row['phase'] == '3' and row['measurement'] == 'probe_b':
+                    row.update(correct='48', accuracy='0.48')
+            with path.open('w', newline='') as f:
+                out = csv.DictWriter(f, fieldnames=rows[0].keys()); out.writeheader(); out.writerows(rows)
+            self.assertTrue(runner.analyze_milestone(self.plan, self.cfg, root)['checks']['complementary:retention_b'])
+
 if __name__ == '__main__':
     unittest.main()

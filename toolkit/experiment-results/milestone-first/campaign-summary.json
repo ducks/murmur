@@ -1,0 +1,373 @@
+{
+  "base_commit": "aaa4a28a669233738314c7e5f15146f83b6ea3f3",
+  "campaign_id": "da5068f3eda7",
+  "cleanup": {
+    "cache": "removed",
+    "rounds": [
+      {
+        "index": 1,
+        "status": "already_absent"
+      },
+      {
+        "index": 2,
+        "status": "removed"
+      }
+    ]
+  },
+  "goal": "Find a model that retains earlier rules and adapts to rule changes at least as well as the mixture baseline.",
+  "protocol": "milestone",
+  "rounds": [
+    {
+      "agent_elapsed_seconds": 43.068972095963545,
+      "agent_usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 116224,
+        "input_tokens": 148695,
+        "output_tokens": 1537,
+        "reasoning_output_tokens": 158
+      },
+      "commit": "e22d28cf8a64a3719b1be31521ee37bcb61a7e71",
+      "development": {
+        "baseline": "mixture",
+        "candidate": "candidate",
+        "checks": {
+          "asymmetric:retention_b": true,
+          "asymmetric:switch_to_a": false,
+          "asymmetric:switch_to_b": false,
+          "complementary:retention_b": true,
+          "complementary:switch_to_a": false,
+          "complementary:switch_to_b": false,
+          "constant_bias:retention_b": true,
+          "constant_bias:switch_to_a": true,
+          "constant_bias:switch_to_b": true,
+          "unequal_noise:retention_b": true,
+          "unequal_noise:switch_to_a": true,
+          "unequal_noise:switch_to_b": true
+        },
+        "comparisons": {
+          "asymmetric:retention_b": {
+            "baseline_accuracy": 0.3981,
+            "candidate_accuracy": 0.4363,
+            "losses": 3,
+            "mean_paired_difference": 0.0382,
+            "ties": 3,
+            "wins": 4
+          },
+          "asymmetric:switch_to_a": {
+            "baseline_accuracy": 0.6759999999999999,
+            "candidate_accuracy": 0.655,
+            "losses": 6,
+            "mean_paired_difference": -0.021000000000000008,
+            "ties": 2,
+            "wins": 2
+          },
+          "asymmetric:switch_to_b": {
+            "baseline_accuracy": 0.527,
+            "candidate_accuracy": 0.485,
+            "losses": 8,
+            "mean_paired_difference": -0.042000000000000016,
+            "ties": 1,
+            "wins": 1
+          },
+          "complementary:retention_b": {
+            "baseline_accuracy": 0.3613,
+            "candidate_accuracy": 0.34249999999999997,
+            "losses": 3,
+            "mean_paired_difference": -0.018800000000000004,
+            "ties": 4,
+            "wins": 3
+          },
+          "complementary:switch_to_a": {
+            "baseline_accuracy": 0.5700000000000001,
+            "candidate_accuracy": 0.541,
+            "losses": 6,
+            "mean_paired_difference": -0.029000000000000005,
+            "ties": 1,
+            "wins": 3
+          },
+          "complementary:switch_to_b": {
+            "baseline_accuracy": 0.553,
+            "candidate_accuracy": 0.43899999999999995,
+            "losses": 9,
+            "mean_paired_difference": -0.11400000000000002,
+            "ties": 0,
+            "wins": 1
+          },
+          "constant_bias:retention_b": {
+            "baseline_accuracy": 0.8985,
+            "candidate_accuracy": 0.8996000000000001,
+            "losses": 1,
+            "mean_paired_difference": 0.001100000000000001,
+            "ties": 2,
+            "wins": 7
+          },
+          "constant_bias:switch_to_a": {
+            "baseline_accuracy": 0.866,
+            "candidate_accuracy": 0.861,
+            "losses": 5,
+            "mean_paired_difference": -0.004999999999999993,
+            "ties": 5,
+            "wins": 0
+          },
+          "constant_bias:switch_to_b": {
+            "baseline_accuracy": 0.7030000000000001,
+            "candidate_accuracy": 0.767,
+            "losses": 0,
+            "mean_paired_difference": 0.06399999999999997,
+            "ties": 0,
+            "wins": 10
+          },
+          "unequal_noise:retention_b": {
+            "baseline_accuracy": 0.41769999999999996,
+            "candidate_accuracy": 0.5187,
+            "losses": 0,
+            "mean_paired_difference": 0.101,
+            "ties": 2,
+            "wins": 8
+          },
+          "unequal_noise:switch_to_a": {
+            "baseline_accuracy": 0.9029999999999999,
+            "candidate_accuracy": 0.897,
+            "losses": 6,
+            "mean_paired_difference": -0.006000000000000005,
+            "ties": 2,
+            "wins": 2
+          },
+          "unequal_noise:switch_to_b": {
+            "baseline_accuracy": 0.517,
+            "candidate_accuracy": 0.539,
+            "losses": 2,
+            "mean_paired_difference": 0.022000000000000013,
+            "ties": 2,
+            "wins": 6
+          }
+        },
+        "elapsed_seconds": 4.976141212973744,
+        "limitations": [
+          "Thresholds on means are operational, not statistical guarantees.",
+          "Non-inferiority alone does not demonstrate novelty; copying the baseline could pass.",
+          "Task families and evaluation seeds are locally visible and can be overfit.",
+          "The oracle receives context labels.",
+          "Inline bytes exclude heap allocations; peak memory is not measured.",
+          "Per-model training times include clock overhead, exclude probes, and are noisy; resource budgets are not matched."
+        ],
+        "logical_transitions": 360000,
+        "max_accuracy_drop": 0.02,
+        "outcome": "criteria_not_met",
+        "peak_memory": "not measured",
+        "resources": {
+          "candidate": {
+            "inline_bytes": 72,
+            "training_ns_total": 3036450,
+            "training_steps": 120000
+          },
+          "mixture": {
+            "inline_bytes": 72,
+            "training_ns_total": 3230742,
+            "training_steps": 120000
+          },
+          "oracle": {
+            "inline_bytes": 48,
+            "training_ns_total": 2212375,
+            "training_steps": 120000
+          },
+          "single": {
+            "inline_bytes": 48,
+            "training_ns_total": 2107472,
+            "training_steps": 120000
+          }
+        },
+        "seeds": 10,
+        "split": "development"
+      },
+      "error": null,
+      "evaluation": null,
+      "final_probe_matrix": {},
+      "idea": {
+        "approach": "Implemented two learned transition tables whose updates are weighted by the squared context belief computed before observing the target. The requested offline tests passed, including a frozen-recall test for conflicting rules.",
+        "falsification": "The candidate fails the operational criteria if its mean paired accuracy falls more than two percentage points below the mixture on any required final B probe or first 100 predictions after a switch.",
+        "hypothesis": "Gating plasticity by predictive context belief will reduce interference between rule memories while retaining enough flexibility to adapt to different binary rule families.",
+        "limitations": "Predictive gating can reinforce an incorrect context assignment or slow learning after a switch, and randomly initialized tables may collapse to similar predictions. No development or evaluation comparison was measured.",
+        "question": "Can predictive-belief-gated plasticity preserve earlier rules and adapt to switches at least as well as the fixed mixture across the four task families?"
+      },
+      "index": 1,
+      "status": "complete"
+    },
+    {
+      "agent_elapsed_seconds": 37.946804643957876,
+      "agent_usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 86144,
+        "input_tokens": 119362,
+        "output_tokens": 1396,
+        "reasoning_output_tokens": 121
+      },
+      "commit": "9c8f02b9551aa59b52f2f59400329783bad5514b",
+      "development": {
+        "baseline": "mixture",
+        "candidate": "candidate",
+        "checks": {
+          "asymmetric:retention_b": true,
+          "asymmetric:switch_to_a": true,
+          "asymmetric:switch_to_b": true,
+          "complementary:retention_b": true,
+          "complementary:switch_to_a": true,
+          "complementary:switch_to_b": true,
+          "constant_bias:retention_b": true,
+          "constant_bias:switch_to_a": true,
+          "constant_bias:switch_to_b": true,
+          "unequal_noise:retention_b": true,
+          "unequal_noise:switch_to_a": false,
+          "unequal_noise:switch_to_b": true
+        },
+        "comparisons": {
+          "asymmetric:retention_b": {
+            "baseline_accuracy": 0.36360000000000003,
+            "candidate_accuracy": 0.5496000000000001,
+            "losses": 0,
+            "mean_paired_difference": 0.186,
+            "ties": 1,
+            "wins": 9
+          },
+          "asymmetric:switch_to_a": {
+            "baseline_accuracy": 0.702,
+            "candidate_accuracy": 0.758,
+            "losses": 1,
+            "mean_paired_difference": 0.05600000000000001,
+            "ties": 0,
+            "wins": 9
+          },
+          "asymmetric:switch_to_b": {
+            "baseline_accuracy": 0.529,
+            "candidate_accuracy": 0.5589999999999999,
+            "losses": 1,
+            "mean_paired_difference": 0.030000000000000006,
+            "ties": 0,
+            "wins": 9
+          },
+          "complementary:retention_b": {
+            "baseline_accuracy": 0.3309,
+            "candidate_accuracy": 0.6597999999999999,
+            "losses": 0,
+            "mean_paired_difference": 0.32889999999999997,
+            "ties": 0,
+            "wins": 10
+          },
+          "complementary:switch_to_a": {
+            "baseline_accuracy": 0.636,
+            "candidate_accuracy": 0.7110000000000001,
+            "losses": 0,
+            "mean_paired_difference": 0.07499999999999998,
+            "ties": 2,
+            "wins": 8
+          },
+          "complementary:switch_to_b": {
+            "baseline_accuracy": 0.576,
+            "candidate_accuracy": 0.603,
+            "losses": 1,
+            "mean_paired_difference": 0.02699999999999999,
+            "ties": 0,
+            "wins": 9
+          },
+          "constant_bias:retention_b": {
+            "baseline_accuracy": 0.8278000000000001,
+            "candidate_accuracy": 0.8919,
+            "losses": 3,
+            "mean_paired_difference": 0.0641,
+            "ties": 4,
+            "wins": 3
+          },
+          "constant_bias:switch_to_a": {
+            "baseline_accuracy": 0.881,
+            "candidate_accuracy": 0.876,
+            "losses": 5,
+            "mean_paired_difference": -0.0050000000000000044,
+            "ties": 3,
+            "wins": 2
+          },
+          "constant_bias:switch_to_b": {
+            "baseline_accuracy": 0.73,
+            "candidate_accuracy": 0.78,
+            "losses": 0,
+            "mean_paired_difference": 0.05000000000000001,
+            "ties": 1,
+            "wins": 9
+          },
+          "unequal_noise:retention_b": {
+            "baseline_accuracy": 0.3255,
+            "candidate_accuracy": 0.3963,
+            "losses": 0,
+            "mean_paired_difference": 0.0708,
+            "ties": 6,
+            "wins": 4
+          },
+          "unequal_noise:switch_to_a": {
+            "baseline_accuracy": 0.889,
+            "candidate_accuracy": 0.8640000000000001,
+            "losses": 8,
+            "mean_paired_difference": -0.025,
+            "ties": 1,
+            "wins": 1
+          },
+          "unequal_noise:switch_to_b": {
+            "baseline_accuracy": 0.538,
+            "candidate_accuracy": 0.55,
+            "losses": 1,
+            "mean_paired_difference": 0.01200000000000001,
+            "ties": 3,
+            "wins": 6
+          }
+        },
+        "elapsed_seconds": 4.927560543059371,
+        "limitations": [
+          "Thresholds on means are operational, not statistical guarantees.",
+          "Non-inferiority alone does not demonstrate novelty; copying the baseline could pass.",
+          "Task families and evaluation seeds are locally visible and can be overfit.",
+          "The oracle receives context labels.",
+          "Inline bytes exclude heap allocations; peak memory is not measured.",
+          "Per-model training times include clock overhead, exclude probes, and are noisy; resource budgets are not matched."
+        ],
+        "logical_transitions": 360000,
+        "max_accuracy_drop": 0.02,
+        "outcome": "criteria_not_met",
+        "peak_memory": "not measured",
+        "resources": {
+          "candidate": {
+            "inline_bytes": 72,
+            "training_ns_total": 4563413,
+            "training_steps": 120000
+          },
+          "mixture": {
+            "inline_bytes": 72,
+            "training_ns_total": 3256493,
+            "training_steps": 120000
+          },
+          "oracle": {
+            "inline_bytes": 48,
+            "training_ns_total": 2199233,
+            "training_steps": 120000
+          },
+          "single": {
+            "inline_bytes": 48,
+            "training_ns_total": 2176334,
+            "training_steps": 120000
+          }
+        },
+        "seeds": 10,
+        "split": "development"
+      },
+      "error": null,
+      "evaluation": null,
+      "final_probe_matrix": {},
+      "idea": {
+        "approach": "Implemented two learned transition memories with posterior-weighted updates discounted by assignment uncertainty. The required offline tests passed, including a test of reduced uncertain updates and frozen-parameter behavior.",
+        "falsification": "The candidate fails the operational criteria if its mean paired accuracy falls more than two percentage points below the mixture on any required final B probe or first 100 predictions after a switch.",
+        "hypothesis": "Discounting uncertain memory assignments may reduce interference while posterior-based routing preserves responsiveness to rule changes.",
+        "limitations": "Discounted updates may slow adaptation or reinforce an incorrect assignment. No development or evaluation comparison was measured, so improvement over the mixture remains untested.",
+        "question": "Can uncertainty-discounted plasticity improve rule retention while matching the mixture's adaptation across the four binary task families?"
+      },
+      "index": 2,
+      "status": "complete"
+    }
+  ]
+}

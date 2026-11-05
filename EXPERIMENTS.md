@@ -1090,3 +1090,25 @@ nix-shell --run 'python3 toolkit/scripts/run_candidate_ablation.py toolkit/confi
 ```
 
 The [generated report](toolkit/experiment-results/prior-ablation/report.md), [summary](toolkit/experiment-results/prior-ablation/summary.csv), [compressed per-seed metrics](toolkit/experiment-results/prior-ablation/metrics.csv.gz), and [manifest](toolkit/experiment-results/prior-ablation/manifest.json) are versioned. The recorded run was generated from clean commit `a292039`; the metrics matched an earlier independent invocation byte-for-byte. The manifest hashes uncompressed metrics and source/config files, but does not pin nixpkgs or measure time and memory. The runner does not invent experiments or apply a success threshold.
+
+## First retention-and-adaptation scorecard campaign
+
+A new milestone protocol compares an agent candidate with the original mixture on four development rule families. Its fixed criterion requires the mean paired candidate accuracy to be no more than 0.02 below the mixture for each family's final frozen B probe and the first 100 online predictions after each A→B and B→A switch: 12 checks in total. Development uses 10 seeds and evaluation, if eligible, uses 20 separate seeds and four different, fixed rule pairs. The evaluator and seeds are locally visible, so these are not blind holdouts. Counts and model/seed coverage are validated; passing non-inferiority does not demonstrate novelty, as simply copying the mixture can pass. A local scripted smoke candidate copied the baseline and achieved equality on all 12 development and evaluation checks; that is an infrastructure test, not a research result.
+
+The first live two-idea campaign began from `aaa4a28` and imported the previous two-idea campaign history. The second agent received the first candidate and its complete development scorecard. Candidate commits are preserved as local branches:
+
+| Idea | Candidate | Development | Failed checks | Evaluation |
+|---|---|---|---|---|
+| 1 | `e22d28c` | 8/12 checks pass | Both complementary switches and both asymmetric switches | Not run: development failed |
+| 2 | `9c8f02b` | 11/12 checks pass | Unequal-noise B→A: 0.864 candidate vs 0.889 mixture, difference -0.025 | Not run: development failed |
+
+The first used two learned transition tables with squared predictive-belief updates; the second used posterior-weighted updates discounted by assignment uncertainty. Their development seeds differ, so the check counts do not establish that the second mechanism is better. This is exploratory feedback, not a validated advance. All final B retention checks passed for both on their respective seeds; several switch checks failed. Before interpreting this as improvement, compare both models on identical seeds and evaluate genuinely withheld tasks or rules.
+
+The first/second agent reported 148,695/119,362 input tokens including 116,224/86,144 cached, and 1,537/1,396 output tokens. Token fields may overlap; no spending cap or monetary estimate is enforced. Both completed worktrees and the shared build cache were removed, while ignored detailed campaign evidence remains under `toolkit/runs/milestone-first/`. The committed [campaign summary](toolkit/experiment-results/milestone-first/campaign-summary.json) preserves scorecards, resource diagnostics, ideas and usage; the frozen plans and development configurations are stored alongside it. The scorecard enforces stage wall time, seed count and logical transitions, while per-model training time and inline size are descriptive only; heap and peak memory are not measured and compute is not matched. The task families are small, fixed, public and vulnerable to repeated adaptive tuning.
+
+```sh
+nix-shell --run 'python3 -B -m toolkit.coordinator.campaign init toolkit/runs/my-milestone --max-ideas 2 --agent-seconds 300 --prior-campaign toolkit/runs/milestone-first'
+nix-shell --run 'python3 -B -m toolkit.coordinator.campaign run toolkit/runs/my-milestone'
+```
+
+Campaign identifiers produce different seeds, and a coding agent is nondeterministic; this reproduces the protocol, not the generated candidate or exact scores. Hosted-agent usage may incur costs. Review candidate source before trusting claims, since the evaluator does not sandbox arbitrary model code as a complete security boundary.

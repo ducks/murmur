@@ -1,0 +1,15 @@
+{
+  "config_sha256": "32ab449cd1342eda449a5849f01cceb7c51a43c4f59479cb445a9ab324a92996",
+  "metrics_sha256": "87e2bce9c2141ae0772c6a5f3683d671d2b6e4db65c8a41b0f4e2f16b898df2a",
+  "protocol_sha256": "28e0d346039738926a3975103146b69e9641b9727667db902c5dcdf340aab390",
+  "revision": "b2246cd57ad1a6480dbcd31b1c6cca1b656bb4e9",
+  "source_sha256": {
+    "toolkit/scripts/run_update_rule_sweep.py": "ab99d1159adfeeda1dc9d4ed8c51dc0a5836031da7f86a61c58d2f41c3d76242",
+    "toolkit/src/bin/update_rule_sweep.rs": "6abd36bf93511f7d127117ab26c283369dbf05894a061588ae186a0119292f06",
+    "toolkit/src/milestone_candidates/idea1.rs": "22b94fe36404ec193fa737b9f9999103da4cd669ad60a53d343517b63ae19870",
+    "toolkit/src/milestone_candidates/idea2.rs": "ea2bf486a6a83d886c8b9974822bbd2e9b65c05477f87b29d58f321e8ee7852f"
+  },
+  "states_sha256": "08b1854f4d4b452fae421f22a00f50335384bdd9a22d260d2533ea63265e5379",
+  "summary_sha256": "c2c8d1fe30e9afccf3ba3f970198c1a8fd05652531a5a72771a528b15281742b",
+  "working_tree_dirty": false
+}

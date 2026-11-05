@@ -1,0 +1,56 @@
+{
+  "family": "uneven_bias",
+  "limitations": [
+    "Descriptive grouping on the same observations; no causal claim.",
+    "P(1|1) threshold is post-hoc and ignores online context belief."
+  ],
+  "method": "Select the slot with higher mean P(1|x) across x=0,1 after B, then inspect the same slot after A. This heuristic is post-hoc and is not a context label.",
+  "models": {
+    "idea2_inspect": {
+      "recall_difference_vs_mixture_by_threshold": {
+        "at_least_0_5": {
+          "count": 23,
+          "mean": -0.0141304347826087
+        },
+        "below_0_5": {
+          "count": 7,
+          "mean": -0.38285714285714284
+        }
+      },
+      "selected_slot_mean_p1_after_a": 0.6413726260685834,
+      "selected_slot_mean_p1_after_b": 0.8271006392380167,
+      "selected_slot_p1_given_1_after_a_mean": 0.6229301428147334,
+      "selected_slot_p1_given_1_below_half_count": 7
+    },
+    "mixture": {
+      "recall_difference_vs_mixture_by_threshold": {
+        "at_least_0_5": {
+          "count": 30,
+          "mean": 0.0
+        }
+      },
+      "selected_slot_mean_p1_after_a": 0.6371399256040666,
+      "selected_slot_mean_p1_after_b": 0.8132636342473334,
+      "selected_slot_p1_given_1_after_a_mean": 0.6522740564313667,
+      "selected_slot_p1_given_1_below_half_count": 0
+    },
+    "posterior_2": {
+      "recall_difference_vs_mixture_by_threshold": {
+        "at_least_0_5": {
+          "count": 7,
+          "mean": 0.00885714285714285
+        },
+        "below_0_5": {
+          "count": 23,
+          "mean": -0.49526086956521737
+        }
+      },
+      "selected_slot_mean_p1_after_a": 0.5312361625982167,
+      "selected_slot_mean_p1_after_b": 0.8575181283298167,
+      "selected_slot_p1_given_1_after_a_mean": 0.4459269083947667,
+      "selected_slot_p1_given_1_below_half_count": 23
+    }
+  },
+  "phase_length": 400,
+  "seeds": 30
+}

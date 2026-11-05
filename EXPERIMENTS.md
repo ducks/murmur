@@ -1147,3 +1147,34 @@ nix-shell --run 'python3 -B toolkit/scripts/compare_milestone_candidates.py tool
 ```
 
 [Development summary](toolkit/experiment-results/milestone-matched/development/summary.json) and [evaluation summary](toolkit/experiment-results/milestone-matched/evaluation/summary.json) contain full scorecards and paired comparisons. Compressed per-seed metrics and resource diagnostics are versioned beside them. The runner uses temporary detached Git worktrees with one shared Cargo target directory and removes them after completion. Timing results are not expected to reproduce byte-for-byte. The Nix package set remains unpinned.
+
+## Update-rule and switch-interval sweep
+
+The frozen protocol and evaluator in `846c2b3` compared the original mixture, the two exact candidate snapshots (`e22d28c`, `9c8f02b`), a stronger-discount variant, a single Markov model, and a context-labelled oracle. The candidate snapshots were checked byte-for-byte against the recorded commits. A unit test independently verifies that idea 2 follows the mixture's inference and parameter update with its posterior responsibility raised to 1.25. The stronger-discount variant changes that exponent to 2; it is an ablation, not an optimized model.
+
+Thirty fresh matched seeds were used for five binary first-order rule families and A–B–A phases of 100, 400 or 1,000 transitions each. The families include no rule change, a subtle change, high noise, a new asymmetric pair, and an uneven symbol bias. The frozen [protocol](toolkit/configs/update-rule-sweep/protocol.json) lists their transition probabilities. For each condition, the simulator reports phase online accuracy and log loss, the first 100 predictions of each phase, and frozen A/B probes after each phase. Different phase lengths also change the amount of training, so this is not a controlled isolation of switching frequency. All candidates receive the same stream and initialization seed; only the oracle receives the context. The test families are hand-selected and public, and the seeds are not a blind holdout.
+
+Selected mean accuracies over the same 30 seeds:
+
+| Family, phase length, measure | Mixture | Idea 1 | Idea 2 (power 1.25) | Power 2 |
+|---|---:|---:|---:|---:|
+| No change, 400, final B probe | 0.802 | 0.802 | 0.801 | 0.793 |
+| High noise, 400, final B probe | 0.435 | 0.412 | 0.521 | 0.544 |
+| New asymmetric, 1,000, final B probe | 0.523 | 0.479 | 0.630 | 0.518 |
+| Uneven bias, 400, B probe immediately after B | 0.809 | 0.812 | 0.810 | 0.810 |
+| Uneven bias, 400, B probe after A returns | 0.786 | 0.794 | 0.686 | 0.408 |
+| Uneven bias, 400, first 100 after B→A | 0.898 | 0.900 | 0.885 | 0.841 |
+
+The uneven-bias condition shows a negative result: both mixture and idea 2 had similar frozen B accuracy immediately after B, but idea 2 lost more after returning to A. For final B recall, its paired difference against the mixture was -0.1002, with 4 wins, 15 losses and 11 ties. A post-hoc seed-paired 10,000-resample percentile interval was [-0.1758, -0.0355]; it is descriptive, unadjusted for examining many conditions, and is not a formal significance claim. Stronger discounting was worse in this particular condition, while it improved high-noise B recall. These patterns do not support simply increasing the exponent across tasks.
+
+After seeing that result, an inspection copy of idea 2 was added in `b2246cd`. It asserts prediction equality with the exact saved candidate at every simulation step and logs the mixture's transition tables and beliefs after each phase. The diagnostic rerun reproduced the original per-seed metrics byte-for-byte; the observation and all following analysis are post-hoc. For each seed on uneven bias at phase length 400, a heuristic selects whichever slot has the higher mean P(1|input) across both input symbols at the end of B and tracks that same slot after A. This is not a true context label. In 7/30 idea-2 runs, that slot's P(1|1) ended below 0.5; the mixture had 0/30 under the same heuristic, and power 2 had 23/30. Idea 2's mean B-recall difference versus the mixture was -0.3829 in its seven below-threshold runs and -0.0141 in the other 23. This correlation suggests a testable failure mechanism, but the slot selection and threshold were chosen after seeing the data, and probe-time beliefs can affect predictions. It does not prove that the slot threshold caused forgetting.
+
+The compressed [per-seed metrics](toolkit/experiment-results/update-rule-sweep/metrics.csv.gz), [logged states](toolkit/experiment-results/update-rule-sweep/states.csv.gz), [compressed aggregate summary](toolkit/experiment-results/update-rule-sweep/summary.csv.gz), [post-hoc drift analysis](toolkit/experiment-results/update-rule-sweep/drift-analysis.json) and [manifest](toolkit/experiment-results/update-rule-sweep/manifest.json) are versioned. Reproduce with:
+
+```sh
+nix-shell --run 'cargo test --offline --manifest-path toolkit/Cargo.toml --bin update_rule_sweep'
+nix-shell --run 'python3 -B toolkit/scripts/run_update_rule_sweep.py toolkit/configs/update-rule-sweep/protocol.json toolkit/configs/update-rule-sweep/matched.cfg toolkit/runs/update-rule-sweep-reproduction'
+python3 -B toolkit/scripts/summarize_memory_drift.py toolkit/runs/update-rule-sweep-reproduction uneven_bias 400
+```
+
+No runtime or memory matching was measured in this sweep, the Nix package set remains unpinned, and hyperparameters and task choices were not surveyed exhaustively. The next discriminating test is to intervene on the selected memory or its routing after B, then measure recall on fresh paired seeds while controlling the intervention; a held-out task family would help distinguish this mechanism from a condition-specific artifact.

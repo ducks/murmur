@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "question": "Does posterior uncertainty-discounted plasticity retain its advantages across switch rates and less distinct rule families?",
+  "hypothesis": "Posterior discounting can reduce memory interference without a large adaptation penalty, but may struggle when contexts are difficult to distinguish.",
+  "falsification": "Report every condition; substantial recall or switch-accuracy regressions compared with the baseline are counterevidence.",
+  "models": ["single", "mixture", "idea1_predictive_gate", "idea2_posterior_1_25", "posterior_2", "oracle"],
+  "candidate_commits": ["e22d28cf8a64a3719b1be31521ee37bcb61a7e71", "9c8f02b9551aa59b52f2f59400329783bad5514b"],
+  "phase_lengths": [100, 400, 1000],
+  "families": {
+    "no_change": [[0.20, 0.80], [0.20, 0.80]],
+    "subtle_shift": [[0.20, 0.80], [0.30, 0.70]],
+    "high_noise": [[0.40, 0.60], [0.60, 0.40]],
+    "asymmetric_new": [[0.10, 0.65], [0.85, 0.45]],
+    "uneven_bias": [[0.05, 0.15], [0.70, 0.85]]
+  },
+  "metrics": ["phase online accuracy and log loss", "first 100 predictions after each phase boundary", "frozen A and B probes after each phase"],
+  "notes": "Exploratory matched seeds, not blind, no formal significance or resource matching. All families are binary first-order processes. The oracle sees the true context. Different phase lengths also change training exposure."
+}

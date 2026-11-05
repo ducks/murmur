@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "purpose": "Compare the two first milestone candidates on identical fresh development seeds before further model changes.",
+  "candidates": {
+    "idea_1": "e22d28cf8a64a3719b1be31521ee37bcb61a7e71",
+    "idea_2": "9c8f02b9551aa59b52f2f59400329783bad5514b"
+  },
+  "configuration": "toolkit/configs/milestone-comparison/development.cfg",
+  "split": "development",
+  "comparison": "Mean paired accuracy difference over 30 shared seeds for each family, final B probe, and first 100 predictions after both switches.",
+  "max_accuracy_drop_vs_mixture": 0.02,
+  "bootstrap": {"draws": 10000, "seed": 20261104, "interval": "descriptive percentile 95%, paired by seed, no multiplicity adjustment"},
+  "interpretation": "A criterion pass is not evidence of novelty or statistical significance. Development and evaluation rule families are public. Timing is diagnostic and heap memory is not measured."
+}

@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "candidate_commit": "48a5c2836142b2fd7d711c42e9d8a77134297fc3",
+  "question": "Does retrospective correction or its guard improve accuracy on varied binary tasks and switching intervals?",
+  "hypothesis": "Guarded correction provides a meaningful improvement over otherwise identical no-correction and unguarded variants.",
+  "candidate": "guarded",
+  "controls": ["no_correction", "unguarded", "mixture"],
+  "families": {
+    "uneven_bias": [[0.05,0.15],[0.70,0.85]],
+    "shifted_bias": [[0.10,0.20],[0.65,0.90]],
+    "similar_rules": [[0.10,0.70],[0.30,0.90]],
+    "high_entropy": [[0.40,0.60],[0.60,0.40]],
+    "reverse_asymmetric": [[0.80,0.30],[0.20,0.75]],
+    "stationary": [[0.20,0.80],[0.20,0.80]]
+  },
+  "phase_lengths": [400,1000],
+  "primary_metrics": ["first 100 online predictions after each switch", "final frozen B recall"],
+  "secondary_metrics": ["final frozen A recall", "full-phase online accuracy", "log loss"],
+  "meaningful_effect": 0.01,
+  "bootstrap": {"draws": 10000, "seed": 20261105, "interval": "descriptive 95% seed-paired percentile; unadjusted across conditions"},
+  "limitations": "Public synthetic tasks and previously inspected candidate; fresh seeds only, not a blind holdout. Phase lengths change training exposure. No matched compute or peak-memory measurement."
+}

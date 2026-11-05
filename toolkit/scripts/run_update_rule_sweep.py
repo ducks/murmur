@@ -3,6 +3,7 @@
 import csv
 import hashlib
 import json
+import math
 from pathlib import Path
 import subprocess
 import sys
@@ -38,11 +39,27 @@ def main():
                 raise ValueError(f'unexpected or duplicate observation: {key}')
             keys.add(key); correct=int(row['correct']); trials=int(row['trials']); accuracy=float(row['accuracy']); loss=float(row['logloss'])
             want=int(length) if measurement=='online' else (100 if measurement=='first_100' else cfg['test_tokens'])
-            if trials!=want or not 0<=correct<=trials or abs(accuracy-correct/trials)>5.1e-9 or not 0<=loss<float('inf'):
+            if trials!=want or not 0<=correct<=trials or not math.isfinite(accuracy) or abs(accuracy-correct/trials)>5.1e-9 or not 0<=loss<float('inf'):
                 raise ValueError(f'invalid observation: {key}')
             groups[(family,length,phase,measurement,model)].append((correct/trials,loss))
     expected=len(seeds)*len(plan['families'])*len(plan['phase_lengths'])*3*4*len(plan['models'])
     if len(keys)!=expected: raise ValueError(f'incomplete metrics: {len(keys)} versus {expected}')
+    state_keys=set()
+    with (output/'states.csv').open(newline='',encoding='utf-8') as f:
+        reader=csv.DictReader(f)
+        if reader.fieldnames!=['seed','family','phase_length','phase','model','p00','p01','p10','p11','belief0','belief1']:
+            raise ValueError('unexpected state columns')
+        for row in reader:
+            key=tuple(row[k] for k in ('seed','family','phase_length','phase','model'))
+            seed,family,length,phase,model=key
+            if seed not in seeds or family not in plan['families'] or int(length) not in plan['phase_lengths'] or phase not in ('1','2','3') or model not in ('mixture','idea2_inspect','posterior_2') or key in state_keys:
+                raise ValueError(f'unexpected or duplicate state: {key}')
+            values=[float(row[k]) for k in ('p00','p01','p10','p11','belief0','belief1')]
+            if any(not math.isfinite(v) or not 0<=v<=1 for v in values) or abs(values[4]+values[5]-1)>1e-9:
+                raise ValueError(f'invalid state: {key}')
+            state_keys.add(key)
+    if len(state_keys)!=len(seeds)*len(plan['families'])*len(plan['phase_lengths'])*3*3:
+        raise ValueError('incomplete state evidence')
     with (output/'summary.csv').open('w',newline='',encoding='utf-8') as f:
         out=csv.writer(f);out.writerow(['family','phase_length','phase','measurement','model','seeds','mean_accuracy','mean_logloss'])
         for key,values in sorted(groups.items()):
@@ -52,7 +69,7 @@ def main():
               'working_tree_dirty':bool(subprocess.run(['git','status','--porcelain','--untracked-files=all'],cwd=ROOT,text=True,capture_output=True,check=True).stdout),
               'protocol_sha256':digest(protocol_path),'config_sha256':digest(config),
               'source_sha256':{str(x.relative_to(ROOT)):digest(x) for x in sources},
-              'metrics_sha256':digest(output/'metrics.csv'),'summary_sha256':digest(output/'summary.csv')}
+              'metrics_sha256':digest(output/'metrics.csv'),'states_sha256':digest(output/'states.csv'),'summary_sha256':digest(output/'summary.csv')}
     (output/'manifest.json').write_text(json.dumps(manifest,indent=2,sort_keys=True)+'\n')
     print('Completed validated study:',output)
 

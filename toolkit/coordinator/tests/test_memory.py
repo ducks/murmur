@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 from toolkit.coordinator import memory, campaign, runner
 
 class MemoryTests(unittest.TestCase):
@@ -68,5 +69,17 @@ class MemoryTests(unittest.TestCase):
         record=result['campaign_rounds'][1]
         self.assertTrue(record['incomplete']);self.assertEqual(record['status'],'running')
         self.assertEqual(record['idea']['question'],'unfinished idea')
+    def test_call_agent_includes_snapshot_in_prompt(self):
+        round_dir=self.root/'idea-001';round_dir.mkdir()
+        worktree=round_dir/'worktree';worktree.mkdir()
+        runner.write_json(round_dir/'research-memory.json',{'agent_context':{'findings':[{'observation':'remember this result'}]}})
+        idea={'question':'q','hypothesis':'h','falsification':'f','approach':'a','limitations':'l'}
+        def fake_process(*args,**kwargs):
+            runner.write_json(round_dir/'idea.json',idea)
+            return 0
+        config={'campaign_id':'test','local_provider':None,'model':None,'goal':'goal','protocol':'milestone','agent_seconds':10}
+        with patch.object(campaign,'bounded_process',side_effect=fake_process):
+            self.assertEqual(campaign.call_agent(config,worktree,round_dir,[]),idea)
+        self.assertIn('remember this result',(round_dir/'prompt.txt').read_text())
 
 if __name__=='__main__': unittest.main()

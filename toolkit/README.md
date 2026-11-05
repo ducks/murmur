@@ -281,7 +281,7 @@ nix-shell --run 'python3 -B -m toolkit.coordinator.memory'
 nix-shell --run 'python3 -B -m toolkit.coordinator.memory --output toolkit/runs/research-memory-snapshot.json'
 ```
 
-Snapshots contain local evidence paths and do not copy the referenced artifacts. For broader datasets, [NVIDIA Auto-Ontology](https://github.com/NVIDIA/auto-ontology) is a possible external semantic layer, and [LangGraph](https://docs.langchain.com/oss/python/langgraph/persistence) is a possible workflow and checkpointing layer. Neither is integrated; this local index requires no model or external service. LangGraph checkpoints do not substitute for validated evidence, scientific controls, or a causal investigation.
+Snapshots contain local evidence paths and do not copy the referenced artifacts. For broader datasets, [NVIDIA Auto-Ontology](https://github.com/NVIDIA/auto-ontology) is a possible external semantic layer, and [LangGraph](https://docs.langchain.com/oss/python/langgraph/persistence) is a possible workflow and checkpointing layer. A small optional [LangGraph adapter](adapters/langgraph/README.md) can inspect a campaign and run one bounded iteration; Auto-Ontology is not integrated. The local memory index requires no model or external service. The experimental adapter has no LangGraph checkpointer; checkpoints would not substitute for validated evidence, scientific controls, or a causal investigation.
 
 ### Automated prior and adaptation comparison
 

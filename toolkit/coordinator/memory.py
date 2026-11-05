@@ -108,7 +108,11 @@ def build_index(runs_root=DEFAULT_RUNS, findings_path=DEFAULT_FINDINGS):
     records, warnings, seen = [], [], set()
     def order(path):
         state = path.parent / 'state.json'
-        return (state.stat().st_mtime_ns if state.exists() else 0, str(path))
+        try:
+            modified = state.stat().st_mtime_ns
+        except OSError:
+            modified = 0
+        return (modified, str(path))
     for config_path in sorted(root.glob('*/campaign.json'), key=order):
         try:
             for record in campaign_records(config_path.parent):

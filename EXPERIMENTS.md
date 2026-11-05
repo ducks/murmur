@@ -1178,3 +1178,22 @@ python3 -B toolkit/scripts/summarize_memory_drift.py toolkit/runs/update-rule-sw
 ```
 
 No runtime or memory matching was measured in this sweep, the Nix package set remains unpinned, and hyperparameters and task choices were not surveyed exhaustively. The next discriminating test is to intervene on the selected memory or its routing after B, then measure recall on fresh paired seeds while controlling the intervention; a held-out task family would help distinguish this mechanism from a condition-specific artifact.
+
+## Controlled memory-restoration intervention
+
+Following the post-hoc uneven-bias observation above, a fixed intervention was committed in `623c2ca` before running 30 fresh seeds. The exact saved idea-2 candidate was run alongside an inspectable equivalent, with prediction equality asserted on every training step. After 400 transitions each of A and B, the protocol saved both transition tables and selected the table with higher mean P(1|input), with ties going to slot 0. After another 400 transitions of A it compared frozen A and B probes for: unchanged idea 2 (sham); restoring the selected table to its end-of-B parameters; restoring the *other* table; and the unmodified mixture. Every arm reset its context belief before each probe. Two public high-P(1) B rules were tested, including the original uneven-bias family and a shifted pair; all arms shared the same streams and 30 seeds.
+
+| Family, final B probe | Mixture | Sham idea 2 | Restore selected slot | Restore other slot |
+|---|---:|---:|---:|---:|
+| Uneven bias | 0.7643 | 0.7278 | 0.8112 | 0.7152 |
+| Shifted bias | 0.8596 | 0.8378 | 0.8526 | 0.8370 |
+
+On uneven bias, restoring the selected table changed mean B accuracy by +0.0834 versus sham, while restoring the other table changed it by -0.0126. The selected-slot change won/lost/tied on 12/12/6 seeds, its median was 0, and its range was -0.018 to +0.670. On shifted bias the mean selected-slot change was +0.0148, with 6/21/3 wins/losses/ties and median -0.0065. The mean benefits therefore came from large improvements on some seeds, not consistent gains for most seeds. On the A probe, restoring the selected table changed mean accuracy by -0.0045 and +0.0017 respectively. Descriptive, unadjusted paired bootstrap intervals and all per-seed outcomes are in the [summary](toolkit/experiment-results/memory-intervention/summary.json) and [metrics](toolkit/experiment-results/memory-intervention/metrics.csv).
+
+This is a direct intervention: it supports the conclusion that selected-slot parameter drift can contribute to reduced B recall on some runs under these chosen conditions. It does not establish that drift explains every failure, and the shifted condition is less convincing. The intervention has a privileged end-of-B checkpoint, is applied after training, and selects the slot using a high-P(1) rule tailored to these two task families; it is not a deployable online learner or a general context-discovery method. The hypotheses came from post-hoc analysis, and all tasks are public. A follow-up should test an online policy against sham and random-slot controls across fresh rules and switch schedules, while measuring A adaptation and computational costs.
+
+```sh
+nix-shell --run 'cargo test --offline --manifest-path toolkit/Cargo.toml --bin memory_intervention'
+nix-shell --run 'cargo run --offline --release --manifest-path toolkit/Cargo.toml --bin memory_intervention -- toolkit/configs/memory-intervention/matched.cfg toolkit/runs/memory-intervention-reproduction'
+python3 -B toolkit/scripts/summarize_memory_intervention.py toolkit/runs/memory-intervention-reproduction/metrics.csv
+```

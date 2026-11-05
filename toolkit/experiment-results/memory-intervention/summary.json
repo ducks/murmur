@@ -1,0 +1,238 @@
+{
+  "bootstrap": "10,000 paired percentile resamples, random seed 20261105, descriptive, unadjusted",
+  "conditions": {
+    "shifted_bias:a": {
+      "mixture": {
+        "bootstrap_95_percentile": [
+          0.00023333333333333355,
+          0.004800000000000004
+        ],
+        "mean_accuracy": 0.8731,
+        "mean_difference_vs_sham": 0.002533333333333336,
+        "median_difference_vs_sham": 0.0010000000000000009,
+        "wins_losses_ties": [
+          19,
+          9,
+          2
+        ]
+      },
+      "restore_other": {
+        "bootstrap_95_percentile": [
+          -0.008699999999999992,
+          0.009633333333333346
+        ],
+        "mean_accuracy": 0.8718666666666667,
+        "mean_difference_vs_sham": 0.0013000000000000086,
+        "median_difference_vs_sham": 0.005500000000000005,
+        "wins_losses_ties": [
+          21,
+          8,
+          1
+        ]
+      },
+      "restore_selected": {
+        "bootstrap_95_percentile": [
+          3.333333333333336e-05,
+          0.0034333333333333364
+        ],
+        "mean_accuracy": 0.8723,
+        "mean_difference_vs_sham": 0.0017333333333333348,
+        "median_difference_vs_sham": 0.0020000000000000018,
+        "wins_losses_ties": [
+          19,
+          8,
+          3
+        ]
+      },
+      "sham": {
+        "bootstrap_95_percentile": [
+          0.0,
+          0.0
+        ],
+        "mean_accuracy": 0.8705666666666667,
+        "mean_difference_vs_sham": 0.0,
+        "median_difference_vs_sham": 0.0,
+        "wins_losses_ties": [
+          0,
+          0,
+          30
+        ]
+      }
+    },
+    "shifted_bias:b": {
+      "mixture": {
+        "bootstrap_95_percentile": [
+          -0.00496666666666666,
+          0.0708
+        ],
+        "mean_accuracy": 0.8596333333333334,
+        "mean_difference_vs_sham": 0.021866666666666666,
+        "median_difference_vs_sham": 0.0010000000000000009,
+        "wins_losses_ties": [
+          17,
+          3,
+          10
+        ]
+      },
+      "restore_other": {
+        "bootstrap_95_percentile": [
+          -0.0033333333333333223,
+          0.0017333333333333348
+        ],
+        "mean_accuracy": 0.837,
+        "mean_difference_vs_sham": -0.0007666666666666645,
+        "median_difference_vs_sham": 0.0,
+        "wins_losses_ties": [
+          12,
+          13,
+          5
+        ]
+      },
+      "restore_selected": {
+        "bootstrap_95_percentile": [
+          -0.012833333333333344,
+          0.06586666666666666
+        ],
+        "mean_accuracy": 0.8526,
+        "mean_difference_vs_sham": 0.014833333333333325,
+        "median_difference_vs_sham": -0.006500000000000006,
+        "wins_losses_ties": [
+          6,
+          21,
+          3
+        ]
+      },
+      "sham": {
+        "bootstrap_95_percentile": [
+          0.0,
+          0.0
+        ],
+        "mean_accuracy": 0.8377666666666667,
+        "mean_difference_vs_sham": 0.0,
+        "median_difference_vs_sham": 0.0,
+        "wins_losses_ties": [
+          0,
+          0,
+          30
+        ]
+      }
+    },
+    "uneven_bias:a": {
+      "mixture": {
+        "bootstrap_95_percentile": [
+          0.00160000000000002,
+          0.014066666666666682
+        ],
+        "mean_accuracy": 0.9242333333333334,
+        "mean_difference_vs_sham": 0.007766666666666677,
+        "median_difference_vs_sham": 0.0050000000000000044,
+        "wins_losses_ties": [
+          19,
+          5,
+          6
+        ]
+      },
+      "restore_other": {
+        "bootstrap_95_percentile": [
+          -0.004999999999999982,
+          0.014100000000000017
+        ],
+        "mean_accuracy": 0.9208333333333334,
+        "mean_difference_vs_sham": 0.0043666666666666775,
+        "median_difference_vs_sham": 0.0010000000000000009,
+        "wins_losses_ties": [
+          15,
+          10,
+          5
+        ]
+      },
+      "restore_selected": {
+        "bootstrap_95_percentile": [
+          -0.011699999999999999,
+          0.002833333333333343
+        ],
+        "mean_accuracy": 0.9119333333333334,
+        "mean_difference_vs_sham": -0.004533333333333326,
+        "median_difference_vs_sham": -0.002999999999999947,
+        "wins_losses_ties": [
+          12,
+          17,
+          1
+        ]
+      },
+      "sham": {
+        "bootstrap_95_percentile": [
+          0.0,
+          0.0
+        ],
+        "mean_accuracy": 0.9164666666666667,
+        "mean_difference_vs_sham": 0.0,
+        "median_difference_vs_sham": 0.0,
+        "wins_losses_ties": [
+          0,
+          0,
+          30
+        ]
+      }
+    },
+    "uneven_bias:b": {
+      "mixture": {
+        "bootstrap_95_percentile": [
+          0.003433333333333325,
+          0.08269999999999998
+        ],
+        "mean_accuracy": 0.7643333333333333,
+        "mean_difference_vs_sham": 0.03653333333333333,
+        "median_difference_vs_sham": 0.0010000000000000009,
+        "wins_losses_ties": [
+          18,
+          4,
+          8
+        ]
+      },
+      "restore_other": {
+        "bootstrap_95_percentile": [
+          -0.025100000000000008,
+          -0.0023000000000000013
+        ],
+        "mean_accuracy": 0.7152333333333334,
+        "mean_difference_vs_sham": -0.012566666666666669,
+        "median_difference_vs_sham": -0.0010000000000000009,
+        "wins_losses_ties": [
+          4,
+          17,
+          9
+        ]
+      },
+      "restore_selected": {
+        "bootstrap_95_percentile": [
+          0.0226,
+          0.1597333333333333
+        ],
+        "mean_accuracy": 0.8112,
+        "mean_difference_vs_sham": 0.08339999999999999,
+        "median_difference_vs_sham": 0.0,
+        "wins_losses_ties": [
+          12,
+          12,
+          6
+        ]
+      },
+      "sham": {
+        "bootstrap_95_percentile": [
+          0.0,
+          0.0
+        ],
+        "mean_accuracy": 0.7278,
+        "mean_difference_vs_sham": 0.0,
+        "median_difference_vs_sham": 0.0,
+        "wins_losses_ties": [
+          0,
+          0,
+          30
+        ]
+      }
+    }
+  },
+  "seed_count": 30
+}

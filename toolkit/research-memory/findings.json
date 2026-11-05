@@ -53,6 +53,25 @@
       "candidate_commits": [
         "9c8f02b9551aa59b52f2f59400329783bad5514b"
       ]
+    },
+    {
+      "id": "memory-restoration-intervention-2026-11",
+      "question": "Does restoring the B-like slot contribute to final B recall on uneven-bias tasks?",
+      "observation": "Across 30 fresh seeds, restoring the selected slot after A returned raised mean B recall from 0.7278 to 0.8112 on uneven bias, but its median paired change was zero; on shifted bias the mean gain was 0.0148 and median change was -0.0065.",
+      "hypothesis": "Changes to the selected table can causally contribute to forgetting in some runs, but do not explain every failure or imply an online solution.",
+      "next_test": "Compare online slot protection against a matched sham or random-slot policy on fresh tasks and seeds, including adaptation and compute costs.",
+      "limitations": "This direct intervention restores a privileged end-of-B checkpoint and chooses a slot with a task-specific high-P(1) heuristic. Tasks are public, and the original hypothesis was post-hoc.",
+      "evidence": [
+        "EXPERIMENTS.md",
+        "toolkit/experiment-results/memory-intervention/summary.json",
+        "toolkit/experiment-results/memory-intervention/metrics.csv"
+      ],
+      "related_findings": [
+        "uneven-bias-forgetting-2026-11"
+      ],
+      "candidate_commits": [
+        "9c8f02b9551aa59b52f2f59400329783bad5514b"
+      ]
     }
   ]
 }

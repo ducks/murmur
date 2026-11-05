@@ -1,4 +1,5 @@
 //! Causal diagnostic: restore one saved slot after A returns, then probe.
+#[allow(dead_code)]
 #[path="../milestone_candidates/idea2.rs"] mod idea2;
 pub mod unlabeled_context { pub use murmur_research_runner::unlabeled_context::*; }
 use murmur::data::Rng;

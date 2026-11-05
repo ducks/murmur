@@ -96,7 +96,7 @@ def campaign_records(directory):
                         'campaign_goal': config.get('goal'), 'protocol': config.get('protocol', 'legacy'),
                         'status': item.get('status'), 'incomplete': incomplete, 'candidate_commit': item.get('commit'),
                         'idea': idea, 'development': checks(item.get('development')),
-                        'evaluation': checks(item.get('evaluation')), 'error': item.get('error'),
+                        'evaluation': checks(item.get('evaluation')), 'diagnosis': item.get('diagnosis'), 'error': item.get('error'),
                         'evidence_directory': str(round_dir),
                         'verification': 'indexed from campaign state; evidence hashes were not rechecked'})
     return records

@@ -29,6 +29,10 @@ SCHEMA = {
                    for key in ('question', 'hypothesis', 'falsification', 'approach', 'limitations')},
     'required': ['question', 'hypothesis', 'falsification', 'approach', 'limitations'],
 }
+DIAGNOSIS_FIELDS = ('observation', 'hypothesis', 'alternative', 'followup_test', 'expected_evidence', 'limitations')
+DIAGNOSIS_SCHEMA = {'type': 'object', 'additionalProperties': False,
+                    'properties': {key: {'type': 'string', 'minLength': 1, 'maxLength': 1000} for key in DIAGNOSIS_FIELDS},
+                    'required': list(DIAGNOSIS_FIELDS)}
 
 
 def git(cwd, *args):
@@ -70,10 +74,12 @@ def make_plan(index, idea, protocol='legacy'):
     return plan
 
 
-def init(directory, goal, max_ideas, agent_seconds, test_seconds, local_provider=None, model=None, prior_campaign=None, protocol='milestone'):
+def init(directory, goal, max_ideas, agent_seconds, test_seconds, local_provider=None, model=None, prior_campaign=None, protocol='milestone', diagnostic_seconds=120, diagnose_failures=True):
     runner.text_field(goal, 'goal')
     if not (1 <= max_ideas <= 100 and 10 <= agent_seconds <= 7200 and 10 <= test_seconds <= 7200):
         raise runner.PlanError('limits outside supported ranges')
+    if not 10 <= diagnostic_seconds <= 7200:
+        raise runner.PlanError('diagnostic time outside supported range')
     if local_provider not in (None, 'ollama', 'lmstudio'):
         raise runner.PlanError('unsupported local provider')
     if protocol not in ('milestone', 'legacy'):
@@ -95,11 +101,13 @@ def init(directory, goal, max_ideas, agent_seconds, test_seconds, local_provider
               'local_provider': local_provider, 'model': model,
               'base_commit': git(runner.ROOT, 'rev-parse', 'HEAD'), 'prior_history': prior,
               'protocol': protocol,
+              'diagnose_failures': diagnose_failures, 'diagnostic_seconds': diagnostic_seconds,
               'scope': 'binary hidden-context sequence task; candidate Rust model only',
               'limits': 'LLM token/cost limits and blind holdouts are not enforced.'}
     runner.write_json(dest / 'campaign.json', config)
     runner.write_json(dest / 'state.json', {'schema_version': 1, 'completed': [], 'next_index': 1, 'base_commit': config['base_commit'], 'status': 'ready'})
     runner.write_json(dest / 'agent-output-schema.json', SCHEMA)
+    runner.write_json(dest / 'diagnosis-output-schema.json', DIAGNOSIS_SCHEMA)
     return config
 
 
@@ -152,6 +160,7 @@ Research memory (observations are not proven explanations; campaign evidence is 
 {json.dumps(research_memory or {}, indent=2)}
 
 For an apparent failure, distinguish observations from possible explanations and propose a discriminating test in your hypothesis and falsification. The full index for this round is saved alongside the agent logs as research-memory.json; the prompt may include only recent campaign rounds.
+If the preceding round contains a completed diagnosis, try to design a focused test that distinguishes its competing explanations, with an explicit control. If the proposed test cannot fit the candidate and test-file scope, state that limitation in your response and select another testable idea. A diagnosis is an unverified hypothesis, not an established cause.
 
 Edit ONLY toolkit/src/agent_candidate.rs and toolkit/tests/agent_generated.rs. The latter must contain at least one meaningful Rust test for your proposed mechanism. Do not alter evaluator, baseline, configs, docs, Git metadata, or any other file; do not commit. The supervisor rejects other changes. Preserve Candidate's Clone, new(seed, rate), reset(), predict(x)->f64 and observe(x,y,learn) interface. `predict` must happen without seeing y; output must be finite in [0,1]. In `observe(..., false)`, do not change learned parameters, though context inference state may update. reset clears transient inference state without erasing learned parameters. Candidate may use local Rust standard library and existing local crates only; no network, pretrained weights, external APIs, hidden future data, environment data, or provided true context. Model-code restrictions are reviewed/tested, not a complete security boundary.
 
@@ -238,6 +247,62 @@ def agent_usage(path):
                 if isinstance(value, int) and not isinstance(value, bool) and value >= 0:
                     totals[key] = totals.get(key, 0) + value
     return totals or None
+
+
+def diagnosis_prompt(result, round_dir):
+    return f'''You are a research investigator analyzing one completed, unsuccessful candidate evaluation.
+Candidate hypothesis and implementation summary:
+{json.dumps(result.get('idea'), indent=2)}
+
+Development and evaluation reports (evaluation may be null):
+{json.dumps({'development': result.get('development'), 'evaluation': result.get('evaluation')}, indent=2)}
+
+The full local evidence and logs are in {round_dir}. You may inspect candidate source and existing evidence with read-only commands. Do not edit files, run new training, change Git state, or inspect an unrun evaluation split. Distinguish what the data show from competing explanations; do not claim a mechanism is proven by correlation. Propose ONE feasible follow-up that compares an intervention with an explicit control and states what observations would distinguish the hypotheses. The next agent can edit only toolkit/src/agent_candidate.rs and toolkit/tests/agent_generated.rs; use that scope where practical, or state clearly if an additional evaluator is required. The supervisor has not executed your proposed follow-up. Return only the requested structured JSON with concise single-line strings.
+'''
+
+
+def call_diagnoser(config, worktree, round_dir, result):
+    response = round_dir / 'diagnosis.json'
+    schema = round_dir.parent / 'diagnosis-output-schema.json'
+    args = ['codex', '-a', 'never', 'exec', '--sandbox', 'read-only', '--ephemeral', '--json',
+            '--cd', str(worktree), '--output-schema', str(schema), '--output-last-message', str(response)]
+    if config.get('local_provider'):
+        args += ['--oss', '--local-provider', config['local_provider']]
+    if config.get('model'):
+        args += ['--model', config['model']]
+    args.append('-')
+    prompt = diagnosis_prompt(result, round_dir)
+    (round_dir / 'diagnosis-prompt.txt').write_text(prompt, encoding='utf-8')
+    started = time.monotonic()
+    try:
+        with (round_dir / 'diagnosis-events.jsonl').open('wb') as stdout, (round_dir / 'diagnosis-stderr.log').open('wb') as stderr:
+            code = bounded_process(args, cwd=worktree, input_bytes=prompt.encode('utf-8'), stdout=stdout,
+                                   stderr=stderr, timeout=config['diagnostic_seconds'])
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        raise runner.PlanError(f'diagnosis could not complete: {exc}') from exc
+    if code:
+        raise runner.PlanError(f'diagnosis agent exited {code}; inspect diagnosis logs')
+    diagnosis = runner.read_json(response)
+    runner.exact_keys(diagnosis, DIAGNOSIS_FIELDS, 'diagnosis')
+    for key, value in diagnosis.items():
+        runner.text_field(value, key)
+        if len(value) > 1000:
+            raise runner.PlanError(f'diagnosis field {key} too long')
+    return {'status': 'complete', 'analysis': diagnosis, 'elapsed_seconds': time.monotonic() - started,
+            'usage': agent_usage(round_dir / 'diagnosis-events.jsonl'),
+            'qualification': 'Agent-proposed explanations and follow-up are unverified.'}
+
+
+def diagnose_failure(config, worktree, round_dir, result, diagnoser=None):
+    if not config.get('diagnose_failures', False):
+        return {'status': 'disabled'}
+    reports = [result.get('development'), result.get('evaluation')]
+    if not any(isinstance(report, dict) and report.get('outcome') == 'criteria_not_met' for report in reports):
+        return {'status': 'not_needed'}
+    try:
+        return (diagnoser or call_diagnoser)(config, worktree, round_dir, result)
+    except (runner.PlanError, OSError, subprocess.SubprocessError) as exc:
+        return {'status': 'failed', 'error': str(exc), 'qualification': 'No diagnosis was produced.'}
 
 
 def changed_paths(worktree):
@@ -408,11 +473,16 @@ def execute_round(directory, config, state, agent=call_agent):
         evidence_stage = 'evaluation' if evaluation is not None else 'development'
         matrix = probe_matrix(study / evidence_stage / 'evidence' / 'probes.csv')
         result.update(status='complete', commit=commit, idea=idea, development=development, evaluation=evaluation, final_probe_matrix=matrix)
+        result['diagnosis'] = diagnose_failure(config, worktree, round_dir, result)
+        if git(worktree, 'rev-parse', 'HEAD') != commit or changed_paths(worktree):
+            raise runner.PlanError('worktree changed during diagnosis; preserve it for inspection')
+        if runner.stage_state(study, 'development') != 'complete' or (evaluation is not None and runner.stage_state(study, 'evaluation') != 'complete'):
+            raise runner.PlanError('study evidence changed during diagnosis')
         state['base_commit'] = commit
     except (runner.PlanError, OSError, subprocess.SubprocessError) as exc:
         result.update(status='failed', error=str(exc))
     runner.write_json(round_dir / 'result.json', result)
-    state['completed'].append({k: result.get(k) for k in ('index', 'status', 'commit', 'idea', 'agent_elapsed_seconds', 'agent_usage', 'development', 'evaluation', 'final_probe_matrix', 'error')})
+    state['completed'].append({k: result.get(k) for k in ('index', 'status', 'commit', 'idea', 'agent_elapsed_seconds', 'agent_usage', 'development', 'evaluation', 'final_probe_matrix', 'diagnosis', 'error')})
     state['next_index'] += 1
     state['status'] = 'ready' if result['status'] == 'complete' else 'inspect_failure'
     runner.write_json(directory / 'state.json', state)
@@ -450,7 +520,8 @@ def _run_locked(directory, max_new=None, agent=call_agent):
         result = execute_round(directory, config, state, agent)
         results.append({'index': result['index'], 'status': result['status'], 'commit': result.get('commit'),
                         'development': (result.get('development') or {}).get('outcome'),
-                        'evaluation': (result.get('evaluation') or {}).get('outcome'), 'error': result.get('error')})
+                        'evaluation': (result.get('evaluation') or {}).get('outcome'),
+                        'diagnosis': (result.get('diagnosis') or {}).get('status'), 'error': result.get('error')})
         if result['status'] != 'complete':
             break
     action = 'inspect_failure' if state['status'] != 'ready' else ('review_results' if len(state['completed']) >= config['max_ideas'] else 'continue')
@@ -465,12 +536,14 @@ def main(argv=None):
     p.add_argument('--test-seconds', type=int, default=180); p.add_argument('--local-provider', choices=('ollama', 'lmstudio'))
     p.add_argument('--model'); p.add_argument('--prior-campaign', help='include prior campaign outcomes in the agent context')
     p.add_argument('--protocol', choices=('milestone', 'legacy'), default='milestone')
+    p.add_argument('--diagnostic-seconds', type=int, default=120)
+    p.add_argument('--no-diagnosis', action='store_true', help='skip the separate failure-analysis agent')
     p = sub.add_parser('run'); p.add_argument('directory'); p.add_argument('--ideas', type=int)
     p = sub.add_parser('cleanup'); p.add_argument('directory')
     args = parser.parse_args(argv)
     try:
         if args.command == 'init':
-            result = init(args.directory, args.goal, args.max_ideas, args.agent_seconds, args.test_seconds, args.local_provider, args.model, args.prior_campaign, args.protocol)
+            result = init(args.directory, args.goal, args.max_ideas, args.agent_seconds, args.test_seconds, args.local_provider, args.model, args.prior_campaign, args.protocol, args.diagnostic_seconds, not args.no_diagnosis)
         elif args.command == 'cleanup':
             result = cleanup(args.directory)
         else:

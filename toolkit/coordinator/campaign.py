@@ -20,7 +20,7 @@ import uuid
 
 from . import runner
 
-GOAL = 'Find interesting, testable ways to create a model that learns useful representations.'
+GOAL = 'Find a model that retains earlier rules and adapts to rule changes at least as well as the mixture baseline.'
 ALLOWED = {'toolkit/src/agent_candidate.rs', 'toolkit/tests/agent_generated.rs'}
 GENERATED = {'toolkit/configs/agent/dev.cfg', 'toolkit/configs/agent/evaluation.cfg', 'toolkit/plans/agent-candidate.json'}
 SCHEMA = {
@@ -48,8 +48,8 @@ def seed_configs(index, seed_base=7_000_001):
     return content(start, 10), content(start + 100_000, 20)
 
 
-def make_plan(index, idea):
-    return {
+def make_plan(index, idea, protocol='legacy'):
+    plan = {
         'schema_version': 1, 'id': f'agent-idea-{index:03d}',
         'question': idea['question'], 'hypothesis': idea['hypothesis'], 'falsification': idea['falsification'],
         'adapter': 'candidate_context', 'development_config': 'toolkit/configs/agent/dev.cfg',
@@ -60,14 +60,24 @@ def make_plan(index, idea):
         'criteria': {'min_mean_difference': 0.05, 'min_paired_win_fraction': 0.6, 'max_stationary_accuracy_drop': 0.02, 'max_other_probe_accuracy_drop': 0.03},
         'budget': {'max_seeds_per_split': 20, 'max_logical_transitions_per_split': 1_200_000, 'max_wall_seconds': 180},
     }
+    if protocol == 'milestone':
+        plan.update(adapter='milestone_context',
+                    comparison={'candidate': 'candidate', 'baseline': 'mixture',
+                                'required_models': ['single', 'mixture', 'candidate', 'oracle'], 'metric': 'accuracy'},
+                    criteria={'max_accuracy_drop': 0.02})
+    elif protocol != 'legacy':
+        raise runner.PlanError('unknown campaign protocol')
+    return plan
 
 
-def init(directory, goal, max_ideas, agent_seconds, test_seconds, local_provider=None, model=None, prior_campaign=None):
+def init(directory, goal, max_ideas, agent_seconds, test_seconds, local_provider=None, model=None, prior_campaign=None, protocol='milestone'):
     runner.text_field(goal, 'goal')
     if not (1 <= max_ideas <= 100 and 10 <= agent_seconds <= 7200 and 10 <= test_seconds <= 7200):
         raise runner.PlanError('limits outside supported ranges')
     if local_provider not in (None, 'ollama', 'lmstudio'):
         raise runner.PlanError('unsupported local provider')
+    if protocol not in ('milestone', 'legacy'):
+        raise runner.PlanError('unsupported campaign protocol')
     if model is not None:
         runner.text_field(model, 'model')
     if git(runner.ROOT, 'status', '--porcelain=v1', '--untracked-files=all'):
@@ -84,6 +94,7 @@ def init(directory, goal, max_ideas, agent_seconds, test_seconds, local_provider
               'max_ideas': max_ideas, 'agent_seconds': agent_seconds, 'test_seconds': test_seconds,
               'local_provider': local_provider, 'model': model,
               'base_commit': git(runner.ROOT, 'rev-parse', 'HEAD'), 'prior_history': prior,
+              'protocol': protocol,
               'scope': 'binary hidden-context sequence task; candidate Rust model only',
               'limits': 'LLM token/cost limits and blind holdouts are not enforced.'}
     runner.write_json(dest / 'campaign.json', config)
@@ -123,17 +134,21 @@ def prior_history(path):
 
 
 def prompt_for(config, history):
+    if config.get('protocol', 'legacy') == 'milestone':
+        criteria_text = 'The supervisor checks final frozen B recall and the first 100 online predictions after each A→B and B→A switch, on each of four binary task families. The candidate must be within 2 percentage points of the unchanged mixture on each mean paired accuracy. Resource budgets apply to the entire stage; inline size and per-model training time are diagnostic only and heap memory is not measured.'
+    else:
+        criteria_text = 'It will test candidate vs the unchanged original mixture on the noisiest ABA B retention, with stationary penalties, a maximum 3 percentage-point mean regression on the other final A/B probes, and fixed criteria.'
     return f'''You are one research agent in an automated, bounded model research campaign.
 Overall goal: {config['goal']}
 
-Propose and implement ONE genuinely motivated candidate model for the existing hidden-context binary sequence task. Read RESEARCH.md, EXPERIMENTS.md, toolkit/src/unlabeled_context.rs, toolkit/src/candidate_context.rs, toolkit/src/agent_candidate.rs and toolkit/tests/candidate_context.rs. The existing mixture and other controls are fixed; seek an improvement over the mixture, not an attractive demonstration. Consider varied ideas, not only stronger thresholds. This is one limited task, not a claim of general language modeling or novelty.
+Propose and implement ONE genuinely motivated candidate model for the existing hidden-context binary sequence task. Read RESEARCH.md, EXPERIMENTS.md, toolkit/src/unlabeled_context.rs, toolkit/src/candidate_context.rs, toolkit/src/bin/milestone_context.rs, toolkit/src/agent_candidate.rs and toolkit/tests/candidate_context.rs. The existing mixture and other controls are fixed; seek an improvement over the mixture, not an attractive demonstration. A copy of the baseline can pass a non-inferiority threshold but is not a novel mechanism. Consider varied ideas, not only stronger thresholds. This is one limited task, not a claim of general language modeling or novelty.
 
 Previous campaign results (may be empty):
 {json.dumps(history, indent=2)}
 
 Edit ONLY toolkit/src/agent_candidate.rs and toolkit/tests/agent_generated.rs. The latter must contain at least one meaningful Rust test for your proposed mechanism. Do not alter evaluator, baseline, configs, docs, Git metadata, or any other file; do not commit. The supervisor rejects other changes. Preserve Candidate's Clone, new(seed, rate), reset(), predict(x)->f64 and observe(x,y,learn) interface. `predict` must happen without seeing y; output must be finite in [0,1]. In `observe(..., false)`, do not change learned parameters, though context inference state may update. reset clears transient inference state without erasing learned parameters. Candidate may use local Rust standard library and existing local crates only; no network, pretrained weights, external APIs, hidden future data, environment data, or provided true context. Model-code restrictions are reviewed/tested, not a complete security boundary.
 
-The supervisor independently generates separate fresh deterministic development and evaluation configs, validates all controls and runs the evaluator. It will test candidate vs the unchanged original mixture on the noisiest ABA B retention, with stationary penalties, a maximum 3 percentage-point mean regression on the other final A/B probes, and fixed criteria. You must not read, generate, inspect, or tune against evaluation data. You may run targeted tests and small development-only experiments, but do not alter their declared criteria or claim statistical significance. The coding-agent service may be remote; the candidate itself must be local.
+The supervisor independently generates separate fresh deterministic development and evaluation configs, validates all controls and runs the evaluator. {criteria_text} You must not read, generate, inspect, or tune against evaluation data. You may run targeted tests and small development-only experiments, but do not alter their declared criteria or claim statistical significance. The coding-agent service may be remote; the candidate itself must be local.
 
 Run: cargo test --offline --manifest-path toolkit/Cargo.toml --test candidate_context --test agent_generated
 Then provide a JSON object matching the supplied schema: question, hypothesis, falsification, approach, limitations. Each field must be a nonempty single-line string. Explain why the idea could fail. Do not claim results you have not measured. Do not ask for input; stop on an actual blocker.
@@ -347,7 +362,7 @@ def execute_round(directory, config, state, agent=call_agent):
         result['agent_usage'] = agent_usage(round_dir / 'agent-events.jsonl')
         verify_agent_changes(worktree, base)
         dev, evaluation = seed_configs(index, config['seed_base'])
-        plan = make_plan(index, idea)
+        plan = make_plan(index, idea, config.get('protocol', 'legacy'))
         runner.validate_plan(plan, dev, evaluation)
         (worktree / 'toolkit/configs/agent').mkdir(parents=True, exist_ok=True)
         (worktree / 'toolkit/plans').mkdir(parents=True, exist_ok=True)
@@ -437,12 +452,13 @@ def main(argv=None):
     p.add_argument('--max-ideas', type=int, default=3); p.add_argument('--agent-seconds', type=int, default=600)
     p.add_argument('--test-seconds', type=int, default=180); p.add_argument('--local-provider', choices=('ollama', 'lmstudio'))
     p.add_argument('--model'); p.add_argument('--prior-campaign', help='include prior campaign outcomes in the agent context')
+    p.add_argument('--protocol', choices=('milestone', 'legacy'), default='milestone')
     p = sub.add_parser('run'); p.add_argument('directory'); p.add_argument('--ideas', type=int)
     p = sub.add_parser('cleanup'); p.add_argument('directory')
     args = parser.parse_args(argv)
     try:
         if args.command == 'init':
-            result = init(args.directory, args.goal, args.max_ideas, args.agent_seconds, args.test_seconds, args.local_provider, args.model, args.prior_campaign)
+            result = init(args.directory, args.goal, args.max_ideas, args.agent_seconds, args.test_seconds, args.local_provider, args.model, args.prior_campaign, args.protocol)
         elif args.command == 'cleanup':
             result = cleanup(args.directory)
         else:

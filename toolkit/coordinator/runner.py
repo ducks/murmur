@@ -15,6 +15,7 @@ ROOT = Path(__file__).resolve().parents[2]
 ADAPTERS = {
     'unlabeled_context': {'single', 'mixture', 'known_filter', 'oracle'},
     'candidate_context': {'single', 'mixture', 'candidate', 'known_filter', 'oracle'},
+    'milestone_context': {'single', 'mixture', 'candidate', 'oracle'},
 }
 MODELS = ADAPTERS['unlabeled_context']
 OFFSETS = (0, 40000, 46000, 48000, 51000)
@@ -116,24 +117,25 @@ def validate_plan(plan, dev_text, evaluation_text):
         raise PlanError(f'unsupported adapter; registered: {sorted(ADAPTERS)}')
     model_names = ADAPTERS[plan['adapter']]
     comparison = plan['comparison']
-    exact_keys(comparison, {'candidate', 'baseline', 'required_models', 'metric', 'regime', 'noise', 'checkpoint', 'probe_rule'}, 'comparison')
+    fields = {'candidate', 'baseline', 'required_models', 'metric'}
+    if plan['adapter'] != 'milestone_context':
+        fields |= {'regime', 'noise', 'checkpoint', 'probe_rule'}
+    exact_keys(comparison, fields, 'comparison')
     if comparison['candidate'] not in model_names or comparison['baseline'] not in model_names or comparison['candidate'] == comparison['baseline']:
         raise PlanError('candidate and baseline must be distinct registered models')
     models = comparison['required_models']
     if not isinstance(models, list) or not all(isinstance(model, str) for model in models) or len(models) != len(set(models)) or set(models) != model_names:
         raise PlanError('required_models must list all adapter models exactly once')
-    if comparison['metric'] != 'accuracy' or comparison['regime'] not in ('aba', 'stationary', 'switching') or comparison['noise'] not in ('0.1', '0.25') or comparison['checkpoint'] not in ('1', '2', '3') or comparison['probe_rule'] not in ('0', '1'):
+    if comparison['metric'] != 'accuracy' or (plan['adapter'] != 'milestone_context' and (comparison['regime'] not in ('aba', 'stationary', 'switching') or comparison['noise'] not in ('0.1', '0.25') or comparison['checkpoint'] not in ('1', '2', '3') or comparison['probe_rule'] not in ('0', '1'))):
         raise PlanError('unsupported comparison filter')
     criteria = plan['criteria']
-    required_criteria = {'min_mean_difference', 'min_paired_win_fraction', 'max_stationary_accuracy_drop'}
-    if plan['adapter'] == 'candidate_context':
-        required_criteria.add('max_other_probe_accuracy_drop')
-    exact_keys(criteria, required_criteria, 'criteria')
-    finite_number(criteria['min_mean_difference'], 'min_mean_difference', -1.0, 1.0)
-    finite_number(criteria['min_paired_win_fraction'], 'min_paired_win_fraction', 0.0, 1.0)
-    finite_number(criteria['max_stationary_accuracy_drop'], 'max_stationary_accuracy_drop', 0.0, 1.0)
-    if 'max_other_probe_accuracy_drop' in criteria:
-        finite_number(criteria['max_other_probe_accuracy_drop'], 'max_other_probe_accuracy_drop', 0.0, 1.0)
+    if plan['adapter'] == 'milestone_context':
+        if comparison['candidate'] != 'candidate' or comparison['baseline'] != 'mixture':
+            raise PlanError('milestone requires candidate versus mixture')
+        exact_keys(criteria, {'max_accuracy_drop'}, 'criteria')
+        finite_number(criteria['max_accuracy_drop'], 'max_accuracy_drop', 0.0, 1.0)
+    else:
+        validate_legacy_criteria(plan, criteria)
     budget = plan['budget']
     exact_keys(budget, {'max_seeds_per_split', 'max_logical_transitions_per_split', 'max_wall_seconds'}, 'budget')
     for key in budget:
@@ -146,12 +148,25 @@ def validate_plan(plan, dev_text, evaluation_text):
     if any(dev[k] != evaluation[k] for k in comparable):
         raise PlanError('development and evaluation configs must differ only in seeds')
     for name, cfg in (('development', dev), ('evaluation', evaluation)):
-        # Six regime/noise conditions, each with three training phases and six
-        # frozen probes. This counts stream transitions once, not model steps.
-        logical = len(cfg['seeds']) * 6 * (3 * cfg['train_tokens'] + 6 * cfg['test_tokens'])
+        if plan['adapter'] == 'milestone_context' and cfg['train_tokens'] < 100:
+            raise PlanError('milestone requires at least 100 transitions per phase')
+        conditions = 4 if plan['adapter'] == 'milestone_context' else 6
+        logical = len(cfg['seeds']) * conditions * (3 * cfg['train_tokens'] + 6 * cfg['test_tokens'])
         if len(cfg['seeds']) > budget['max_seeds_per_split'] or logical > budget['max_logical_transitions_per_split']:
             raise PlanError(f'{name} exceeds declared logical-transition or seed budget')
     return dev, evaluation
+
+
+def validate_legacy_criteria(plan, criteria):
+    required_criteria = {'min_mean_difference', 'min_paired_win_fraction', 'max_stationary_accuracy_drop'}
+    if plan['adapter'] == 'candidate_context':
+        required_criteria.add('max_other_probe_accuracy_drop')
+    exact_keys(criteria, required_criteria, 'criteria')
+    finite_number(criteria['min_mean_difference'], 'min_mean_difference', -1.0, 1.0)
+    finite_number(criteria['min_paired_win_fraction'], 'min_paired_win_fraction', 0.0, 1.0)
+    finite_number(criteria['max_stationary_accuracy_drop'], 'max_stationary_accuracy_drop', 0.0, 1.0)
+    if 'max_other_probe_accuracy_drop' in criteria:
+        finite_number(criteria['max_other_probe_accuracy_drop'], 'max_other_probe_accuracy_drop', 0.0, 1.0)
 
 
 def command(*args, check=True):
@@ -278,7 +293,87 @@ def parse_counts(row, location):
     return correct, trials
 
 
-def analyze(plan, cfg, evidence):
+MILESTONE_FAMILIES = ('complementary', 'asymmetric', 'constant_bias', 'unequal_noise')
+MILESTONE_EVAL_FAMILIES = ('shifted_bias', 'mixed_rules', 'similar_rules', 'reversed_asym')
+
+
+def analyze_milestone(plan, cfg, evidence, split='development'):
+    families = MILESTONE_EVAL_FAMILIES if split == 'evaluation' else MILESTONE_FAMILIES
+    fields = ['seed', 'family', 'phase', 'measurement', 'model', 'correct', 'trials', 'accuracy', 'logloss']
+    rows = load_csv(evidence / 'metrics.csv', fields)
+    seeds = {str(s) for s in cfg['seeds']}
+    lookup = {}
+    for row in rows:
+        key = tuple(row[k] for k in ('seed', 'family', 'phase', 'measurement', 'model'))
+        seed, family, phase, measurement, model = key
+        windows = {f'window_{start:04d}': min(100, cfg['train_tokens'] - start)
+                   for start in range(0, cfg['train_tokens'], 100)}
+        lengths = {'online': cfg['train_tokens'], 'probe_a': cfg['test_tokens'], 'probe_b': cfg['test_tokens'], **windows}
+        if seed not in seeds or family not in families or phase not in ('1', '2', '3') or measurement not in lengths or model not in ADAPTERS['milestone_context'] or key in lookup:
+            raise PlanError(f'unexpected or duplicate milestone row: {key}')
+        try:
+            correct, trials = int(row['correct']), int(row['trials'])
+            accuracy, logloss = float(row['accuracy']), float(row['logloss'])
+        except (ValueError, TypeError) as exc:
+            raise PlanError(f'invalid milestone row: {key}') from exc
+        if trials != lengths[measurement] or not 0 <= correct <= trials or not math.isfinite(accuracy) or abs(accuracy - correct / trials) > 5.1e-9 or not math.isfinite(logloss) or logloss < 0:
+            raise PlanError(f'inconsistent milestone row: {key}')
+        lookup[key] = correct / trials
+    expected = len(seeds) * len(families) * 3 * (3 + len(range(0, cfg['train_tokens'], 100))) * len(ADAPTERS['milestone_context'])
+    if len(lookup) != expected:
+        raise PlanError('milestone evidence is incomplete')
+    resources = {}
+    resource_rows = load_csv(evidence / 'resources.csv', ['seed', 'family', 'model', 'inline_bytes', 'training_ns', 'training_steps'])
+    for row in resource_rows:
+        key = (row['seed'], row['family'], row['model'])
+        if key[0] not in seeds or key[1] not in families or key[2] not in ADAPTERS['milestone_context'] or key in resources:
+            raise PlanError(f'unexpected or duplicate resource row: {key}')
+        try:
+            size, elapsed, steps = (int(row[name]) for name in ('inline_bytes', 'training_ns', 'training_steps'))
+        except ValueError as exc:
+            raise PlanError(f'invalid resource row: {key}') from exc
+        if size < 0 or elapsed < 0 or steps != 3 * cfg['train_tokens']:
+            raise PlanError(f'inconsistent resource row: {key}')
+        resources[key] = (size, elapsed, steps)
+    if len(resources) != len(seeds) * len(families) * len(ADAPTERS['milestone_context']):
+        raise PlanError('resource evidence is incomplete')
+    resource_summary = {}
+    for model in sorted(ADAPTERS['milestone_context']):
+        values = [value for key, value in resources.items() if key[2] == model]
+        sizes = sorted({value[0] for value in values})
+        if len(sizes) != 1:
+            raise PlanError(f'inconsistent inline sizes for {model}')
+        resource_summary[model] = {'inline_bytes': sizes[0], 'training_ns_total': sum(x[1] for x in values),
+                                   'training_steps': sum(x[2] for x in values)}
+    comparisons = {}
+    checks = {}
+    baseline, candidate = plan['comparison']['baseline'], plan['comparison']['candidate']
+    threshold = plan['criteria']['max_accuracy_drop']
+    for family in families:
+        for label, phase, measurement in (('retention_b', '3', 'probe_b'), ('switch_to_b', '2', 'window_0000'), ('switch_to_a', '3', 'window_0000')):
+            values = [(lookup[(s, family, phase, measurement, candidate)], lookup[(s, family, phase, measurement, baseline)]) for s in sorted(seeds, key=int)]
+            diffs = [a - b for a, b in values]
+            key = f'{family}:{label}'
+            mean = sum(diffs) / len(diffs)
+            comparisons[key] = {'candidate_accuracy': sum(x[0] for x in values) / len(values),
+                                'baseline_accuracy': sum(x[1] for x in values) / len(values),
+                                'mean_paired_difference': mean,
+                                'wins': sum(x > 0 for x in diffs), 'losses': sum(x < 0 for x in diffs), 'ties': sum(x == 0 for x in diffs)}
+            checks[key] = mean >= -threshold - 1e-12
+    return {'outcome': 'criteria_met' if all(checks.values()) else 'criteria_not_met',
+            'candidate': candidate, 'baseline': baseline, 'seeds': len(seeds),
+            'max_accuracy_drop': threshold, 'checks': checks, 'comparisons': comparisons, 'resources': resource_summary,
+            'limitations': ['Thresholds on means are operational, not statistical guarantees.',
+                            'Non-inferiority alone does not demonstrate novelty; copying the baseline could pass.',
+                            'Task families and evaluation seeds are locally visible and can be overfit.',
+                            'The oracle receives context labels.',
+                            'Inline bytes exclude heap allocations; peak memory is not measured.',
+                            'Per-model training times include clock overhead, exclude probes, and are noisy; resource budgets are not matched.']}
+
+
+def analyze(plan, cfg, evidence, split='development'):
+    if plan['adapter'] == 'milestone_context':
+        return analyze_milestone(plan, cfg, evidence, split)
     model_names = ADAPTERS[plan['adapter']]
     probe_fields = ['seed', 'regime', 'noise', 'checkpoint', 'rule', 'model', 'correct', 'trials', 'accuracy', 'mean_logloss']
     window_fields = ['seed', 'regime', 'noise', 'window_start', 'window_end', 'model', 'correct', 'trials', 'accuracy', 'mean_logloss']
@@ -419,6 +514,8 @@ def run_stage(directory, split):
     write_json(stage / 'status.json', status)
     try:
         args = ['cargo', 'run', '--offline', '--quiet', '--release', '--manifest-path', str(ROOT / 'toolkit/Cargo.toml'), '--bin', plan['adapter'], '--', str(directory / f'{split}.cfg'), str(stage / 'evidence')]
+        if plan['adapter'] == 'milestone_context':
+            args.append(split)
         with (stage / 'stdout.log').open('wb') as stdout, (stage / 'stderr.log').open('wb') as stderr:
             result = subprocess.run(args, cwd=ROOT, stdout=stdout, stderr=stderr, timeout=plan['budget']['max_wall_seconds'], check=False)
         load_lock(directory)  # Fail closed if source or frozen plan changed during execution.
@@ -426,13 +523,23 @@ def run_stage(directory, split):
             raise PlanError(f'adapter failed with exit code {result.returncode}; inspect stderr.log')
         if (stage / 'evidence' / 'status.txt').read_text(encoding='utf-8').strip() != 'complete':
             raise PlanError('adapter did not report complete')
-        report = analyze(plan, configs[split], stage / 'evidence')
+        report = analyze(plan, configs[split], stage / 'evidence', split)
         report['split'] = split
         report['elapsed_seconds'] = time.monotonic() - started
-        report['logical_transitions'] = len(configs[split]['seeds']) * 6 * (3 * configs[split]['train_tokens'] + 6 * configs[split]['test_tokens'])
+        conditions = 4 if plan['adapter'] == 'milestone_context' else 6
+        report['logical_transitions'] = len(configs[split]['seeds']) * conditions * (3 * configs[split]['train_tokens'] + 6 * configs[split]['test_tokens'])
         report['peak_memory'] = 'not measured'
         write_json(stage / 'report.json', report)
-        (stage / 'report.md').write_text(
+        if plan['adapter'] == 'milestone_context':
+            lines = [f"# {plan['id']}: {split}", '', f"Outcome: **{report['outcome']}**", '',
+                     f"Maximum permitted mean accuracy drop: {report['max_accuracy_drop']:.4f}", '',
+                     '| Family and measure | Candidate | Mixture | Difference | Pass |', '|---|---:|---:|---:|---|']
+            for name, item in report['comparisons'].items():
+                lines.append(f"| {name} | {item['candidate_accuracy']:.4f} | {item['baseline_accuracy']:.4f} | {item['mean_paired_difference']:+.4f} | {report['checks'][name]} |")
+            lines.extend(['', 'Resource diagnostics: ' + json.dumps(report['resources'], sort_keys=True), '', *report['limitations']])
+            (stage / 'report.md').write_text('\n'.join(lines) + '\n', encoding='utf-8')
+        else:
+            (stage / 'report.md').write_text(
             f"# {plan['id']}: {split}\n\nQuestion: {plan['question']}\n\nHypothesis: {plan['hypothesis']}\n\n"
             f"Declared falsification: {plan['falsification']}\n\nOutcome: **{report['outcome']}**\n\n"
             f"{report['candidate']} minus {report['baseline']} mean paired accuracy: {report['mean_paired_difference']:.4f}; "

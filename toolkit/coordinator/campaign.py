@@ -75,7 +75,7 @@ def make_plan(index, idea, protocol='legacy'):
     return plan
 
 
-def init(directory, goal, max_ideas, agent_seconds, test_seconds, local_provider=None, model=None, prior_campaign=None, protocol='milestone', diagnostic_seconds=120, diagnose_failures=True, max_reported_input_tokens=None):
+def init(directory, goal, max_ideas, agent_seconds, test_seconds, local_provider=None, model=None, prior_campaign=None, protocol='milestone', diagnostic_seconds=120, diagnose_failures=True, max_reported_input_tokens=None, review_successes=True):
     runner.text_field(goal, 'goal')
     if not (1 <= max_ideas <= 100 and 10 <= agent_seconds <= 7200 and 10 <= test_seconds <= 7200):
         raise runner.PlanError('limits outside supported ranges')
@@ -105,6 +105,7 @@ def init(directory, goal, max_ideas, agent_seconds, test_seconds, local_provider
               'base_commit': git(runner.ROOT, 'rev-parse', 'HEAD'), 'prior_history': prior,
               'protocol': protocol,
               'diagnose_failures': diagnose_failures, 'diagnostic_seconds': diagnostic_seconds,
+              'review_successes': review_successes and diagnose_failures,
               'max_reported_input_tokens': max_reported_input_tokens,
               'scope': 'binary hidden-context sequence task; candidate Rust model only',
               'limits': 'LLM token/cost limits and blind holdouts are not enforced.'}
@@ -312,7 +313,12 @@ def followup_metrics(path, preview_limit=10, max_records=10000):
 
 
 def diagnosis_prompt(result, round_dir):
-    return f'''You are a research investigator analyzing one completed, unsuccessful candidate evaluation.
+    reports = [result.get('development'), result.get('evaluation')]
+    failed = any(isinstance(x, dict) and x.get('outcome') == 'criteria_not_met' for x in reports)
+    focus = ('Identify failed checks and competing explanations.' if failed else
+             'The candidate passed the operational checks. A pass does not show that its added mechanism helped. Identify untested causal claims, possible regressions or complexity costs, and propose a matched ablation against an explicit control before adding more complexity.')
+    return f'''You are a research investigator analyzing one completed candidate evaluation.
+{focus}
 Candidate hypothesis and implementation summary:
 {json.dumps(result.get('idea'), indent=2)}
 
@@ -362,7 +368,9 @@ def diagnose_failure(config, worktree, round_dir, result, diagnoser=None):
     if not config.get('diagnose_failures', False):
         return {'status': 'disabled'}
     reports = [result.get('development'), result.get('evaluation')]
-    if not any(isinstance(report, dict) and report.get('outcome') == 'criteria_not_met' for report in reports):
+    failed = any(isinstance(report, dict) and report.get('outcome') == 'criteria_not_met' for report in reports)
+    passed = isinstance(result.get('evaluation'), dict) and result['evaluation'].get('outcome') == 'criteria_met'
+    if not failed and not (passed and config.get('review_successes', False)):
         return {'status': 'not_needed'}
     try:
         return (diagnoser or call_diagnoser)(config, worktree, round_dir, result)
@@ -642,13 +650,14 @@ def main(argv=None):
     p.add_argument('--protocol', choices=('milestone', 'legacy'), default='milestone')
     p.add_argument('--diagnostic-seconds', type=int, default=120)
     p.add_argument('--no-diagnosis', action='store_true', help='skip the separate failure-analysis agent')
+    p.add_argument('--no-success-review', action='store_true', help='analyze failures but skip reviews of passing candidates')
     p.add_argument('--max-reported-input-tokens', type=int, help='stop between rounds when reported total reaches this threshold (not a hard cap)')
     p = sub.add_parser('run'); p.add_argument('directory'); p.add_argument('--ideas', type=int)
     p = sub.add_parser('cleanup'); p.add_argument('directory')
     args = parser.parse_args(argv)
     try:
         if args.command == 'init':
-            result = init(args.directory, args.goal, args.max_ideas, args.agent_seconds, args.test_seconds, args.local_provider, args.model, args.prior_campaign, args.protocol, args.diagnostic_seconds, not args.no_diagnosis, args.max_reported_input_tokens)
+            result = init(args.directory, args.goal, args.max_ideas, args.agent_seconds, args.test_seconds, args.local_provider, args.model, args.prior_campaign, args.protocol, args.diagnostic_seconds, not args.no_diagnosis, args.max_reported_input_tokens, not args.no_success_review)
         elif args.command == 'cleanup':
             result = cleanup(args.directory)
         else:

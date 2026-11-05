@@ -22,6 +22,14 @@ class DiagnosisTests(unittest.TestCase):
         self.assertEqual(campaign.diagnose_failure(self.config,self.worktree,self.round,passed,fake)['status'],'not_needed')
         self.assertEqual(len(calls),1)
         self.assertEqual(campaign.diagnose_failure({'diagnose_failures':False},self.worktree,self.round,self.failed,fake)['status'],'disabled')
+    def test_success_review_requests_ablation_without_claiming_a_cause(self):
+        passed={'development':{'outcome':'criteria_met'},'evaluation':{'outcome':'criteria_met'}}
+        config={**self.config,'review_successes':True}
+        def fake(*args):return {'status':'complete','analysis':self.analysis}
+        self.assertEqual(campaign.diagnose_failure(config,self.worktree,self.round,passed,fake)['status'],'complete')
+        prompt=campaign.diagnosis_prompt(passed,self.round)
+        self.assertIn('passed the operational checks',prompt)
+        self.assertIn('matched ablation',prompt)
     def test_diagnoser_failure_is_visible_and_does_not_fabricate_result(self):
         def bad(*_):raise runner.PlanError('unavailable')
         result=campaign.diagnose_failure(self.config,self.worktree,self.round,self.failed,bad)

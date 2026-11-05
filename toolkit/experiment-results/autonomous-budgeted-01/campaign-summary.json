@@ -1,0 +1,1396 @@
+{
+  "base_commit": "2394d1bf11f3c46448eb45bca61fceb161cbeb4d",
+  "campaign_id": "ca7789c0a5e9",
+  "cleanup": {
+    "cache": "removed",
+    "rounds": [
+      {
+        "index": 1,
+        "status": "already_absent"
+      },
+      {
+        "index": 2,
+        "status": "already_absent"
+      },
+      {
+        "index": 3,
+        "status": "already_absent"
+      },
+      {
+        "index": 4,
+        "status": "already_absent"
+      }
+    ]
+  },
+  "max_ideas": 5,
+  "max_reported_input_tokens": 1500000,
+  "reported_cached_input_tokens": 1539072,
+  "reported_input_tokens": 1803489,
+  "reported_output_tokens": 7215,
+  "rounds": [
+    {
+      "agent_elapsed_seconds": 59.7412464839872,
+      "agent_usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 392832,
+        "input_tokens": 462158,
+        "output_tokens": 1783,
+        "reasoning_output_tokens": 241
+      },
+      "commit": "9ce5038a1cdbeb7f5a9e53a0379ce701be5f0cc4",
+      "development": {
+        "baseline": "mixture",
+        "candidate": "candidate",
+        "checks": {
+          "asymmetric:retention_b": true,
+          "asymmetric:switch_to_a": true,
+          "asymmetric:switch_to_b": true,
+          "complementary:retention_b": true,
+          "complementary:switch_to_a": true,
+          "complementary:switch_to_b": true,
+          "constant_bias:retention_b": true,
+          "constant_bias:switch_to_a": true,
+          "constant_bias:switch_to_b": true,
+          "unequal_noise:retention_b": true,
+          "unequal_noise:switch_to_a": true,
+          "unequal_noise:switch_to_b": true
+        },
+        "comparisons": {
+          "asymmetric:retention_b": {
+            "baseline_accuracy": 0.3644,
+            "candidate_accuracy": 0.6654,
+            "losses": 0,
+            "mean_paired_difference": 0.301,
+            "ties": 0,
+            "wins": 10
+          },
+          "asymmetric:switch_to_a": {
+            "baseline_accuracy": 0.63,
+            "candidate_accuracy": 0.7230000000000001,
+            "losses": 0,
+            "mean_paired_difference": 0.093,
+            "ties": 0,
+            "wins": 10
+          },
+          "asymmetric:switch_to_b": {
+            "baseline_accuracy": 0.491,
+            "candidate_accuracy": 0.53,
+            "losses": 1,
+            "mean_paired_difference": 0.03899999999999998,
+            "ties": 1,
+            "wins": 8
+          },
+          "complementary:retention_b": {
+            "baseline_accuracy": 0.374,
+            "candidate_accuracy": 0.7466999999999999,
+            "losses": 1,
+            "mean_paired_difference": 0.3727,
+            "ties": 0,
+            "wins": 9
+          },
+          "complementary:switch_to_a": {
+            "baseline_accuracy": 0.61,
+            "candidate_accuracy": 0.7110000000000001,
+            "losses": 0,
+            "mean_paired_difference": 0.10100000000000002,
+            "ties": 1,
+            "wins": 9
+          },
+          "complementary:switch_to_b": {
+            "baseline_accuracy": 0.531,
+            "candidate_accuracy": 0.5660000000000001,
+            "losses": 1,
+            "mean_paired_difference": 0.034999999999999955,
+            "ties": 0,
+            "wins": 9
+          },
+          "constant_bias:retention_b": {
+            "baseline_accuracy": 0.8983000000000001,
+            "candidate_accuracy": 0.8931000000000001,
+            "losses": 7,
+            "mean_paired_difference": -0.005200000000000005,
+            "ties": 1,
+            "wins": 2
+          },
+          "constant_bias:switch_to_a": {
+            "baseline_accuracy": 0.849,
+            "candidate_accuracy": 0.836,
+            "losses": 3,
+            "mean_paired_difference": -0.013000000000000001,
+            "ties": 6,
+            "wins": 1
+          },
+          "constant_bias:switch_to_b": {
+            "baseline_accuracy": 0.717,
+            "candidate_accuracy": 0.749,
+            "losses": 2,
+            "mean_paired_difference": 0.031999999999999994,
+            "ties": 1,
+            "wins": 7
+          },
+          "unequal_noise:retention_b": {
+            "baseline_accuracy": 0.31,
+            "candidate_accuracy": 0.6779999999999999,
+            "losses": 0,
+            "mean_paired_difference": 0.368,
+            "ties": 0,
+            "wins": 10
+          },
+          "unequal_noise:switch_to_a": {
+            "baseline_accuracy": 0.865,
+            "candidate_accuracy": 0.852,
+            "losses": 7,
+            "mean_paired_difference": -0.012999999999999989,
+            "ties": 2,
+            "wins": 1
+          },
+          "unequal_noise:switch_to_b": {
+            "baseline_accuracy": 0.479,
+            "candidate_accuracy": 0.524,
+            "losses": 2,
+            "mean_paired_difference": 0.045000000000000005,
+            "ties": 0,
+            "wins": 8
+          }
+        },
+        "elapsed_seconds": 6.461477381992154,
+        "limitations": [
+          "Thresholds on means are operational, not statistical guarantees.",
+          "Non-inferiority alone does not demonstrate novelty; copying the baseline could pass.",
+          "Task families and evaluation seeds are locally visible and can be overfit.",
+          "The oracle receives context labels.",
+          "Inline bytes exclude heap allocations; peak memory is not measured.",
+          "Per-model training times include clock overhead, exclude probes, and are noisy; resource budgets are not matched."
+        ],
+        "logical_transitions": 360000,
+        "max_accuracy_drop": 0.02,
+        "outcome": "criteria_met",
+        "peak_memory": "not measured",
+        "resources": {
+          "candidate": {
+            "inline_bytes": 200,
+            "training_ns_total": 6661428,
+            "training_steps": 120000
+          },
+          "mixture": {
+            "inline_bytes": 72,
+            "training_ns_total": 3253631,
+            "training_steps": 120000
+          },
+          "oracle": {
+            "inline_bytes": 48,
+            "training_ns_total": 2264507,
+            "training_steps": 120000
+          },
+          "single": {
+            "inline_bytes": 48,
+            "training_ns_total": 2255177,
+            "training_steps": 120000
+          }
+        },
+        "seeds": 10,
+        "split": "development"
+      },
+      "diagnosis": {
+        "status": "not_needed"
+      },
+      "error": null,
+      "evaluation": {
+        "baseline": "mixture",
+        "candidate": "candidate",
+        "checks": {
+          "mixed_rules:retention_b": true,
+          "mixed_rules:switch_to_a": true,
+          "mixed_rules:switch_to_b": true,
+          "reversed_asym:retention_b": true,
+          "reversed_asym:switch_to_a": true,
+          "reversed_asym:switch_to_b": true,
+          "shifted_bias:retention_b": true,
+          "shifted_bias:switch_to_a": true,
+          "shifted_bias:switch_to_b": true,
+          "similar_rules:retention_b": true,
+          "similar_rules:switch_to_a": true,
+          "similar_rules:switch_to_b": true
+        },
+        "comparisons": {
+          "mixed_rules:retention_b": {
+            "baseline_accuracy": 0.48580000000000007,
+            "candidate_accuracy": 0.68425,
+            "losses": 1,
+            "mean_paired_difference": 0.19845,
+            "ties": 0,
+            "wins": 19
+          },
+          "mixed_rules:switch_to_a": {
+            "baseline_accuracy": 0.8165000000000001,
+            "candidate_accuracy": 0.865,
+            "losses": 0,
+            "mean_paired_difference": 0.0485,
+            "ties": 1,
+            "wins": 19
+          },
+          "mixed_rules:switch_to_b": {
+            "baseline_accuracy": 0.58,
+            "candidate_accuracy": 0.596,
+            "losses": 9,
+            "mean_paired_difference": 0.016000000000000004,
+            "ties": 0,
+            "wins": 11
+          },
+          "reversed_asym:retention_b": {
+            "baseline_accuracy": 0.32625000000000004,
+            "candidate_accuracy": 0.7723,
+            "losses": 1,
+            "mean_paired_difference": 0.44605000000000006,
+            "ties": 1,
+            "wins": 18
+          },
+          "reversed_asym:switch_to_a": {
+            "baseline_accuracy": 0.61,
+            "candidate_accuracy": 0.6769999999999999,
+            "losses": 2,
+            "mean_paired_difference": 0.067,
+            "ties": 0,
+            "wins": 18
+          },
+          "reversed_asym:switch_to_b": {
+            "baseline_accuracy": 0.5685,
+            "candidate_accuracy": 0.5860000000000001,
+            "losses": 7,
+            "mean_paired_difference": 0.017500000000000005,
+            "ties": 0,
+            "wins": 13
+          },
+          "shifted_bias:retention_b": {
+            "baseline_accuracy": 0.4689,
+            "candidate_accuracy": 0.7877000000000001,
+            "losses": 6,
+            "mean_paired_difference": 0.31880000000000003,
+            "ties": 1,
+            "wins": 13
+          },
+          "shifted_bias:switch_to_a": {
+            "baseline_accuracy": 0.7395,
+            "candidate_accuracy": 0.7715,
+            "losses": 1,
+            "mean_paired_difference": 0.031999999999999994,
+            "ties": 5,
+            "wins": 14
+          },
+          "shifted_bias:switch_to_b": {
+            "baseline_accuracy": 0.6235,
+            "candidate_accuracy": 0.653,
+            "losses": 6,
+            "mean_paired_difference": 0.029500000000000005,
+            "ties": 1,
+            "wins": 13
+          },
+          "similar_rules:retention_b": {
+            "baseline_accuracy": 0.8477,
+            "candidate_accuracy": 0.8477,
+            "losses": 0,
+            "mean_paired_difference": 0.0,
+            "ties": 20,
+            "wins": 0
+          },
+          "similar_rules:switch_to_a": {
+            "baseline_accuracy": 0.853,
+            "candidate_accuracy": 0.853,
+            "losses": 0,
+            "mean_paired_difference": 0.0,
+            "ties": 20,
+            "wins": 0
+          },
+          "similar_rules:switch_to_b": {
+            "baseline_accuracy": 0.8539999999999999,
+            "candidate_accuracy": 0.85,
+            "losses": 3,
+            "mean_paired_difference": -0.003999999999999998,
+            "ties": 17,
+            "wins": 0
+          }
+        },
+        "elapsed_seconds": 0.36822762805968523,
+        "limitations": [
+          "Thresholds on means are operational, not statistical guarantees.",
+          "Non-inferiority alone does not demonstrate novelty; copying the baseline could pass.",
+          "Task families and evaluation seeds are locally visible and can be overfit.",
+          "The oracle receives context labels.",
+          "Inline bytes exclude heap allocations; peak memory is not measured.",
+          "Per-model training times include clock overhead, exclude probes, and are noisy; resource budgets are not matched."
+        ],
+        "logical_transitions": 720000,
+        "max_accuracy_drop": 0.02,
+        "outcome": "criteria_met",
+        "peak_memory": "not measured",
+        "resources": {
+          "candidate": {
+            "inline_bytes": 200,
+            "training_ns_total": 15289959,
+            "training_steps": 240000
+          },
+          "mixture": {
+            "inline_bytes": 72,
+            "training_ns_total": 7485868,
+            "training_steps": 240000
+          },
+          "oracle": {
+            "inline_bytes": 48,
+            "training_ns_total": 5566785,
+            "training_steps": 240000
+          },
+          "single": {
+            "inline_bytes": 48,
+            "training_ns_total": 5611837,
+            "training_steps": 240000
+          }
+        },
+        "seeds": 20,
+        "split": "evaluation"
+      },
+      "final_probe_matrix": {},
+      "followups": {
+        "aggregate_count": 0,
+        "aggregates": [],
+        "full_records_path": "/home/urho/dev/murmur/toolkit/runs/autonomous-budgeted-01/idea-001/followup-records.json",
+        "qualification": "Agent-authored test output; arithmetic checked, experimental design not independently verified.",
+        "record_count": 0,
+        "records": [],
+        "records_shown": 0,
+        "warnings": []
+      },
+      "idea": {
+        "approach": "Implemented per-entry fast and slow error traces that release consolidation when recent error exceeds its longer-term level. Added an absolute-error control and a mechanism test; all four required offline tests passed.",
+        "falsification": "Compare the candidate, the matched absolute-error control, and the fixed mixture on paired streams. If calibrated release does not improve the retention\u2013adaptation tradeoff, the hypothesis is unsupported; any required mean accuracy more than two percentage points below the mixture fails the campaign criterion.",
+        "hypothesis": "Calibrating consolidation release to sustained excess error may distinguish a changed rule from ordinary noise and preserve useful memories. A switch deficit could instead reflect incorrect context assignments or slow memory learning; the matched control distinguishes the effect of the release signal from the shared routing and learning design.",
+        "limitations": "Error traces can follow noise, and a slow baseline can delay adaptation or protect an incorrect memory. The mechanism test uses a fixed predictor and does not establish an accuracy gain. No development or evaluation comparison was run.",
+        "question": "Can error-calibrated consolidation retain earlier rules while adapting to hidden rule changes at least as well as the mixture baseline?"
+      },
+      "index": 1,
+      "status": "complete"
+    },
+    {
+      "agent_elapsed_seconds": 58.16592708788812,
+      "agent_usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 414208,
+        "input_tokens": 471847,
+        "output_tokens": 1886,
+        "reasoning_output_tokens": 258
+      },
+      "commit": "7a67b0861300c72bc32fd7b611e2da2abaa66d3a",
+      "development": {
+        "baseline": "mixture",
+        "candidate": "candidate",
+        "checks": {
+          "asymmetric:retention_b": true,
+          "asymmetric:switch_to_a": true,
+          "asymmetric:switch_to_b": true,
+          "complementary:retention_b": true,
+          "complementary:switch_to_a": true,
+          "complementary:switch_to_b": true,
+          "constant_bias:retention_b": true,
+          "constant_bias:switch_to_a": true,
+          "constant_bias:switch_to_b": true,
+          "unequal_noise:retention_b": true,
+          "unequal_noise:switch_to_a": true,
+          "unequal_noise:switch_to_b": true
+        },
+        "comparisons": {
+          "asymmetric:retention_b": {
+            "baseline_accuracy": 0.4133,
+            "candidate_accuracy": 0.6658,
+            "losses": 1,
+            "mean_paired_difference": 0.2525,
+            "ties": 0,
+            "wins": 9
+          },
+          "asymmetric:switch_to_a": {
+            "baseline_accuracy": 0.6809999999999999,
+            "candidate_accuracy": 0.746,
+            "losses": 2,
+            "mean_paired_difference": 0.06500000000000002,
+            "ties": 0,
+            "wins": 8
+          },
+          "asymmetric:switch_to_b": {
+            "baseline_accuracy": 0.513,
+            "candidate_accuracy": 0.541,
+            "losses": 1,
+            "mean_paired_difference": 0.028000000000000025,
+            "ties": 1,
+            "wins": 8
+          },
+          "complementary:retention_b": {
+            "baseline_accuracy": 0.43949999999999995,
+            "candidate_accuracy": 0.7381,
+            "losses": 2,
+            "mean_paired_difference": 0.2986,
+            "ties": 0,
+            "wins": 8
+          },
+          "complementary:switch_to_a": {
+            "baseline_accuracy": 0.592,
+            "candidate_accuracy": 0.696,
+            "losses": 0,
+            "mean_paired_difference": 0.10399999999999995,
+            "ties": 0,
+            "wins": 10
+          },
+          "complementary:switch_to_b": {
+            "baseline_accuracy": 0.5690000000000001,
+            "candidate_accuracy": 0.6060000000000001,
+            "losses": 2,
+            "mean_paired_difference": 0.03700000000000001,
+            "ties": 1,
+            "wins": 7
+          },
+          "constant_bias:retention_b": {
+            "baseline_accuracy": 0.8981999999999999,
+            "candidate_accuracy": 0.8936999999999999,
+            "losses": 6,
+            "mean_paired_difference": -0.004500000000000004,
+            "ties": 2,
+            "wins": 2
+          },
+          "constant_bias:switch_to_a": {
+            "baseline_accuracy": 0.873,
+            "candidate_accuracy": 0.8629999999999999,
+            "losses": 5,
+            "mean_paired_difference": -0.010000000000000009,
+            "ties": 3,
+            "wins": 2
+          },
+          "constant_bias:switch_to_b": {
+            "baseline_accuracy": 0.714,
+            "candidate_accuracy": 0.729,
+            "losses": 1,
+            "mean_paired_difference": 0.01499999999999999,
+            "ties": 2,
+            "wins": 7
+          },
+          "unequal_noise:retention_b": {
+            "baseline_accuracy": 0.3217,
+            "candidate_accuracy": 0.6646,
+            "losses": 0,
+            "mean_paired_difference": 0.34290000000000004,
+            "ties": 0,
+            "wins": 10
+          },
+          "unequal_noise:switch_to_a": {
+            "baseline_accuracy": 0.897,
+            "candidate_accuracy": 0.908,
+            "losses": 3,
+            "mean_paired_difference": 0.010999999999999987,
+            "ties": 4,
+            "wins": 3
+          },
+          "unequal_noise:switch_to_b": {
+            "baseline_accuracy": 0.504,
+            "candidate_accuracy": 0.5589999999999999,
+            "losses": 2,
+            "mean_paired_difference": 0.05499999999999998,
+            "ties": 0,
+            "wins": 8
+          }
+        },
+        "elapsed_seconds": 5.2473140669753775,
+        "limitations": [
+          "Thresholds on means are operational, not statistical guarantees.",
+          "Non-inferiority alone does not demonstrate novelty; copying the baseline could pass.",
+          "Task families and evaluation seeds are locally visible and can be overfit.",
+          "The oracle receives context labels.",
+          "Inline bytes exclude heap allocations; peak memory is not measured.",
+          "Per-model training times include clock overhead, exclude probes, and are noisy; resource budgets are not matched."
+        ],
+        "logical_transitions": 360000,
+        "max_accuracy_drop": 0.02,
+        "outcome": "criteria_met",
+        "peak_memory": "not measured",
+        "resources": {
+          "candidate": {
+            "inline_bytes": 232,
+            "training_ns_total": 7655136,
+            "training_steps": 120000
+          },
+          "mixture": {
+            "inline_bytes": 72,
+            "training_ns_total": 3284629,
+            "training_steps": 120000
+          },
+          "oracle": {
+            "inline_bytes": 48,
+            "training_ns_total": 2210883,
+            "training_steps": 120000
+          },
+          "single": {
+            "inline_bytes": 48,
+            "training_ns_total": 2161704,
+            "training_steps": 120000
+          }
+        },
+        "seeds": 10,
+        "split": "development"
+      },
+      "diagnosis": {
+        "status": "not_needed"
+      },
+      "error": null,
+      "evaluation": {
+        "baseline": "mixture",
+        "candidate": "candidate",
+        "checks": {
+          "mixed_rules:retention_b": true,
+          "mixed_rules:switch_to_a": true,
+          "mixed_rules:switch_to_b": true,
+          "reversed_asym:retention_b": true,
+          "reversed_asym:switch_to_a": true,
+          "reversed_asym:switch_to_b": true,
+          "shifted_bias:retention_b": true,
+          "shifted_bias:switch_to_a": true,
+          "shifted_bias:switch_to_b": true,
+          "similar_rules:retention_b": true,
+          "similar_rules:switch_to_a": true,
+          "similar_rules:switch_to_b": true
+        },
+        "comparisons": {
+          "mixed_rules:retention_b": {
+            "baseline_accuracy": 0.4614,
+            "candidate_accuracy": 0.6931999999999999,
+            "losses": 0,
+            "mean_paired_difference": 0.23179999999999995,
+            "ties": 0,
+            "wins": 20
+          },
+          "mixed_rules:switch_to_a": {
+            "baseline_accuracy": 0.8074999999999999,
+            "candidate_accuracy": 0.852,
+            "losses": 1,
+            "mean_paired_difference": 0.0445,
+            "ties": 2,
+            "wins": 17
+          },
+          "mixed_rules:switch_to_b": {
+            "baseline_accuracy": 0.5675,
+            "candidate_accuracy": 0.617,
+            "losses": 2,
+            "mean_paired_difference": 0.0495,
+            "ties": 0,
+            "wins": 18
+          },
+          "reversed_asym:retention_b": {
+            "baseline_accuracy": 0.43689999999999996,
+            "candidate_accuracy": 0.7706000000000001,
+            "losses": 5,
+            "mean_paired_difference": 0.3337,
+            "ties": 0,
+            "wins": 15
+          },
+          "reversed_asym:switch_to_a": {
+            "baseline_accuracy": 0.6495,
+            "candidate_accuracy": 0.6950000000000001,
+            "losses": 2,
+            "mean_paired_difference": 0.0455,
+            "ties": 1,
+            "wins": 17
+          },
+          "reversed_asym:switch_to_b": {
+            "baseline_accuracy": 0.611,
+            "candidate_accuracy": 0.646,
+            "losses": 4,
+            "mean_paired_difference": 0.03500000000000001,
+            "ties": 3,
+            "wins": 13
+          },
+          "shifted_bias:retention_b": {
+            "baseline_accuracy": 0.56075,
+            "candidate_accuracy": 0.7931,
+            "losses": 10,
+            "mean_paired_difference": 0.23235,
+            "ties": 0,
+            "wins": 10
+          },
+          "shifted_bias:switch_to_a": {
+            "baseline_accuracy": 0.7285,
+            "candidate_accuracy": 0.7555,
+            "losses": 3,
+            "mean_paired_difference": 0.027000000000000014,
+            "ties": 3,
+            "wins": 14
+          },
+          "shifted_bias:switch_to_b": {
+            "baseline_accuracy": 0.624,
+            "candidate_accuracy": 0.654,
+            "losses": 4,
+            "mean_paired_difference": 0.030000000000000006,
+            "ties": 2,
+            "wins": 14
+          },
+          "similar_rules:retention_b": {
+            "baseline_accuracy": 0.84975,
+            "candidate_accuracy": 0.84975,
+            "losses": 0,
+            "mean_paired_difference": 0.0,
+            "ties": 20,
+            "wins": 0
+          },
+          "similar_rules:switch_to_a": {
+            "baseline_accuracy": 0.8459999999999999,
+            "candidate_accuracy": 0.8459999999999999,
+            "losses": 0,
+            "mean_paired_difference": 0.0,
+            "ties": 20,
+            "wins": 0
+          },
+          "similar_rules:switch_to_b": {
+            "baseline_accuracy": 0.8630000000000001,
+            "candidate_accuracy": 0.8619999999999999,
+            "losses": 1,
+            "mean_paired_difference": -0.0010000000000000009,
+            "ties": 19,
+            "wins": 0
+          }
+        },
+        "elapsed_seconds": 0.3439710970269516,
+        "limitations": [
+          "Thresholds on means are operational, not statistical guarantees.",
+          "Non-inferiority alone does not demonstrate novelty; copying the baseline could pass.",
+          "Task families and evaluation seeds are locally visible and can be overfit.",
+          "The oracle receives context labels.",
+          "Inline bytes exclude heap allocations; peak memory is not measured.",
+          "Per-model training times include clock overhead, exclude probes, and are noisy; resource budgets are not matched."
+        ],
+        "logical_transitions": 720000,
+        "max_accuracy_drop": 0.02,
+        "outcome": "criteria_met",
+        "peak_memory": "not measured",
+        "resources": {
+          "candidate": {
+            "inline_bytes": 232,
+            "training_ns_total": 15310575,
+            "training_steps": 240000
+          },
+          "mixture": {
+            "inline_bytes": 72,
+            "training_ns_total": 6612462,
+            "training_steps": 240000
+          },
+          "oracle": {
+            "inline_bytes": 48,
+            "training_ns_total": 4506712,
+            "training_steps": 240000
+          },
+          "single": {
+            "inline_bytes": 48,
+            "training_ns_total": 4539534,
+            "training_steps": 240000
+          }
+        },
+        "seeds": 20,
+        "split": "evaluation"
+      },
+      "final_probe_matrix": {},
+      "followups": {
+        "aggregate_count": 0,
+        "aggregates": [],
+        "full_records_path": "/home/urho/dev/murmur/toolkit/runs/autonomous-budgeted-01/idea-002/followup-records.json",
+        "qualification": "Agent-authored test output; arithmetic checked, experimental design not independently verified.",
+        "record_count": 0,
+        "records": [],
+        "records_shown": 0,
+        "warnings": []
+      },
+      "idea": {
+        "approach": "Implemented evidence-limited sharing between each context memory\u2019s input rows, building on consolidated memories. A matched control disables sharing. The mechanism test confirms that sharing affects an underexposed row, fades with exposure, and remains frozen when learning is disabled. All four required offline tests passed.",
+        "falsification": "Compare the candidate and no-sharing control on paired development streams, including switch accuracy and frozen B retention. Little or negative improvement would weigh against the pooling hypothesis. The campaign criterion fails if any required mean accuracy trails the mixture by more than two percentage points.",
+        "hypothesis": "When one input row is rarely observed, borrowing evidence from the other under a repeat/flip prior may improve early predictions; reducing that borrowing as row-specific evidence accumulates may limit bias on asymmetric rules.",
+        "limitations": "The repeat/flip prior can bias predictions for asymmetric or constant-output rules, and incorrect context assignments can distort the exposure counts. The mechanism test does not establish an accuracy gain. No development or evaluation comparison was run.",
+        "question": "Can temporary cross-row evidence sharing improve adaptation and retained-rule recall relative to the fixed mixture?"
+      },
+      "index": 2,
+      "status": "complete"
+    },
+    {
+      "agent_elapsed_seconds": 55.41528672701679,
+      "agent_usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 348288,
+        "input_tokens": 420294,
+        "output_tokens": 1959,
+        "reasoning_output_tokens": 300
+      },
+      "commit": "cf10ca907e1347c8ab939233f76701636cfb3353",
+      "development": {
+        "baseline": "mixture",
+        "candidate": "candidate",
+        "checks": {
+          "asymmetric:retention_b": true,
+          "asymmetric:switch_to_a": true,
+          "asymmetric:switch_to_b": true,
+          "complementary:retention_b": true,
+          "complementary:switch_to_a": true,
+          "complementary:switch_to_b": true,
+          "constant_bias:retention_b": true,
+          "constant_bias:switch_to_a": true,
+          "constant_bias:switch_to_b": true,
+          "unequal_noise:retention_b": true,
+          "unequal_noise:switch_to_a": true,
+          "unequal_noise:switch_to_b": true
+        },
+        "comparisons": {
+          "asymmetric:retention_b": {
+            "baseline_accuracy": 0.367,
+            "candidate_accuracy": 0.6649,
+            "losses": 0,
+            "mean_paired_difference": 0.2979,
+            "ties": 0,
+            "wins": 10
+          },
+          "asymmetric:switch_to_a": {
+            "baseline_accuracy": 0.678,
+            "candidate_accuracy": 0.765,
+            "losses": 1,
+            "mean_paired_difference": 0.08700000000000001,
+            "ties": 1,
+            "wins": 8
+          },
+          "asymmetric:switch_to_b": {
+            "baseline_accuracy": 0.542,
+            "candidate_accuracy": 0.577,
+            "losses": 1,
+            "mean_paired_difference": 0.03499999999999998,
+            "ties": 1,
+            "wins": 8
+          },
+          "complementary:retention_b": {
+            "baseline_accuracy": 0.3468,
+            "candidate_accuracy": 0.7399,
+            "losses": 1,
+            "mean_paired_difference": 0.3931,
+            "ties": 0,
+            "wins": 9
+          },
+          "complementary:switch_to_a": {
+            "baseline_accuracy": 0.6,
+            "candidate_accuracy": 0.713,
+            "losses": 0,
+            "mean_paired_difference": 0.11299999999999999,
+            "ties": 0,
+            "wins": 10
+          },
+          "complementary:switch_to_b": {
+            "baseline_accuracy": 0.5529999999999999,
+            "candidate_accuracy": 0.588,
+            "losses": 1,
+            "mean_paired_difference": 0.03500000000000002,
+            "ties": 1,
+            "wins": 8
+          },
+          "constant_bias:retention_b": {
+            "baseline_accuracy": 0.8313,
+            "candidate_accuracy": 0.9008,
+            "losses": 5,
+            "mean_paired_difference": 0.0695,
+            "ties": 3,
+            "wins": 2
+          },
+          "constant_bias:switch_to_a": {
+            "baseline_accuracy": 0.876,
+            "candidate_accuracy": 0.873,
+            "losses": 3,
+            "mean_paired_difference": -0.0030000000000000027,
+            "ties": 4,
+            "wins": 3
+          },
+          "constant_bias:switch_to_b": {
+            "baseline_accuracy": 0.739,
+            "candidate_accuracy": 0.746,
+            "losses": 4,
+            "mean_paired_difference": 0.006999999999999995,
+            "ties": 1,
+            "wins": 5
+          },
+          "unequal_noise:retention_b": {
+            "baseline_accuracy": 0.3659,
+            "candidate_accuracy": 0.6656,
+            "losses": 0,
+            "mean_paired_difference": 0.29969999999999997,
+            "ties": 0,
+            "wins": 10
+          },
+          "unequal_noise:switch_to_a": {
+            "baseline_accuracy": 0.908,
+            "candidate_accuracy": 0.901,
+            "losses": 3,
+            "mean_paired_difference": -0.007000000000000006,
+            "ties": 6,
+            "wins": 1
+          },
+          "unequal_noise:switch_to_b": {
+            "baseline_accuracy": 0.525,
+            "candidate_accuracy": 0.568,
+            "losses": 3,
+            "mean_paired_difference": 0.04299999999999999,
+            "ties": 0,
+            "wins": 7
+          }
+        },
+        "elapsed_seconds": 5.229167765006423,
+        "limitations": [
+          "Thresholds on means are operational, not statistical guarantees.",
+          "Non-inferiority alone does not demonstrate novelty; copying the baseline could pass.",
+          "Task families and evaluation seeds are locally visible and can be overfit.",
+          "The oracle receives context labels.",
+          "Inline bytes exclude heap allocations; peak memory is not measured.",
+          "Per-model training times include clock overhead, exclude probes, and are noisy; resource budgets are not matched."
+        ],
+        "logical_transitions": 360000,
+        "max_accuracy_drop": 0.02,
+        "outcome": "criteria_met",
+        "peak_memory": "not measured",
+        "resources": {
+          "candidate": {
+            "inline_bytes": 248,
+            "training_ns_total": 14469352,
+            "training_steps": 120000
+          },
+          "mixture": {
+            "inline_bytes": 72,
+            "training_ns_total": 3318133,
+            "training_steps": 120000
+          },
+          "oracle": {
+            "inline_bytes": 48,
+            "training_ns_total": 2293801,
+            "training_steps": 120000
+          },
+          "single": {
+            "inline_bytes": 48,
+            "training_ns_total": 2322913,
+            "training_steps": 120000
+          }
+        },
+        "seeds": 10,
+        "split": "development"
+      },
+      "diagnosis": {
+        "status": "not_needed"
+      },
+      "error": null,
+      "evaluation": {
+        "baseline": "mixture",
+        "candidate": "candidate",
+        "checks": {
+          "mixed_rules:retention_b": true,
+          "mixed_rules:switch_to_a": true,
+          "mixed_rules:switch_to_b": true,
+          "reversed_asym:retention_b": true,
+          "reversed_asym:switch_to_a": true,
+          "reversed_asym:switch_to_b": true,
+          "shifted_bias:retention_b": true,
+          "shifted_bias:switch_to_a": true,
+          "shifted_bias:switch_to_b": true,
+          "similar_rules:retention_b": true,
+          "similar_rules:switch_to_a": true,
+          "similar_rules:switch_to_b": true
+        },
+        "comparisons": {
+          "mixed_rules:retention_b": {
+            "baseline_accuracy": 0.4664,
+            "candidate_accuracy": 0.69,
+            "losses": 0,
+            "mean_paired_difference": 0.22359999999999997,
+            "ties": 0,
+            "wins": 20
+          },
+          "mixed_rules:switch_to_a": {
+            "baseline_accuracy": 0.817,
+            "candidate_accuracy": 0.874,
+            "losses": 1,
+            "mean_paired_difference": 0.056999999999999995,
+            "ties": 1,
+            "wins": 18
+          },
+          "mixed_rules:switch_to_b": {
+            "baseline_accuracy": 0.5695,
+            "candidate_accuracy": 0.6005,
+            "losses": 5,
+            "mean_paired_difference": 0.03099999999999999,
+            "ties": 2,
+            "wins": 13
+          },
+          "reversed_asym:retention_b": {
+            "baseline_accuracy": 0.3626,
+            "candidate_accuracy": 0.7688,
+            "losses": 2,
+            "mean_paired_difference": 0.4062,
+            "ties": 1,
+            "wins": 17
+          },
+          "reversed_asym:switch_to_a": {
+            "baseline_accuracy": 0.631,
+            "candidate_accuracy": 0.704,
+            "losses": 3,
+            "mean_paired_difference": 0.07299999999999998,
+            "ties": 0,
+            "wins": 17
+          },
+          "reversed_asym:switch_to_b": {
+            "baseline_accuracy": 0.6045,
+            "candidate_accuracy": 0.653,
+            "losses": 1,
+            "mean_paired_difference": 0.048499999999999995,
+            "ties": 1,
+            "wins": 18
+          },
+          "shifted_bias:retention_b": {
+            "baseline_accuracy": 0.4627,
+            "candidate_accuracy": 0.78545,
+            "losses": 4,
+            "mean_paired_difference": 0.32275,
+            "ties": 0,
+            "wins": 16
+          },
+          "shifted_bias:switch_to_a": {
+            "baseline_accuracy": 0.729,
+            "candidate_accuracy": 0.764,
+            "losses": 3,
+            "mean_paired_difference": 0.03499999999999999,
+            "ties": 1,
+            "wins": 16
+          },
+          "shifted_bias:switch_to_b": {
+            "baseline_accuracy": 0.6184999999999999,
+            "candidate_accuracy": 0.6445000000000001,
+            "losses": 4,
+            "mean_paired_difference": 0.026000000000000013,
+            "ties": 2,
+            "wins": 14
+          },
+          "similar_rules:retention_b": {
+            "baseline_accuracy": 0.8533999999999999,
+            "candidate_accuracy": 0.8533999999999999,
+            "losses": 0,
+            "mean_paired_difference": 0.0,
+            "ties": 20,
+            "wins": 0
+          },
+          "similar_rules:switch_to_a": {
+            "baseline_accuracy": 0.8664999999999999,
+            "candidate_accuracy": 0.865,
+            "losses": 2,
+            "mean_paired_difference": -0.0014999999999999957,
+            "ties": 18,
+            "wins": 0
+          },
+          "similar_rules:switch_to_b": {
+            "baseline_accuracy": 0.8445,
+            "candidate_accuracy": 0.8425,
+            "losses": 3,
+            "mean_paired_difference": -0.0020000000000000018,
+            "ties": 17,
+            "wins": 0
+          }
+        },
+        "elapsed_seconds": 0.33914144802838564,
+        "limitations": [
+          "Thresholds on means are operational, not statistical guarantees.",
+          "Non-inferiority alone does not demonstrate novelty; copying the baseline could pass.",
+          "Task families and evaluation seeds are locally visible and can be overfit.",
+          "The oracle receives context labels.",
+          "Inline bytes exclude heap allocations; peak memory is not measured.",
+          "Per-model training times include clock overhead, exclude probes, and are noisy; resource budgets are not matched."
+        ],
+        "logical_transitions": 720000,
+        "max_accuracy_drop": 0.02,
+        "outcome": "criteria_met",
+        "peak_memory": "not measured",
+        "resources": {
+          "candidate": {
+            "inline_bytes": 248,
+            "training_ns_total": 27685405,
+            "training_steps": 240000
+          },
+          "mixture": {
+            "inline_bytes": 72,
+            "training_ns_total": 6519088,
+            "training_steps": 240000
+          },
+          "oracle": {
+            "inline_bytes": 48,
+            "training_ns_total": 4399544,
+            "training_steps": 240000
+          },
+          "single": {
+            "inline_bytes": 48,
+            "training_ns_total": 4392304,
+            "training_steps": 240000
+          }
+        },
+        "seeds": 20,
+        "split": "evaluation"
+      },
+      "final_probe_matrix": {},
+      "followups": {
+        "aggregate_count": 0,
+        "aggregates": [],
+        "full_records_path": "/home/urho/dev/murmur/toolkit/runs/autonomous-budgeted-01/idea-003/followup-records.json",
+        "qualification": "Agent-authored test output; arithmetic checked, experimental design not independently verified.",
+        "record_count": 0,
+        "records": [],
+        "records_shown": 0,
+        "warnings": []
+      },
+      "idea": {
+        "approach": "Implemented per-memory evidence for same versus opposite input-row relationships, using it to guide temporary cross-row sharing. Added a fixed-opposite-relation control and a mechanism test. Both required offline test suites passed.",
+        "falsification": "Compare the candidate, fixed-relation control, and mixture on paired streams. Little or negative improvement over the fixed-relation control would weigh against adaptive sharing; a mean accuracy more than two percentage points below the mixture on any required measure fails the campaign criterion.",
+        "hypothesis": "Learning whether each memory's input rows behave similarly or oppositely may reduce the bias of fixed repeat/flip sharing while retaining its benefit for underexposed rows.",
+        "limitations": "No development or evaluation accuracy comparison was run. Noisy observations or incorrect context assignments can mislead relationship evidence, and the discounted evidence may adapt too slowly or follow noise. The mechanism test does not establish an accuracy gain.",
+        "question": "Can learned cross-row relationships improve adaptation and retained-rule recall relative to fixed cross-row sharing and the mixture baseline?"
+      },
+      "index": 3,
+      "status": "complete"
+    },
+    {
+      "agent_elapsed_seconds": 52.737348614027724,
+      "agent_usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 383744,
+        "input_tokens": 449190,
+        "output_tokens": 1587,
+        "reasoning_output_tokens": 180
+      },
+      "commit": "1b1bab5e3d7cf0a4011e6d4c31d2cd97bb1f2cd0",
+      "development": {
+        "baseline": "mixture",
+        "candidate": "candidate",
+        "checks": {
+          "asymmetric:retention_b": true,
+          "asymmetric:switch_to_a": true,
+          "asymmetric:switch_to_b": true,
+          "complementary:retention_b": true,
+          "complementary:switch_to_a": true,
+          "complementary:switch_to_b": true,
+          "constant_bias:retention_b": true,
+          "constant_bias:switch_to_a": true,
+          "constant_bias:switch_to_b": true,
+          "unequal_noise:retention_b": true,
+          "unequal_noise:switch_to_a": true,
+          "unequal_noise:switch_to_b": true
+        },
+        "comparisons": {
+          "asymmetric:retention_b": {
+            "baseline_accuracy": 0.44480000000000003,
+            "candidate_accuracy": 0.6754,
+            "losses": 0,
+            "mean_paired_difference": 0.2306,
+            "ties": 0,
+            "wins": 10
+          },
+          "asymmetric:switch_to_a": {
+            "baseline_accuracy": 0.696,
+            "candidate_accuracy": 0.776,
+            "losses": 0,
+            "mean_paired_difference": 0.07999999999999999,
+            "ties": 1,
+            "wins": 9
+          },
+          "asymmetric:switch_to_b": {
+            "baseline_accuracy": 0.514,
+            "candidate_accuracy": 0.5660000000000001,
+            "losses": 0,
+            "mean_paired_difference": 0.052000000000000005,
+            "ties": 1,
+            "wins": 9
+          },
+          "complementary:retention_b": {
+            "baseline_accuracy": 0.4383,
+            "candidate_accuracy": 0.7386,
+            "losses": 2,
+            "mean_paired_difference": 0.3003,
+            "ties": 0,
+            "wins": 8
+          },
+          "complementary:switch_to_a": {
+            "baseline_accuracy": 0.576,
+            "candidate_accuracy": 0.7110000000000001,
+            "losses": 0,
+            "mean_paired_difference": 0.135,
+            "ties": 0,
+            "wins": 10
+          },
+          "complementary:switch_to_b": {
+            "baseline_accuracy": 0.5469999999999999,
+            "candidate_accuracy": 0.608,
+            "losses": 0,
+            "mean_paired_difference": 0.061,
+            "ties": 0,
+            "wins": 10
+          },
+          "constant_bias:retention_b": {
+            "baseline_accuracy": 0.8255000000000001,
+            "candidate_accuracy": 0.8872,
+            "losses": 7,
+            "mean_paired_difference": 0.0617,
+            "ties": 2,
+            "wins": 1
+          },
+          "constant_bias:switch_to_a": {
+            "baseline_accuracy": 0.8789999999999999,
+            "candidate_accuracy": 0.8800000000000001,
+            "losses": 3,
+            "mean_paired_difference": 0.0010000000000000009,
+            "ties": 4,
+            "wins": 3
+          },
+          "constant_bias:switch_to_b": {
+            "baseline_accuracy": 0.71,
+            "candidate_accuracy": 0.757,
+            "losses": 1,
+            "mean_paired_difference": 0.047,
+            "ties": 1,
+            "wins": 8
+          },
+          "unequal_noise:retention_b": {
+            "baseline_accuracy": 0.3382,
+            "candidate_accuracy": 0.6623,
+            "losses": 0,
+            "mean_paired_difference": 0.3241,
+            "ties": 0,
+            "wins": 10
+          },
+          "unequal_noise:switch_to_a": {
+            "baseline_accuracy": 0.9,
+            "candidate_accuracy": 0.9,
+            "losses": 4,
+            "mean_paired_difference": 0.0,
+            "ties": 2,
+            "wins": 4
+          },
+          "unequal_noise:switch_to_b": {
+            "baseline_accuracy": 0.512,
+            "candidate_accuracy": 0.577,
+            "losses": 0,
+            "mean_paired_difference": 0.06499999999999997,
+            "ties": 0,
+            "wins": 10
+          }
+        },
+        "elapsed_seconds": 5.952803969033994,
+        "limitations": [
+          "Thresholds on means are operational, not statistical guarantees.",
+          "Non-inferiority alone does not demonstrate novelty; copying the baseline could pass.",
+          "Task families and evaluation seeds are locally visible and can be overfit.",
+          "The oracle receives context labels.",
+          "Inline bytes exclude heap allocations; peak memory is not measured.",
+          "Per-model training times include clock overhead, exclude probes, and are noisy; resource budgets are not matched."
+        ],
+        "logical_transitions": 360000,
+        "max_accuracy_drop": 0.02,
+        "outcome": "criteria_met",
+        "peak_memory": "not measured",
+        "resources": {
+          "candidate": {
+            "inline_bytes": 248,
+            "training_ns_total": 14706994,
+            "training_steps": 120000
+          },
+          "mixture": {
+            "inline_bytes": 72,
+            "training_ns_total": 3269537,
+            "training_steps": 120000
+          },
+          "oracle": {
+            "inline_bytes": 48,
+            "training_ns_total": 2255300,
+            "training_steps": 120000
+          },
+          "single": {
+            "inline_bytes": 48,
+            "training_ns_total": 2221973,
+            "training_steps": 120000
+          }
+        },
+        "seeds": 10,
+        "split": "development"
+      },
+      "diagnosis": {
+        "status": "not_needed"
+      },
+      "error": null,
+      "evaluation": {
+        "baseline": "mixture",
+        "candidate": "candidate",
+        "checks": {
+          "mixed_rules:retention_b": true,
+          "mixed_rules:switch_to_a": true,
+          "mixed_rules:switch_to_b": true,
+          "reversed_asym:retention_b": true,
+          "reversed_asym:switch_to_a": true,
+          "reversed_asym:switch_to_b": true,
+          "shifted_bias:retention_b": true,
+          "shifted_bias:switch_to_a": true,
+          "shifted_bias:switch_to_b": true,
+          "similar_rules:retention_b": true,
+          "similar_rules:switch_to_a": true,
+          "similar_rules:switch_to_b": true
+        },
+        "comparisons": {
+          "mixed_rules:retention_b": {
+            "baseline_accuracy": 0.4609,
+            "candidate_accuracy": 0.68685,
+            "losses": 0,
+            "mean_paired_difference": 0.22595,
+            "ties": 0,
+            "wins": 20
+          },
+          "mixed_rules:switch_to_a": {
+            "baseline_accuracy": 0.8150000000000001,
+            "candidate_accuracy": 0.8545,
+            "losses": 1,
+            "mean_paired_difference": 0.03949999999999999,
+            "ties": 3,
+            "wins": 16
+          },
+          "mixed_rules:switch_to_b": {
+            "baseline_accuracy": 0.589,
+            "candidate_accuracy": 0.6054999999999999,
+            "losses": 6,
+            "mean_paired_difference": 0.016499999999999994,
+            "ties": 3,
+            "wins": 11
+          },
+          "reversed_asym:retention_b": {
+            "baseline_accuracy": 0.28875,
+            "candidate_accuracy": 0.77055,
+            "losses": 2,
+            "mean_paired_difference": 0.48180000000000006,
+            "ties": 0,
+            "wins": 18
+          },
+          "reversed_asym:switch_to_a": {
+            "baseline_accuracy": 0.654,
+            "candidate_accuracy": 0.7175,
+            "losses": 1,
+            "mean_paired_difference": 0.06349999999999997,
+            "ties": 1,
+            "wins": 18
+          },
+          "reversed_asym:switch_to_b": {
+            "baseline_accuracy": 0.615,
+            "candidate_accuracy": 0.6595,
+            "losses": 3,
+            "mean_paired_difference": 0.044500000000000005,
+            "ties": 1,
+            "wins": 16
+          },
+          "shifted_bias:retention_b": {
+            "baseline_accuracy": 0.4803,
+            "candidate_accuracy": 0.79095,
+            "losses": 8,
+            "mean_paired_difference": 0.31065,
+            "ties": 0,
+            "wins": 12
+          },
+          "shifted_bias:switch_to_a": {
+            "baseline_accuracy": 0.733,
+            "candidate_accuracy": 0.7725,
+            "losses": 1,
+            "mean_paired_difference": 0.0395,
+            "ties": 2,
+            "wins": 17
+          },
+          "shifted_bias:switch_to_b": {
+            "baseline_accuracy": 0.606,
+            "candidate_accuracy": 0.633,
+            "losses": 4,
+            "mean_paired_difference": 0.02699999999999999,
+            "ties": 2,
+            "wins": 14
+          },
+          "similar_rules:retention_b": {
+            "baseline_accuracy": 0.85275,
+            "candidate_accuracy": 0.85275,
+            "losses": 0,
+            "mean_paired_difference": 0.0,
+            "ties": 20,
+            "wins": 0
+          },
+          "similar_rules:switch_to_a": {
+            "baseline_accuracy": 0.8404999999999999,
+            "candidate_accuracy": 0.8400000000000001,
+            "losses": 1,
+            "mean_paired_difference": -0.0005000000000000004,
+            "ties": 19,
+            "wins": 0
+          },
+          "similar_rules:switch_to_b": {
+            "baseline_accuracy": 0.85,
+            "candidate_accuracy": 0.849,
+            "losses": 3,
+            "mean_paired_difference": -0.0010000000000000009,
+            "ties": 16,
+            "wins": 1
+          }
+        },
+        "elapsed_seconds": 0.3367816269164905,
+        "limitations": [
+          "Thresholds on means are operational, not statistical guarantees.",
+          "Non-inferiority alone does not demonstrate novelty; copying the baseline could pass.",
+          "Task families and evaluation seeds are locally visible and can be overfit.",
+          "The oracle receives context labels.",
+          "Inline bytes exclude heap allocations; peak memory is not measured.",
+          "Per-model training times include clock overhead, exclude probes, and are noisy; resource budgets are not matched."
+        ],
+        "logical_transitions": 720000,
+        "max_accuracy_drop": 0.02,
+        "outcome": "criteria_met",
+        "peak_memory": "not measured",
+        "resources": {
+          "candidate": {
+            "inline_bytes": 248,
+            "training_ns_total": 28112592,
+            "training_steps": 240000
+          },
+          "mixture": {
+            "inline_bytes": 72,
+            "training_ns_total": 6461322,
+            "training_steps": 240000
+          },
+          "oracle": {
+            "inline_bytes": 48,
+            "training_ns_total": 4442339,
+            "training_steps": 240000
+          },
+          "single": {
+            "inline_bytes": 48,
+            "training_ns_total": 4374427,
+            "training_steps": 240000
+          }
+        },
+        "seeds": 20,
+        "split": "evaluation"
+      },
+      "final_probe_matrix": {},
+      "followups": {
+        "aggregate_count": 0,
+        "aggregates": [],
+        "full_records_path": "/home/urho/dev/murmur/toolkit/runs/autonomous-budgeted-01/idea-004/followup-records.json",
+        "qualification": "Agent-authored test output; arithmetic checked, experimental design not independently verified.",
+        "record_count": 0,
+        "records": [],
+        "records_shown": 0,
+        "warnings": []
+      },
+      "idea": {
+        "approach": "Implemented alternative-aware consolidation release on top of the prior adaptive cross-row candidate: an observation releases less protection from one memory when the other memory predicts it well. Added an unguarded-release control and a mechanism test. The required offline tests passed.",
+        "falsification": "Compare the candidate with the matched unguarded-release control and mixture on paired streams. Little or negative retention improvement, slower switching, or any required mean accuracy more than two percentage points below the mixture would weigh against the proposal.",
+        "hypothesis": "If surprising observations often belong to another learned context, using that alternative explanation to temper consolidation release may protect useful memories. Alternatively, errors may reflect stale memories or incorrect routing, in which case the guard could impede adaptation; the matched control distinguishes its combined effect on learning and inference.",
+        "limitations": "The other memory can explain noise or be incorrectly learned, and the guard may preserve stale entries. The mechanism test shows changed consolidation and frozen behavior, not an accuracy gain. No development or evaluation comparison was run; visible task families also limit generalization.",
+        "question": "Can alternative-aware consolidation release improve rule retention while preserving adaptation relative to unguarded release and the fixed mixture?"
+      },
+      "index": 4,
+      "status": "complete"
+    }
+  ]
+}

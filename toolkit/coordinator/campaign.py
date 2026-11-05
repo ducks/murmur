@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 import os
 import re
@@ -44,6 +45,51 @@ def git(cwd, *args):
     return result.stdout.decode('utf-8', errors='strict').strip()
 
 
+def seed_blobs(commit):
+    """Read only the two permitted regular files from the recorded Git commit."""
+    blobs = {}
+    for name in sorted(ALLOWED):
+        entry = git(runner.ROOT, 'ls-tree', commit, '--', name)
+        if not entry.startswith('100644 blob ') or '\t' not in entry or entry.split('\t', 1)[1] != name:
+            raise runner.PlanError(f'seed candidate requires a regular file: {name}')
+        try:
+            blobs[name] = subprocess.run(['git', 'show', f'{commit}:{name}'], cwd=runner.ROOT,
+                                         stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True).stdout
+        except (OSError, subprocess.CalledProcessError) as exc:
+            raise runner.PlanError(f'cannot read seed candidate file: {name}') from exc
+    return blobs
+
+
+def resolve_seed_candidate(revision):
+    if not isinstance(revision, str) or not re.fullmatch(r'[0-9a-f]{7,40}', revision):
+        raise runner.PlanError('seed candidate must be a hexadecimal Git commit ID')
+    commit = git(runner.ROOT, 'rev-parse', '--verify', f'{revision}^{{commit}}')
+    blobs = seed_blobs(commit)
+    return commit, {name: hashlib.sha256(data).hexdigest() for name, data in blobs.items()}
+
+
+def apply_seed_candidate(worktree, config, base):
+    commit = config.get('seed_candidate_commit')
+    if not commit:
+        return base
+    if git(worktree, 'rev-parse', 'HEAD') != base or changed_paths(worktree):
+        raise runner.PlanError('cannot seed a changed worktree')
+    blobs = seed_blobs(commit)
+    hashes = {name: hashlib.sha256(data).hexdigest() for name, data in blobs.items()}
+    if hashes != config.get('seed_source_sha256'):
+        raise runner.PlanError('seed candidate content does not match frozen hashes')
+    for name, data in blobs.items():
+        path = worktree / name
+        if any(parent.is_symlink() for parent in (path, path.parent, path.parent.parent)):
+            raise runner.PlanError(f'seed destination is symlinked: {name}')
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(data)
+    git(worktree, 'add', '--', *sorted(ALLOWED))
+    if git(worktree, 'diff', '--cached', '--name-only'):
+        git(worktree, 'commit', '-m', f'Seed candidate from {commit[:12]}')
+    return git(worktree, 'rev-parse', 'HEAD')
+
+
 def seed_configs(index, seed_base=7_000_001):
     # All role offsets fit within 51,000; groups and rounds are 100,000+ apart.
     start = seed_base + index * 300_000
@@ -75,7 +121,7 @@ def make_plan(index, idea, protocol='legacy'):
     return plan
 
 
-def init(directory, goal, max_ideas, agent_seconds, test_seconds, local_provider=None, model=None, prior_campaign=None, protocol='milestone', diagnostic_seconds=120, diagnose_failures=True, max_reported_input_tokens=None, review_successes=True):
+def init(directory, goal, max_ideas, agent_seconds, test_seconds, local_provider=None, model=None, prior_campaign=None, protocol='milestone', diagnostic_seconds=120, diagnose_failures=True, max_reported_input_tokens=None, review_successes=True, seed_candidate=None):
     runner.text_field(goal, 'goal')
     if not (1 <= max_ideas <= 100 and 10 <= agent_seconds <= 7200 and 10 <= test_seconds <= 7200):
         raise runner.PlanError('limits outside supported ranges')
@@ -91,6 +137,7 @@ def init(directory, goal, max_ideas, agent_seconds, test_seconds, local_provider
         runner.text_field(model, 'model')
     if git(runner.ROOT, 'status', '--porcelain=v1', '--untracked-files=all'):
         raise runner.PlanError('commit or otherwise clean the starting worktree before creating a campaign')
+    seed_commit, seed_hashes = resolve_seed_candidate(seed_candidate) if seed_candidate else (None, {})
     prior = prior_history(prior_campaign) if prior_campaign else []
     dest = runner.output_location(directory)
     try:
@@ -103,6 +150,7 @@ def init(directory, goal, max_ideas, agent_seconds, test_seconds, local_provider
               'max_ideas': max_ideas, 'agent_seconds': agent_seconds, 'test_seconds': test_seconds,
               'local_provider': local_provider, 'model': model,
               'base_commit': git(runner.ROOT, 'rev-parse', 'HEAD'), 'prior_history': prior,
+              'seed_candidate_commit': seed_commit, 'seed_source_sha256': seed_hashes,
               'protocol': protocol,
               'diagnose_failures': diagnose_failures, 'diagnostic_seconds': diagnostic_seconds,
               'review_successes': review_successes and diagnose_failures,
@@ -153,8 +201,12 @@ def prompt_for(config, history, research_memory=None):
     else:
         criteria_text = 'It will test candidate vs the unchanged original mixture on the noisiest ABA B retention, with stationary penalties, a maximum 3 percentage-point mean regression on the other final A/B probes, and fixed criteria.'
         evaluator_reference = ''
+    seed_note = (f"The current candidate and test files were initialized from prior candidate commit {config['seed_candidate_commit']}. "
+                 'Treat that code as the starting point and use the recorded review to design a matched follow-up.'
+                 if config.get('seed_candidate_commit') else 'No previous candidate was checked out as a seed.')
     return f'''You are one research agent in an automated, bounded model research campaign.
 Overall goal: {config['goal']}
+{seed_note}
 
 Propose and implement ONE genuinely motivated candidate model for the existing hidden-context binary sequence task. Read RESEARCH.md, EXPERIMENTS.md, toolkit/src/unlabeled_context.rs, toolkit/src/candidate_context.rs{evaluator_reference}, toolkit/src/agent_candidate.rs and toolkit/tests/candidate_context.rs. The existing mixture and other controls are fixed; seek an improvement over the mixture, not an attractive demonstration. A copy of the baseline can pass a non-inferiority threshold but is not a novel mechanism. Consider varied ideas, not only stronger thresholds. This is one limited task, not a claim of general language modeling or novelty.
 
@@ -169,7 +221,7 @@ If the preceding round contains a completed diagnosis, try to design a focused t
 Prior candidate commits are available locally: when building on a previous idea, inspect its candidate source with git show <commit>:toolkit/src/agent_candidate.rs and adapt it within the permitted files. Starting a new campaign does not automatically check out the prior candidate.
 For any quantitative follow-up in agent_generated.rs, print one single-line record per aggregate measurement using this exact prefix and JSON shape: MURMUR_FOLLOWUP {{"measure":"name","candidate":"name","control":"name","candidate_correct":1,"control_correct":1,"trials":2}}. Counts must refer to the same paired observations. Prefer aggregate counts by task and measure, not one record per seed; keep any per-seed details in the test log. The supervisor preserves and checks the arithmetic but does not independently verify the experimental design. Do not emit a record for a test you did not run.
 
-Edit ONLY toolkit/src/agent_candidate.rs and toolkit/tests/agent_generated.rs. The latter must contain at least one meaningful Rust test for your proposed mechanism. Do not alter evaluator, baseline, configs, docs, Git metadata, or any other file; do not commit. The supervisor rejects other changes. Preserve Candidate's Clone, new(seed, rate), reset(), predict(x)->f64 and observe(x,y,learn) interface. `predict` must happen without seeing y; output must be finite in [0,1]. In `observe(..., false)`, do not change learned parameters, though context inference state may update. reset clears transient inference state without erasing learned parameters. Candidate may use local Rust standard library and existing local crates only; no network, pretrained weights, external APIs, hidden future data, environment data, or provided true context. Model-code restrictions are reviewed/tested, not a complete security boundary.
+Edit ONLY toolkit/src/agent_candidate.rs and toolkit/tests/agent_generated.rs. A test-only investigation is allowed; the latter must contain at least one meaningful Rust test for your proposed mechanism. Do not alter evaluator, baseline, configs, docs, Git metadata, or any other file; do not commit. The supervisor rejects other changes. Preserve Candidate's Clone, new(seed, rate), reset(), predict(x)->f64 and observe(x,y,learn) interface. `predict` must happen without seeing y; output must be finite in [0,1]. In `observe(..., false)`, do not change learned parameters, though context inference state may update. reset clears transient inference state without erasing learned parameters. Candidate may use local Rust standard library and existing local crates only; no network, pretrained weights, external APIs, hidden future data, environment data, or provided true context. Model-code restrictions are reviewed/tested, not a complete security boundary.
 
 The supervisor independently generates separate fresh deterministic development and evaluation configs, validates all controls and runs the evaluator. {criteria_text} You must not read, generate, inspect, or tune against evaluation data. You may run targeted tests and small development-only experiments, but do not alter their declared criteria or claim statistical significance. The coding-agent service may be remote; the candidate itself must be local.
 
@@ -408,8 +460,8 @@ def verify_agent_changes(worktree, base):
     if git(worktree, 'rev-parse', 'HEAD') != base:
         raise runner.PlanError('agent changed Git HEAD; preserve the worktree for inspection')
     changes = changed_paths(worktree)
-    if not changes or 'toolkit/src/agent_candidate.rs' not in changes:
-        raise runner.PlanError('agent did not change the candidate model')
+    if not changes or not changes.intersection(ALLOWED):
+        raise runner.PlanError('agent did not change the candidate or its test')
     if changes - ALLOWED:
         raise runner.PlanError(f'agent changed files outside candidate scope: {sorted(changes - ALLOWED)}')
     for name in ALLOWED:
@@ -520,6 +572,11 @@ def execute_round(directory, config, state, agent=call_agent):
     runner.write_json(round_dir / 'result.json', result)
     try:
         git(runner.ROOT, 'worktree', 'add', '-b', branch, str(worktree), base)
+        if index == 1 and config.get('seed_candidate_commit'):
+            base = apply_seed_candidate(worktree, config, base)
+            result.update(base_commit=base, seed_candidate_commit=config['seed_candidate_commit'],
+                          seed_source_sha256=config['seed_source_sha256'])
+            runner.write_json(round_dir / 'result.json', result)
         research_index = memory.build_index()
         research_index['agent_context'] = memory.snapshot_for_agent(research_index, config['campaign_id'])
         research_index['agent_context']['full_snapshot_path'] = str(round_dir / 'research-memory.json')
@@ -574,7 +631,7 @@ def execute_round(directory, config, state, agent=call_agent):
     except (runner.PlanError, OSError, subprocess.SubprocessError) as exc:
         result.update(status='failed', error=str(exc))
     runner.write_json(round_dir / 'result.json', result)
-    state['completed'].append({k: result.get(k) for k in ('index', 'status', 'commit', 'idea', 'agent_elapsed_seconds', 'agent_usage', 'followups', 'development', 'evaluation', 'final_probe_matrix', 'diagnosis', 'error')})
+    state['completed'].append({k: result.get(k) for k in ('index', 'status', 'base_commit', 'seed_candidate_commit', 'commit', 'idea', 'agent_elapsed_seconds', 'agent_usage', 'followups', 'development', 'evaluation', 'final_probe_matrix', 'diagnosis', 'error')})
     state['next_index'] += 1
     state['status'] = 'ready' if result['status'] == 'complete' else 'inspect_failure'
     runner.write_json(directory / 'state.json', state)
@@ -652,12 +709,13 @@ def main(argv=None):
     p.add_argument('--no-diagnosis', action='store_true', help='skip the separate failure-analysis agent')
     p.add_argument('--no-success-review', action='store_true', help='analyze failures but skip reviews of passing candidates')
     p.add_argument('--max-reported-input-tokens', type=int, help='stop between rounds when reported total reaches this threshold (not a hard cap)')
+    p.add_argument('--seed-candidate', help='start from the candidate and test files in this Git commit')
     p = sub.add_parser('run'); p.add_argument('directory'); p.add_argument('--ideas', type=int)
     p = sub.add_parser('cleanup'); p.add_argument('directory')
     args = parser.parse_args(argv)
     try:
         if args.command == 'init':
-            result = init(args.directory, args.goal, args.max_ideas, args.agent_seconds, args.test_seconds, args.local_provider, args.model, args.prior_campaign, args.protocol, args.diagnostic_seconds, not args.no_diagnosis, args.max_reported_input_tokens, not args.no_success_review)
+            result = init(args.directory, args.goal, args.max_ideas, args.agent_seconds, args.test_seconds, args.local_provider, args.model, args.prior_campaign, args.protocol, args.diagnostic_seconds, not args.no_diagnosis, args.max_reported_input_tokens, not args.no_success_review, args.seed_candidate)
         elif args.command == 'cleanup':
             result = cleanup(args.directory)
         else:

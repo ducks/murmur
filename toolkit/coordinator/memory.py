@@ -110,6 +110,7 @@ def campaign_records(directory):
                         'campaign_id': config['campaign_id'], 'round': item['index'],
                         'campaign_goal': config.get('goal'), 'protocol': config.get('protocol', 'legacy'),
                         'status': item.get('status'), 'incomplete': incomplete, 'candidate_commit': item.get('commit'),
+                        'seed_candidate_commit': config.get('seed_candidate_commit'),
                         'idea': idea, 'followups': followups, 'development': checks(item.get('development')),
                         'evaluation': checks(item.get('evaluation')), 'diagnosis': item.get('diagnosis'), 'error': item.get('error'),
                         'evidence_directory': str(round_dir),

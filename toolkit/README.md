@@ -270,6 +270,8 @@ Seeds are generated from a campaign identifier and separated across rounds; ther
 
 To start a separate campaign with the evidence from a previous one in the agent's context, pass `--prior-campaign toolkit/runs/previous-campaign` to `init`. Milestone reports include all retention and switch comparisons for the next agent. The legacy protocol instead compares noisy B retention with a three-percentage-point cross-condition regression guard. Neither protocol is a universal definition of model quality.
 
+To continue from a specific candidate instead of recreating it from a description, add `--seed-candidate <candidate-commit>` to `init`, optionally together with `--prior-campaign`. The supervisor resolves the commit, freezes hashes of its candidate and generated-test files, copies only those two files into the first isolated worktree on top of the current evaluator, and records a new seed commit before starting the agent. Later rounds build on the preceding candidate commit. The agent may make a test-only change when investigating a mechanism. The seed carries model code and tests, not trained weights or live learned state; scorecards, logs and review remain necessary.
+
 Campaign round results include the coding agent's wall time and, when the CLI reports it, token-usage fields extracted from its event log. They are usage records, not a cost estimate or an enforced token budget. Detailed event logs may include code and experiment information sent to the configured agent provider.
 
 A possible longer-term direction for volunteer compute, and the additional verification and isolation it would need, is described in [DISTRIBUTED_VISION.md](coordinator/DISTRIBUTED_VISION.md). Distributed execution is not implemented.

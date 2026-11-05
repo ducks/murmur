@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "hypothesis": "Restoring the heuristically B-like memory to its end-of-B parameters will recover final B recall if later memory drift contributes to forgetting.",
+  "selection": "At the end of B choose the slot with larger mean P(1|x) for x in {0,1}; ties choose slot 0.",
+  "arms": ["sham", "restore_selected", "restore_other", "mixture"],
+  "intervention": "After A returns, restore exactly one selected or other transition table from the saved end-of-B checkpoint; reset beliefs identically before frozen probes. Sham leaves both tables unchanged.",
+  "tasks": {"uneven_bias": [[0.05,0.15],[0.70,0.85]], "shifted_bias": [[0.10,0.20],[0.65,0.90]]},
+  "limitations": "Post-hoc hypothesis. Direct restoration uses a privileged checkpoint and is not a deployable online learning method. The slot heuristic exploits these high-P(1) B rules and does not apply generally. Task rules are public."
+}

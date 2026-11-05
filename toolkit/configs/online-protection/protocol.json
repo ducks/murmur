@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "question": "Can online protection of a less likely memory improve retention without unacceptable switch adaptation costs?",
+  "hypothesis": "When predictive context confidence exceeds 0.8, freezing the less likely slot may reduce memory corruption without using true context or a saved checkpoint.",
+  "arms": ["mixture", "idea2", "protect_inactive", "random_slot_control"],
+  "control": "The random policy freezes one uniformly random slot when its own predictive confidence exceeds 0.8. It has its own state, so freeze counts need not match the protection arm exactly; log and compare them.",
+  "families": {"uneven_bias": [[0.05,0.15],[0.70,0.85]], "shifted_bias": [[0.10,0.20],[0.65,0.90]], "complementary": [[0.25,0.75],[0.75,0.25]], "no_change": [[0.20,0.80],[0.20,0.80]]},
+  "phase_lengths": [400,1000],
+  "primary_metrics": ["final frozen B recall", "first 100 online predictions after A-to-B and B-to-A", "final frozen A accuracy"],
+  "falsification": "Report all conditions. If protection reduces recall or switch accuracy versus idea2 or performs comparably to the random-slot control, its proposed advantage is unsupported.",
+  "limitations": "Exploratory, public binary tasks. Threshold selected before this run, not optimized. Phase lengths also change total exposure. The random control has its own state and may freeze on different steps. No compute matching."
+}

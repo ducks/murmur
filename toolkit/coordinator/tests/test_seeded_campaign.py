@@ -42,5 +42,10 @@ class SeededCampaignTests(unittest.TestCase):
     def test_invalid_revision_is_rejected(self):
         with self.assertRaisesRegex(runner.PlanError,'hexadecimal'):
             campaign.resolve_seed_candidate('--bad-revision')
+    def test_prompt_identifies_seed_and_allows_test_only_investigation(self):
+        config={'goal':'investigate','protocol':'milestone','seed_candidate_commit':self.seed}
+        prompt=campaign.prompt_for(config,[])
+        self.assertIn(self.seed,prompt)
+        self.assertIn('test-only investigation is allowed',prompt)
 
 if __name__=='__main__':unittest.main()

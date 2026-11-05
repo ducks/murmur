@@ -1,0 +1,1922 @@
+{
+  "base_commit": "79d3985111a8925e5c85d3c6531ed8656a08e83e",
+  "campaign_id": "773d192d7aa9",
+  "cleanup": {
+    "cache": "removed",
+    "rounds": [
+      {
+        "index": 1,
+        "status": "already_absent"
+      },
+      {
+        "index": 2,
+        "status": "already_absent"
+      },
+      {
+        "index": 3,
+        "status": "removed"
+      }
+    ]
+  },
+  "diagnostic_seconds": 120,
+  "max_ideas": 3,
+  "protocol": "milestone",
+  "rounds": [
+    {
+      "agent_elapsed_seconds": 63.20600365300197,
+      "agent_usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 267520,
+        "input_tokens": 315549,
+        "output_tokens": 2264,
+        "reasoning_output_tokens": 223
+      },
+      "commit": "560b1c840485fda86c96453c3b41681877c93306",
+      "development": {
+        "baseline": "mixture",
+        "candidate": "candidate",
+        "checks": {
+          "asymmetric:retention_b": true,
+          "asymmetric:switch_to_a": true,
+          "asymmetric:switch_to_b": true,
+          "complementary:retention_b": true,
+          "complementary:switch_to_a": true,
+          "complementary:switch_to_b": false,
+          "constant_bias:retention_b": true,
+          "constant_bias:switch_to_a": true,
+          "constant_bias:switch_to_b": true,
+          "unequal_noise:retention_b": true,
+          "unequal_noise:switch_to_a": false,
+          "unequal_noise:switch_to_b": false
+        },
+        "comparisons": {
+          "asymmetric:retention_b": {
+            "baseline_accuracy": 0.38770000000000004,
+            "candidate_accuracy": 0.6729,
+            "losses": 0,
+            "mean_paired_difference": 0.2852,
+            "ties": 0,
+            "wins": 10
+          },
+          "asymmetric:switch_to_a": {
+            "baseline_accuracy": 0.663,
+            "candidate_accuracy": 0.769,
+            "losses": 0,
+            "mean_paired_difference": 0.10600000000000001,
+            "ties": 0,
+            "wins": 10
+          },
+          "asymmetric:switch_to_b": {
+            "baseline_accuracy": 0.516,
+            "candidate_accuracy": 0.522,
+            "losses": 4,
+            "mean_paired_difference": 0.006000000000000005,
+            "ties": 1,
+            "wins": 5
+          },
+          "complementary:retention_b": {
+            "baseline_accuracy": 0.4405,
+            "candidate_accuracy": 0.7389,
+            "losses": 2,
+            "mean_paired_difference": 0.2984,
+            "ties": 0,
+            "wins": 8
+          },
+          "complementary:switch_to_a": {
+            "baseline_accuracy": 0.577,
+            "candidate_accuracy": 0.647,
+            "losses": 3,
+            "mean_paired_difference": 0.06999999999999999,
+            "ties": 1,
+            "wins": 6
+          },
+          "complementary:switch_to_b": {
+            "baseline_accuracy": 0.533,
+            "candidate_accuracy": 0.508,
+            "losses": 4,
+            "mean_paired_difference": -0.025000000000000012,
+            "ties": 0,
+            "wins": 6
+          },
+          "constant_bias:retention_b": {
+            "baseline_accuracy": 0.8287000000000001,
+            "candidate_accuracy": 0.8943,
+            "losses": 6,
+            "mean_paired_difference": 0.06559999999999999,
+            "ties": 3,
+            "wins": 1
+          },
+          "constant_bias:switch_to_a": {
+            "baseline_accuracy": 0.866,
+            "candidate_accuracy": 0.8630000000000001,
+            "losses": 3,
+            "mean_paired_difference": -0.0029999999999999914,
+            "ties": 2,
+            "wins": 5
+          },
+          "constant_bias:switch_to_b": {
+            "baseline_accuracy": 0.723,
+            "candidate_accuracy": 0.737,
+            "losses": 4,
+            "mean_paired_difference": 0.014000000000000002,
+            "ties": 2,
+            "wins": 4
+          },
+          "unequal_noise:retention_b": {
+            "baseline_accuracy": 0.3637,
+            "candidate_accuracy": 0.5625,
+            "losses": 1,
+            "mean_paired_difference": 0.19880000000000003,
+            "ties": 1,
+            "wins": 8
+          },
+          "unequal_noise:switch_to_a": {
+            "baseline_accuracy": 0.883,
+            "candidate_accuracy": 0.852,
+            "losses": 7,
+            "mean_paired_difference": -0.031000000000000017,
+            "ties": 1,
+            "wins": 2
+          },
+          "unequal_noise:switch_to_b": {
+            "baseline_accuracy": 0.525,
+            "candidate_accuracy": 0.46900000000000003,
+            "losses": 7,
+            "mean_paired_difference": -0.05600000000000001,
+            "ties": 1,
+            "wins": 2
+          }
+        },
+        "elapsed_seconds": 5.399942849995568,
+        "limitations": [
+          "Thresholds on means are operational, not statistical guarantees.",
+          "Non-inferiority alone does not demonstrate novelty; copying the baseline could pass.",
+          "Task families and evaluation seeds are locally visible and can be overfit.",
+          "The oracle receives context labels.",
+          "Inline bytes exclude heap allocations; peak memory is not measured.",
+          "Per-model training times include clock overhead, exclude probes, and are noisy; resource budgets are not matched."
+        ],
+        "logical_transitions": 360000,
+        "max_accuracy_drop": 0.02,
+        "outcome": "criteria_not_met",
+        "peak_memory": "not measured",
+        "resources": {
+          "candidate": {
+            "inline_bytes": 128,
+            "training_ns_total": 5190003,
+            "training_steps": 120000
+          },
+          "mixture": {
+            "inline_bytes": 72,
+            "training_ns_total": 3344582,
+            "training_steps": 120000
+          },
+          "oracle": {
+            "inline_bytes": 48,
+            "training_ns_total": 2293598,
+            "training_steps": 120000
+          },
+          "single": {
+            "inline_bytes": 48,
+            "training_ns_total": 2306612,
+            "training_steps": 120000
+          }
+        },
+        "seeds": 10,
+        "split": "development"
+      },
+      "diagnosis": {
+        "analysis": {
+          "alternative": "The fast filter may have little effect, or consolidation and responsibility-weighted learning may dominate; differences in learned memories and stochastic streams could also explain the observed switch deficits.",
+          "expected_evidence": "A reproducible paired advantage for the parallel filter, especially in early switch windows without a retention loss, would support a routing benefit. Similar performance would suggest little benefit; worse switch performance would weigh against it. Separately trained models may diverge in memory, so frozen-memory comparisons are needed to isolate inference.",
+          "followup_test": "In agent_generated.rs, run paired development-family streams using Candidate and its single_timescale control initialized identically before training, with all other settings shared; compare per-seed first-100-event switch accuracy and frozen B retention after A-B-A training. Also clone each trained model at each switch, reset both filters, and compare parallel versus single-timescale inference with learning disabled on identical events. Include the fixed mixture as a reference. Implement any needed test access in agent_candidate.rs; no additional evaluator is required.",
+          "hypothesis": "The faster filter improves switch adaptation when applied to the same learned memories, while shared consolidated memories preserve B; its benefit may be obscured or reversed by changes to memory learning.",
+          "limitations": "Only 10 development seeds were reported; mean thresholds are not statistical guarantees. The existing frozen test establishes a routing difference, not an accuracy gain. No evaluation comparison or proposed follow-up has been run.",
+          "observation": "The candidate missed three development checks: complementary switch to B by 2.5 percentage points and unequal-noise switches to A and B by 3.1 and 5.6 points versus the mixture. Mean B retention exceeded the mixture in all four families. No single-timescale accuracy comparison was reported."
+        },
+        "elapsed_seconds": 20.330560588045046,
+        "qualification": "Agent-proposed explanations and follow-up are unverified.",
+        "status": "complete",
+        "usage": {
+          "cache_write_input_tokens": 0,
+          "cached_input_tokens": 54016,
+          "input_tokens": 77745,
+          "output_tokens": 659,
+          "reasoning_output_tokens": 37
+        }
+      },
+      "error": null,
+      "evaluation": null,
+      "final_probe_matrix": {},
+      "followups": {
+        "qualification": "Agent-authored test output; arithmetic checked, experimental design not independently verified.",
+        "records": [],
+        "warnings": []
+      },
+      "idea": {
+        "approach": "Implemented consolidated context memories shared by slow and fast context filters. A matched single-timescale control and frozen-inference test isolate the filters' routing behavior; all four required offline tests passed.",
+        "falsification": "Compare the candidate with its single-timescale control and the fixed mixture on paired streams. A lack of switching improvement, a retention loss, or any required mean accuracy more than two percentage points below the mixture would weigh against the proposal.",
+        "hypothesis": "A faster context filter may respond sooner to rule changes while the slower filter and consolidated memories preserve earlier rules. The reported prior switching deficit is an observation; slow routing is only a possible explanation.",
+        "limitations": "The fast filter may follow noise or contaminate shared memories, and consolidation can preserve incorrect assignments. The test establishes a routing difference, not improved accuracy; no development or evaluation comparison was run.",
+        "question": "Can parallel context filters with shared consolidated memories improve adaptation while retaining earlier rules at least as well as the fixed mixture?"
+      },
+      "index": 1,
+      "status": "complete"
+    },
+    {
+      "agent_elapsed_seconds": 89.7881014100276,
+      "agent_usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 591488,
+        "input_tokens": 643943,
+        "output_tokens": 3658,
+        "reasoning_output_tokens": 575
+      },
+      "commit": "2dc04c08f039d7c5b764db82fd1ac2e408113155",
+      "development": {
+        "baseline": "mixture",
+        "candidate": "candidate",
+        "checks": {
+          "asymmetric:retention_b": true,
+          "asymmetric:switch_to_a": true,
+          "asymmetric:switch_to_b": true,
+          "complementary:retention_b": true,
+          "complementary:switch_to_a": true,
+          "complementary:switch_to_b": true,
+          "constant_bias:retention_b": true,
+          "constant_bias:switch_to_a": true,
+          "constant_bias:switch_to_b": true,
+          "unequal_noise:retention_b": true,
+          "unequal_noise:switch_to_a": true,
+          "unequal_noise:switch_to_b": true
+        },
+        "comparisons": {
+          "asymmetric:retention_b": {
+            "baseline_accuracy": 0.47119999999999995,
+            "candidate_accuracy": 0.6373,
+            "losses": 1,
+            "mean_paired_difference": 0.16609999999999997,
+            "ties": 0,
+            "wins": 9
+          },
+          "asymmetric:switch_to_a": {
+            "baseline_accuracy": 0.679,
+            "candidate_accuracy": 0.759,
+            "losses": 0,
+            "mean_paired_difference": 0.07999999999999999,
+            "ties": 0,
+            "wins": 10
+          },
+          "asymmetric:switch_to_b": {
+            "baseline_accuracy": 0.506,
+            "candidate_accuracy": 0.503,
+            "losses": 4,
+            "mean_paired_difference": -0.0030000000000000083,
+            "ties": 0,
+            "wins": 6
+          },
+          "complementary:retention_b": {
+            "baseline_accuracy": 0.4888,
+            "candidate_accuracy": 0.7332,
+            "losses": 2,
+            "mean_paired_difference": 0.2444,
+            "ties": 1,
+            "wins": 7
+          },
+          "complementary:switch_to_a": {
+            "baseline_accuracy": 0.61,
+            "candidate_accuracy": 0.721,
+            "losses": 0,
+            "mean_paired_difference": 0.11099999999999999,
+            "ties": 0,
+            "wins": 10
+          },
+          "complementary:switch_to_b": {
+            "baseline_accuracy": 0.5770000000000001,
+            "candidate_accuracy": 0.583,
+            "losses": 2,
+            "mean_paired_difference": 0.005999999999999978,
+            "ties": 2,
+            "wins": 6
+          },
+          "constant_bias:retention_b": {
+            "baseline_accuracy": 0.8238,
+            "candidate_accuracy": 0.8884000000000001,
+            "losses": 6,
+            "mean_paired_difference": 0.0646,
+            "ties": 3,
+            "wins": 1
+          },
+          "constant_bias:switch_to_a": {
+            "baseline_accuracy": 0.8630000000000001,
+            "candidate_accuracy": 0.867,
+            "losses": 1,
+            "mean_paired_difference": 0.0040000000000000036,
+            "ties": 5,
+            "wins": 4
+          },
+          "constant_bias:switch_to_b": {
+            "baseline_accuracy": 0.7220000000000001,
+            "candidate_accuracy": 0.744,
+            "losses": 2,
+            "mean_paired_difference": 0.021999999999999974,
+            "ties": 1,
+            "wins": 7
+          },
+          "unequal_noise:retention_b": {
+            "baseline_accuracy": 0.337,
+            "candidate_accuracy": 0.5458999999999999,
+            "losses": 0,
+            "mean_paired_difference": 0.2089,
+            "ties": 1,
+            "wins": 9
+          },
+          "unequal_noise:switch_to_a": {
+            "baseline_accuracy": 0.85,
+            "candidate_accuracy": 0.842,
+            "losses": 6,
+            "mean_paired_difference": -0.008000000000000007,
+            "ties": 1,
+            "wins": 3
+          },
+          "unequal_noise:switch_to_b": {
+            "baseline_accuracy": 0.491,
+            "candidate_accuracy": 0.497,
+            "losses": 4,
+            "mean_paired_difference": 0.005999999999999994,
+            "ties": 1,
+            "wins": 5
+          }
+        },
+        "elapsed_seconds": 5.252864739042707,
+        "limitations": [
+          "Thresholds on means are operational, not statistical guarantees.",
+          "Non-inferiority alone does not demonstrate novelty; copying the baseline could pass.",
+          "Task families and evaluation seeds are locally visible and can be overfit.",
+          "The oracle receives context labels.",
+          "Inline bytes exclude heap allocations; peak memory is not measured.",
+          "Per-model training times include clock overhead, exclude probes, and are noisy; resource budgets are not matched."
+        ],
+        "logical_transitions": 360000,
+        "max_accuracy_drop": 0.02,
+        "outcome": "criteria_met",
+        "peak_memory": "not measured",
+        "resources": {
+          "candidate": {
+            "inline_bytes": 128,
+            "training_ns_total": 5081854,
+            "training_steps": 120000
+          },
+          "mixture": {
+            "inline_bytes": 72,
+            "training_ns_total": 3262776,
+            "training_steps": 120000
+          },
+          "oracle": {
+            "inline_bytes": 48,
+            "training_ns_total": 2180154,
+            "training_steps": 120000
+          },
+          "single": {
+            "inline_bytes": 48,
+            "training_ns_total": 2155340,
+            "training_steps": 120000
+          }
+        },
+        "seeds": 10,
+        "split": "development"
+      },
+      "diagnosis": {
+        "analysis": {
+          "alternative": "The online deficit could arise from routing during the switch, from differences in learned memories, or from their interaction; the existing comparisons do not establish which.",
+          "expected_evidence": "If the deficit follows the training history under both frozen routing modes, that supports a learned-memory contribution. If it follows routing mode on both memory sets, that supports an inference contribution. A crossed or inconsistent pattern suggests an interaction or insufficient evidence.",
+          "followup_test": "In toolkit/tests/agent_generated.rs, train parallel and single-timescale controls on paired development streams, then at each switch clone each model into both routing modes, reset beliefs, freeze learning, and replay the same first 100 events. Compare paired accuracies across the resulting 2\u00d72 training-history-by-routing conditions, alongside online switch accuracy and B retention; expose minimal access in toolkit/src/agent_candidate.rs if needed. No additional evaluator is required.",
+          "hypothesis": "Parallel routing changes the memories learned during training, contributing to the online switch-to-B deficit even when its isolated frozen-routing effect is small.",
+          "limitations": "The proposed follow-up has not been executed. Ten-seed development results are exploratory; training-history effects include all consequences of the routing intervention, and reset, frozen probes do not reproduce online adaptation. The evaluation failure does not establish a mechanism.",
+          "observation": "Evaluation failed only reversed_asym switch to B: candidate accuracy was 0.591 versus mixture 0.6165, a 2.55-point deficit against the 2-point limit. In the development replay, frozen routing differences were at most 1 point across switch comparisons, while online parallel routing was 7.1 points worse than the single-timescale control on unequal-noise switch to B."
+        },
+        "elapsed_seconds": 20.44096784503199,
+        "qualification": "Agent-proposed explanations and follow-up are unverified.",
+        "status": "complete",
+        "usage": {
+          "cache_write_input_tokens": 0,
+          "cached_input_tokens": 71040,
+          "input_tokens": 100345,
+          "output_tokens": 673,
+          "reasoning_output_tokens": 70
+        }
+      },
+      "error": null,
+      "evaluation": {
+        "baseline": "mixture",
+        "candidate": "candidate",
+        "checks": {
+          "mixed_rules:retention_b": true,
+          "mixed_rules:switch_to_a": true,
+          "mixed_rules:switch_to_b": true,
+          "reversed_asym:retention_b": true,
+          "reversed_asym:switch_to_a": true,
+          "reversed_asym:switch_to_b": false,
+          "shifted_bias:retention_b": true,
+          "shifted_bias:switch_to_a": true,
+          "shifted_bias:switch_to_b": true,
+          "similar_rules:retention_b": true,
+          "similar_rules:switch_to_a": true,
+          "similar_rules:switch_to_b": true
+        },
+        "comparisons": {
+          "mixed_rules:retention_b": {
+            "baseline_accuracy": 0.46425,
+            "candidate_accuracy": 0.6818,
+            "losses": 0,
+            "mean_paired_difference": 0.21755,
+            "ties": 0,
+            "wins": 20
+          },
+          "mixed_rules:switch_to_a": {
+            "baseline_accuracy": 0.8115,
+            "candidate_accuracy": 0.865,
+            "losses": 1,
+            "mean_paired_difference": 0.05349999999999999,
+            "ties": 2,
+            "wins": 17
+          },
+          "mixed_rules:switch_to_b": {
+            "baseline_accuracy": 0.563,
+            "candidate_accuracy": 0.567,
+            "losses": 7,
+            "mean_paired_difference": 0.003999999999999987,
+            "ties": 4,
+            "wins": 9
+          },
+          "reversed_asym:retention_b": {
+            "baseline_accuracy": 0.34475,
+            "candidate_accuracy": 0.775,
+            "losses": 2,
+            "mean_paired_difference": 0.43025,
+            "ties": 0,
+            "wins": 18
+          },
+          "reversed_asym:switch_to_a": {
+            "baseline_accuracy": 0.64,
+            "candidate_accuracy": 0.683,
+            "losses": 3,
+            "mean_paired_difference": 0.04299999999999998,
+            "ties": 0,
+            "wins": 17
+          },
+          "reversed_asym:switch_to_b": {
+            "baseline_accuracy": 0.6165,
+            "candidate_accuracy": 0.591,
+            "losses": 8,
+            "mean_paired_difference": -0.025500000000000005,
+            "ties": 4,
+            "wins": 8
+          },
+          "shifted_bias:retention_b": {
+            "baseline_accuracy": 0.68475,
+            "candidate_accuracy": 0.7907500000000001,
+            "losses": 12,
+            "mean_paired_difference": 0.10600000000000001,
+            "ties": 2,
+            "wins": 6
+          },
+          "shifted_bias:switch_to_a": {
+            "baseline_accuracy": 0.7295,
+            "candidate_accuracy": 0.7635,
+            "losses": 3,
+            "mean_paired_difference": 0.03400000000000001,
+            "ties": 4,
+            "wins": 13
+          },
+          "shifted_bias:switch_to_b": {
+            "baseline_accuracy": 0.607,
+            "candidate_accuracy": 0.601,
+            "losses": 8,
+            "mean_paired_difference": -0.005999999999999989,
+            "ties": 2,
+            "wins": 10
+          },
+          "similar_rules:retention_b": {
+            "baseline_accuracy": 0.8486,
+            "candidate_accuracy": 0.8486,
+            "losses": 0,
+            "mean_paired_difference": 0.0,
+            "ties": 20,
+            "wins": 0
+          },
+          "similar_rules:switch_to_a": {
+            "baseline_accuracy": 0.8445,
+            "candidate_accuracy": 0.8445,
+            "losses": 0,
+            "mean_paired_difference": 0.0,
+            "ties": 20,
+            "wins": 0
+          },
+          "similar_rules:switch_to_b": {
+            "baseline_accuracy": 0.8525,
+            "candidate_accuracy": 0.8505,
+            "losses": 3,
+            "mean_paired_difference": -0.0020000000000000018,
+            "ties": 17,
+            "wins": 0
+          }
+        },
+        "elapsed_seconds": 0.3451589699834585,
+        "limitations": [
+          "Thresholds on means are operational, not statistical guarantees.",
+          "Non-inferiority alone does not demonstrate novelty; copying the baseline could pass.",
+          "Task families and evaluation seeds are locally visible and can be overfit.",
+          "The oracle receives context labels.",
+          "Inline bytes exclude heap allocations; peak memory is not measured.",
+          "Per-model training times include clock overhead, exclude probes, and are noisy; resource budgets are not matched."
+        ],
+        "logical_transitions": 720000,
+        "max_accuracy_drop": 0.02,
+        "outcome": "criteria_not_met",
+        "peak_memory": "not measured",
+        "resources": {
+          "candidate": {
+            "inline_bytes": 128,
+            "training_ns_total": 10625567,
+            "training_steps": 240000
+          },
+          "mixture": {
+            "inline_bytes": 72,
+            "training_ns_total": 6873420,
+            "training_steps": 240000
+          },
+          "oracle": {
+            "inline_bytes": 48,
+            "training_ns_total": 4910985,
+            "training_steps": 240000
+          },
+          "single": {
+            "inline_bytes": 48,
+            "training_ns_total": 4881131,
+            "training_steps": 240000
+          }
+        },
+        "seeds": 20,
+        "split": "evaluation"
+      },
+      "final_probe_matrix": {},
+      "followups": {
+        "qualification": "Agent-authored test output; arithmetic checked, experimental design not independently verified.",
+        "records": [
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.27,
+            "candidate_correct": 27,
+            "control": "single",
+            "control_accuracy": 0.27,
+            "control_correct": 27,
+            "measure": "complementary_switch_1_frozen_parallel_trained_seed_1",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.27,
+            "candidate_correct": 27,
+            "control": "single",
+            "control_accuracy": 0.27,
+            "control_correct": 27,
+            "measure": "complementary_switch_1_frozen_single_trained_seed_1",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.5,
+            "candidate_correct": 50,
+            "control": "single",
+            "control_accuracy": 0.52,
+            "control_correct": 52,
+            "measure": "complementary_switch_1_online_seed_1",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.5,
+            "candidate_correct": 50,
+            "control": "mixture",
+            "control_accuracy": 0.49,
+            "control_correct": 49,
+            "measure": "complementary_switch_1_online_seed_1",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.68,
+            "candidate_correct": 68,
+            "control": "single",
+            "control_accuracy": 0.71,
+            "control_correct": 71,
+            "measure": "complementary_switch_2_frozen_parallel_trained_seed_1",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.72,
+            "candidate_correct": 72,
+            "control": "single",
+            "control_accuracy": 0.73,
+            "control_correct": 73,
+            "measure": "complementary_switch_2_frozen_single_trained_seed_1",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.71,
+            "candidate_correct": 71,
+            "control": "single",
+            "control_accuracy": 0.72,
+            "control_correct": 72,
+            "measure": "complementary_switch_2_online_seed_1",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.71,
+            "candidate_correct": 71,
+            "control": "mixture",
+            "control_accuracy": 0.6,
+            "control_correct": 60,
+            "measure": "complementary_switch_2_online_seed_1",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.74,
+            "candidate_correct": 740,
+            "control": "single",
+            "control_accuracy": 0.743,
+            "control_correct": 743,
+            "measure": "complementary_retention_b_seed_1",
+            "trials": 1000
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.74,
+            "candidate_correct": 740,
+            "control": "mixture",
+            "control_accuracy": 0.255,
+            "control_correct": 255,
+            "measure": "complementary_retention_b_seed_1",
+            "trials": 1000
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.21,
+            "candidate_correct": 21,
+            "control": "single",
+            "control_accuracy": 0.21,
+            "control_correct": 21,
+            "measure": "complementary_switch_1_frozen_parallel_trained_seed_2",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.21,
+            "candidate_correct": 21,
+            "control": "single",
+            "control_accuracy": 0.21,
+            "control_correct": 21,
+            "measure": "complementary_switch_1_frozen_single_trained_seed_2",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.62,
+            "candidate_correct": 62,
+            "control": "single",
+            "control_accuracy": 0.64,
+            "control_correct": 64,
+            "measure": "complementary_switch_1_online_seed_2",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.62,
+            "candidate_correct": 62,
+            "control": "mixture",
+            "control_accuracy": 0.59,
+            "control_correct": 59,
+            "measure": "complementary_switch_1_online_seed_2",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.73,
+            "candidate_correct": 73,
+            "control": "single",
+            "control_accuracy": 0.74,
+            "control_correct": 74,
+            "measure": "complementary_switch_2_frozen_parallel_trained_seed_2",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.73,
+            "candidate_correct": 73,
+            "control": "single",
+            "control_accuracy": 0.75,
+            "control_correct": 75,
+            "measure": "complementary_switch_2_frozen_single_trained_seed_2",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.75,
+            "candidate_correct": 75,
+            "control": "single",
+            "control_accuracy": 0.75,
+            "control_correct": 75,
+            "measure": "complementary_switch_2_online_seed_2",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.75,
+            "candidate_correct": 75,
+            "control": "mixture",
+            "control_accuracy": 0.61,
+            "control_correct": 61,
+            "measure": "complementary_switch_2_online_seed_2",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.735,
+            "candidate_correct": 735,
+            "control": "single",
+            "control_accuracy": 0.737,
+            "control_correct": 737,
+            "measure": "complementary_retention_b_seed_2",
+            "trials": 1000
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.735,
+            "candidate_correct": 735,
+            "control": "mixture",
+            "control_accuracy": 0.508,
+            "control_correct": 508,
+            "measure": "complementary_retention_b_seed_2",
+            "trials": 1000
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.22,
+            "candidate_correct": 22,
+            "control": "single",
+            "control_accuracy": 0.22,
+            "control_correct": 22,
+            "measure": "complementary_switch_1_frozen_parallel_trained_seed_3",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.22,
+            "candidate_correct": 22,
+            "control": "single",
+            "control_accuracy": 0.22,
+            "control_correct": 22,
+            "measure": "complementary_switch_1_frozen_single_trained_seed_3",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.59,
+            "candidate_correct": 59,
+            "control": "single",
+            "control_accuracy": 0.63,
+            "control_correct": 63,
+            "measure": "complementary_switch_1_online_seed_3",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.59,
+            "candidate_correct": 59,
+            "control": "mixture",
+            "control_accuracy": 0.57,
+            "control_correct": 57,
+            "measure": "complementary_switch_1_online_seed_3",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.73,
+            "candidate_correct": 73,
+            "control": "single",
+            "control_accuracy": 0.73,
+            "control_correct": 73,
+            "measure": "complementary_switch_2_frozen_parallel_trained_seed_3",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.73,
+            "candidate_correct": 73,
+            "control": "single",
+            "control_accuracy": 0.73,
+            "control_correct": 73,
+            "measure": "complementary_switch_2_frozen_single_trained_seed_3",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.71,
+            "candidate_correct": 71,
+            "control": "single",
+            "control_accuracy": 0.71,
+            "control_correct": 71,
+            "measure": "complementary_switch_2_online_seed_3",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.71,
+            "candidate_correct": 71,
+            "control": "mixture",
+            "control_accuracy": 0.64,
+            "control_correct": 64,
+            "measure": "complementary_switch_2_online_seed_3",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.751,
+            "candidate_correct": 751,
+            "control": "single",
+            "control_accuracy": 0.753,
+            "control_correct": 753,
+            "measure": "complementary_retention_b_seed_3",
+            "trials": 1000
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.751,
+            "candidate_correct": 751,
+            "control": "mixture",
+            "control_accuracy": 0.489,
+            "control_correct": 489,
+            "measure": "complementary_retention_b_seed_3",
+            "trials": 1000
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.35,
+            "candidate_correct": 35,
+            "control": "single",
+            "control_accuracy": 0.35,
+            "control_correct": 35,
+            "measure": "complementary_switch_1_frozen_parallel_trained_seed_4",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.35,
+            "candidate_correct": 35,
+            "control": "single",
+            "control_accuracy": 0.35,
+            "control_correct": 35,
+            "measure": "complementary_switch_1_frozen_single_trained_seed_4",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.45,
+            "candidate_correct": 45,
+            "control": "single",
+            "control_accuracy": 0.47,
+            "control_correct": 47,
+            "measure": "complementary_switch_1_online_seed_4",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.45,
+            "candidate_correct": 45,
+            "control": "mixture",
+            "control_accuracy": 0.52,
+            "control_correct": 52,
+            "measure": "complementary_switch_1_online_seed_4",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.75,
+            "candidate_correct": 75,
+            "control": "single",
+            "control_accuracy": 0.75,
+            "control_correct": 75,
+            "measure": "complementary_switch_2_frozen_parallel_trained_seed_4",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.74,
+            "candidate_correct": 74,
+            "control": "single",
+            "control_accuracy": 0.74,
+            "control_correct": 74,
+            "measure": "complementary_switch_2_frozen_single_trained_seed_4",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.74,
+            "candidate_correct": 74,
+            "control": "single",
+            "control_accuracy": 0.74,
+            "control_correct": 74,
+            "measure": "complementary_switch_2_online_seed_4",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.74,
+            "candidate_correct": 74,
+            "control": "mixture",
+            "control_accuracy": 0.63,
+            "control_correct": 63,
+            "measure": "complementary_switch_2_online_seed_4",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.726,
+            "candidate_correct": 726,
+            "control": "single",
+            "control_accuracy": 0.73,
+            "control_correct": 730,
+            "measure": "complementary_retention_b_seed_4",
+            "trials": 1000
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.726,
+            "candidate_correct": 726,
+            "control": "mixture",
+            "control_accuracy": 0.268,
+            "control_correct": 268,
+            "measure": "complementary_retention_b_seed_4",
+            "trials": 1000
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.47,
+            "candidate_correct": 47,
+            "control": "single",
+            "control_accuracy": 0.47,
+            "control_correct": 47,
+            "measure": "complementary_switch_1_frozen_parallel_trained_seed_5",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.46,
+            "candidate_correct": 46,
+            "control": "single",
+            "control_accuracy": 0.48,
+            "control_correct": 48,
+            "measure": "complementary_switch_1_frozen_single_trained_seed_5",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.57,
+            "candidate_correct": 57,
+            "control": "single",
+            "control_accuracy": 0.59,
+            "control_correct": 59,
+            "measure": "complementary_switch_1_online_seed_5",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.57,
+            "candidate_correct": 57,
+            "control": "mixture",
+            "control_accuracy": 0.56,
+            "control_correct": 56,
+            "measure": "complementary_switch_1_online_seed_5",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.64,
+            "candidate_correct": 64,
+            "control": "single",
+            "control_accuracy": 0.63,
+            "control_correct": 63,
+            "measure": "complementary_switch_2_frozen_parallel_trained_seed_5",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.64,
+            "candidate_correct": 64,
+            "control": "single",
+            "control_accuracy": 0.63,
+            "control_correct": 63,
+            "measure": "complementary_switch_2_frozen_single_trained_seed_5",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.61,
+            "candidate_correct": 61,
+            "control": "single",
+            "control_accuracy": 0.61,
+            "control_correct": 61,
+            "measure": "complementary_switch_2_online_seed_5",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.61,
+            "candidate_correct": 61,
+            "control": "mixture",
+            "control_accuracy": 0.48,
+            "control_correct": 48,
+            "measure": "complementary_switch_2_online_seed_5",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.717,
+            "candidate_correct": 717,
+            "control": "single",
+            "control_accuracy": 0.724,
+            "control_correct": 724,
+            "measure": "complementary_retention_b_seed_5",
+            "trials": 1000
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.717,
+            "candidate_correct": 717,
+            "control": "mixture",
+            "control_accuracy": 0.52,
+            "control_correct": 520,
+            "measure": "complementary_retention_b_seed_5",
+            "trials": 1000
+          }
+        ],
+        "warnings": [
+          "additional follow-up records were omitted"
+        ]
+      },
+      "idea": {
+        "approach": "Retained the prior parallel-filter candidate and added a matched single-timescale control plus paired development-family tests for online switching, frozen routing, and B retention. Added a method to restore parallel routing on either model\u2019s learned memories. The requested offline tests passed.",
+        "falsification": "A consistent frozen-memory switch advantage for parallel routing would support the proposed inference benefit; similar or worse accuracy weighs against it. Separately trained comparisons test the combined effects of routing and learning. The campaign criterion fails if any required mean accuracy trails the mixture by more than two percentage points.",
+        "hypothesis": "The faster filter might improve adaptation to rule changes while consolidated memories preserve earlier rules. Alternatively, its influence on memory learning could account for the previously observed switch deficits.",
+        "limitations": "In the ten-seed development replay, frozen parallel routing differed from the single-timescale control by at most one percentage point across switch comparisons; online parallel routing was 7.1 points worse on unequal-noise switch to B. This does not establish the cause. The candidate is the previously tested model, not a new architecture, and it previously failed three supervisor development checks. No evaluation data was inspected or tested.",
+        "question": "Does parallel context routing improve switching on fixed learned memories, and how does its combined effect on learning and inference compare with a single-timescale control and the fixed mixture?"
+      },
+      "index": 2,
+      "status": "complete"
+    },
+    {
+      "agent_elapsed_seconds": 70.92848198802676,
+      "agent_usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 517632,
+        "input_tokens": 564562,
+        "output_tokens": 2731,
+        "reasoning_output_tokens": 406
+      },
+      "commit": "8698ad79eab6df4f9600b7377b8cdf8beba1d2b1",
+      "development": {
+        "baseline": "mixture",
+        "candidate": "candidate",
+        "checks": {
+          "asymmetric:retention_b": true,
+          "asymmetric:switch_to_a": true,
+          "asymmetric:switch_to_b": true,
+          "complementary:retention_b": true,
+          "complementary:switch_to_a": true,
+          "complementary:switch_to_b": true,
+          "constant_bias:retention_b": true,
+          "constant_bias:switch_to_a": true,
+          "constant_bias:switch_to_b": true,
+          "unequal_noise:retention_b": true,
+          "unequal_noise:switch_to_a": true,
+          "unequal_noise:switch_to_b": true
+        },
+        "comparisons": {
+          "asymmetric:retention_b": {
+            "baseline_accuracy": 0.3339,
+            "candidate_accuracy": 0.6559,
+            "losses": 0,
+            "mean_paired_difference": 0.32199999999999995,
+            "ties": 0,
+            "wins": 10
+          },
+          "asymmetric:switch_to_a": {
+            "baseline_accuracy": 0.6639999999999999,
+            "candidate_accuracy": 0.738,
+            "losses": 0,
+            "mean_paired_difference": 0.074,
+            "ties": 1,
+            "wins": 9
+          },
+          "asymmetric:switch_to_b": {
+            "baseline_accuracy": 0.541,
+            "candidate_accuracy": 0.5609999999999999,
+            "losses": 2,
+            "mean_paired_difference": 0.019999999999999973,
+            "ties": 0,
+            "wins": 8
+          },
+          "complementary:retention_b": {
+            "baseline_accuracy": 0.3448,
+            "candidate_accuracy": 0.7476,
+            "losses": 1,
+            "mean_paired_difference": 0.40280000000000005,
+            "ties": 0,
+            "wins": 9
+          },
+          "complementary:switch_to_a": {
+            "baseline_accuracy": 0.595,
+            "candidate_accuracy": 0.692,
+            "losses": 0,
+            "mean_paired_difference": 0.09699999999999998,
+            "ties": 0,
+            "wins": 10
+          },
+          "complementary:switch_to_b": {
+            "baseline_accuracy": 0.5740000000000001,
+            "candidate_accuracy": 0.623,
+            "losses": 0,
+            "mean_paired_difference": 0.04900000000000003,
+            "ties": 1,
+            "wins": 9
+          },
+          "constant_bias:retention_b": {
+            "baseline_accuracy": 0.8219,
+            "candidate_accuracy": 0.8915000000000001,
+            "losses": 7,
+            "mean_paired_difference": 0.0696,
+            "ties": 0,
+            "wins": 3
+          },
+          "constant_bias:switch_to_a": {
+            "baseline_accuracy": 0.8630000000000001,
+            "candidate_accuracy": 0.8619999999999999,
+            "losses": 2,
+            "mean_paired_difference": -0.0010000000000000009,
+            "ties": 6,
+            "wins": 2
+          },
+          "constant_bias:switch_to_b": {
+            "baseline_accuracy": 0.729,
+            "candidate_accuracy": 0.78,
+            "losses": 0,
+            "mean_paired_difference": 0.051000000000000004,
+            "ties": 1,
+            "wins": 9
+          },
+          "unequal_noise:retention_b": {
+            "baseline_accuracy": 0.319,
+            "candidate_accuracy": 0.5502,
+            "losses": 0,
+            "mean_paired_difference": 0.23120000000000002,
+            "ties": 1,
+            "wins": 9
+          },
+          "unequal_noise:switch_to_a": {
+            "baseline_accuracy": 0.899,
+            "candidate_accuracy": 0.8939999999999999,
+            "losses": 4,
+            "mean_paired_difference": -0.004999999999999993,
+            "ties": 6,
+            "wins": 0
+          },
+          "unequal_noise:switch_to_b": {
+            "baseline_accuracy": 0.528,
+            "candidate_accuracy": 0.533,
+            "losses": 3,
+            "mean_paired_difference": 0.004999999999999993,
+            "ties": 0,
+            "wins": 7
+          }
+        },
+        "elapsed_seconds": 5.349782859906554,
+        "limitations": [
+          "Thresholds on means are operational, not statistical guarantees.",
+          "Non-inferiority alone does not demonstrate novelty; copying the baseline could pass.",
+          "Task families and evaluation seeds are locally visible and can be overfit.",
+          "The oracle receives context labels.",
+          "Inline bytes exclude heap allocations; peak memory is not measured.",
+          "Per-model training times include clock overhead, exclude probes, and are noisy; resource budgets are not matched."
+        ],
+        "logical_transitions": 360000,
+        "max_accuracy_drop": 0.02,
+        "outcome": "criteria_met",
+        "peak_memory": "not measured",
+        "resources": {
+          "candidate": {
+            "inline_bytes": 136,
+            "training_ns_total": 5967433,
+            "training_steps": 120000
+          },
+          "mixture": {
+            "inline_bytes": 72,
+            "training_ns_total": 3348991,
+            "training_steps": 120000
+          },
+          "oracle": {
+            "inline_bytes": 48,
+            "training_ns_total": 2317719,
+            "training_steps": 120000
+          },
+          "single": {
+            "inline_bytes": 48,
+            "training_ns_total": 2303509,
+            "training_steps": 120000
+          }
+        },
+        "seeds": 10,
+        "split": "development"
+      },
+      "diagnosis": {
+        "status": "not_needed"
+      },
+      "error": null,
+      "evaluation": {
+        "baseline": "mixture",
+        "candidate": "candidate",
+        "checks": {
+          "mixed_rules:retention_b": true,
+          "mixed_rules:switch_to_a": true,
+          "mixed_rules:switch_to_b": true,
+          "reversed_asym:retention_b": true,
+          "reversed_asym:switch_to_a": true,
+          "reversed_asym:switch_to_b": true,
+          "shifted_bias:retention_b": true,
+          "shifted_bias:switch_to_a": true,
+          "shifted_bias:switch_to_b": true,
+          "similar_rules:retention_b": true,
+          "similar_rules:switch_to_a": true,
+          "similar_rules:switch_to_b": true
+        },
+        "comparisons": {
+          "mixed_rules:retention_b": {
+            "baseline_accuracy": 0.46185,
+            "candidate_accuracy": 0.6776,
+            "losses": 0,
+            "mean_paired_difference": 0.21574999999999997,
+            "ties": 1,
+            "wins": 19
+          },
+          "mixed_rules:switch_to_a": {
+            "baseline_accuracy": 0.8314999999999999,
+            "candidate_accuracy": 0.8654999999999999,
+            "losses": 2,
+            "mean_paired_difference": 0.034000000000000016,
+            "ties": 3,
+            "wins": 15
+          },
+          "mixed_rules:switch_to_b": {
+            "baseline_accuracy": 0.5740000000000001,
+            "candidate_accuracy": 0.616,
+            "losses": 1,
+            "mean_paired_difference": 0.04200000000000001,
+            "ties": 2,
+            "wins": 17
+          },
+          "reversed_asym:retention_b": {
+            "baseline_accuracy": 0.32715,
+            "candidate_accuracy": 0.7736500000000001,
+            "losses": 1,
+            "mean_paired_difference": 0.44650000000000006,
+            "ties": 0,
+            "wins": 19
+          },
+          "reversed_asym:switch_to_a": {
+            "baseline_accuracy": 0.644,
+            "candidate_accuracy": 0.7095,
+            "losses": 0,
+            "mean_paired_difference": 0.0655,
+            "ties": 3,
+            "wins": 17
+          },
+          "reversed_asym:switch_to_b": {
+            "baseline_accuracy": 0.6045,
+            "candidate_accuracy": 0.631,
+            "losses": 4,
+            "mean_paired_difference": 0.026499999999999996,
+            "ties": 1,
+            "wins": 15
+          },
+          "shifted_bias:retention_b": {
+            "baseline_accuracy": 0.53415,
+            "candidate_accuracy": 0.7926,
+            "losses": 5,
+            "mean_paired_difference": 0.25845,
+            "ties": 1,
+            "wins": 14
+          },
+          "shifted_bias:switch_to_a": {
+            "baseline_accuracy": 0.7335,
+            "candidate_accuracy": 0.7695000000000001,
+            "losses": 2,
+            "mean_paired_difference": 0.036000000000000004,
+            "ties": 2,
+            "wins": 16
+          },
+          "shifted_bias:switch_to_b": {
+            "baseline_accuracy": 0.6094999999999999,
+            "candidate_accuracy": 0.6505,
+            "losses": 1,
+            "mean_paired_difference": 0.041000000000000016,
+            "ties": 2,
+            "wins": 17
+          },
+          "similar_rules:retention_b": {
+            "baseline_accuracy": 0.85565,
+            "candidate_accuracy": 0.85565,
+            "losses": 0,
+            "mean_paired_difference": 0.0,
+            "ties": 20,
+            "wins": 0
+          },
+          "similar_rules:switch_to_a": {
+            "baseline_accuracy": 0.8585,
+            "candidate_accuracy": 0.858,
+            "losses": 1,
+            "mean_paired_difference": -0.0005000000000000004,
+            "ties": 19,
+            "wins": 0
+          },
+          "similar_rules:switch_to_b": {
+            "baseline_accuracy": 0.8445,
+            "candidate_accuracy": 0.8375,
+            "losses": 5,
+            "mean_paired_difference": -0.007000000000000001,
+            "ties": 15,
+            "wins": 0
+          }
+        },
+        "elapsed_seconds": 0.34285030304454267,
+        "limitations": [
+          "Thresholds on means are operational, not statistical guarantees.",
+          "Non-inferiority alone does not demonstrate novelty; copying the baseline could pass.",
+          "Task families and evaluation seeds are locally visible and can be overfit.",
+          "The oracle receives context labels.",
+          "Inline bytes exclude heap allocations; peak memory is not measured.",
+          "Per-model training times include clock overhead, exclude probes, and are noisy; resource budgets are not matched."
+        ],
+        "logical_transitions": 720000,
+        "max_accuracy_drop": 0.02,
+        "outcome": "criteria_met",
+        "peak_memory": "not measured",
+        "resources": {
+          "candidate": {
+            "inline_bytes": 136,
+            "training_ns_total": 12568967,
+            "training_steps": 240000
+          },
+          "mixture": {
+            "inline_bytes": 72,
+            "training_ns_total": 7286256,
+            "training_steps": 240000
+          },
+          "oracle": {
+            "inline_bytes": 48,
+            "training_ns_total": 5356976,
+            "training_steps": 240000
+          },
+          "single": {
+            "inline_bytes": 48,
+            "training_ns_total": 5358846,
+            "training_steps": 240000
+          }
+        },
+        "seeds": 20,
+        "split": "evaluation"
+      },
+      "final_probe_matrix": {},
+      "followups": {
+        "qualification": "Agent-authored test output; arithmetic checked, experimental design not independently verified.",
+        "records": [
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.27,
+            "candidate_correct": 27,
+            "control": "single",
+            "control_accuracy": 0.27,
+            "control_correct": 27,
+            "measure": "complementary_switch_1_frozen_parallel_trained_seed_1",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.27,
+            "candidate_correct": 27,
+            "control": "single",
+            "control_accuracy": 0.27,
+            "control_correct": 27,
+            "measure": "complementary_switch_1_frozen_single_trained_seed_1",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel_trained",
+            "candidate_accuracy": 0.27,
+            "candidate_correct": 27,
+            "control": "single_trained",
+            "control_accuracy": 0.27,
+            "control_correct": 27,
+            "measure": "complementary_switch_1_frozen_parallel_route_seed_1",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel_trained",
+            "candidate_accuracy": 0.27,
+            "candidate_correct": 27,
+            "control": "single_trained",
+            "control_accuracy": 0.27,
+            "control_correct": 27,
+            "measure": "complementary_switch_1_frozen_single_route_seed_1",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.5,
+            "candidate_correct": 50,
+            "control": "single",
+            "control_accuracy": 0.52,
+            "control_correct": 52,
+            "measure": "complementary_switch_1_online_seed_1",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.5,
+            "candidate_correct": 50,
+            "control": "mixture",
+            "control_accuracy": 0.49,
+            "control_correct": 49,
+            "measure": "complementary_switch_1_online_seed_1",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.68,
+            "candidate_correct": 68,
+            "control": "single",
+            "control_accuracy": 0.71,
+            "control_correct": 71,
+            "measure": "complementary_switch_2_frozen_parallel_trained_seed_1",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.72,
+            "candidate_correct": 72,
+            "control": "single",
+            "control_accuracy": 0.73,
+            "control_correct": 73,
+            "measure": "complementary_switch_2_frozen_single_trained_seed_1",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel_trained",
+            "candidate_accuracy": 0.68,
+            "candidate_correct": 68,
+            "control": "single_trained",
+            "control_accuracy": 0.72,
+            "control_correct": 72,
+            "measure": "complementary_switch_2_frozen_parallel_route_seed_1",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel_trained",
+            "candidate_accuracy": 0.71,
+            "candidate_correct": 71,
+            "control": "single_trained",
+            "control_accuracy": 0.73,
+            "control_correct": 73,
+            "measure": "complementary_switch_2_frozen_single_route_seed_1",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.71,
+            "candidate_correct": 71,
+            "control": "single",
+            "control_accuracy": 0.72,
+            "control_correct": 72,
+            "measure": "complementary_switch_2_online_seed_1",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.71,
+            "candidate_correct": 71,
+            "control": "mixture",
+            "control_accuracy": 0.6,
+            "control_correct": 60,
+            "measure": "complementary_switch_2_online_seed_1",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.74,
+            "candidate_correct": 740,
+            "control": "single",
+            "control_accuracy": 0.743,
+            "control_correct": 743,
+            "measure": "complementary_retention_b_seed_1",
+            "trials": 1000
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.74,
+            "candidate_correct": 740,
+            "control": "mixture",
+            "control_accuracy": 0.255,
+            "control_correct": 255,
+            "measure": "complementary_retention_b_seed_1",
+            "trials": 1000
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.21,
+            "candidate_correct": 21,
+            "control": "single",
+            "control_accuracy": 0.21,
+            "control_correct": 21,
+            "measure": "complementary_switch_1_frozen_parallel_trained_seed_2",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.21,
+            "candidate_correct": 21,
+            "control": "single",
+            "control_accuracy": 0.21,
+            "control_correct": 21,
+            "measure": "complementary_switch_1_frozen_single_trained_seed_2",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel_trained",
+            "candidate_accuracy": 0.21,
+            "candidate_correct": 21,
+            "control": "single_trained",
+            "control_accuracy": 0.21,
+            "control_correct": 21,
+            "measure": "complementary_switch_1_frozen_parallel_route_seed_2",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel_trained",
+            "candidate_accuracy": 0.21,
+            "candidate_correct": 21,
+            "control": "single_trained",
+            "control_accuracy": 0.21,
+            "control_correct": 21,
+            "measure": "complementary_switch_1_frozen_single_route_seed_2",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.62,
+            "candidate_correct": 62,
+            "control": "single",
+            "control_accuracy": 0.64,
+            "control_correct": 64,
+            "measure": "complementary_switch_1_online_seed_2",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.62,
+            "candidate_correct": 62,
+            "control": "mixture",
+            "control_accuracy": 0.59,
+            "control_correct": 59,
+            "measure": "complementary_switch_1_online_seed_2",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.73,
+            "candidate_correct": 73,
+            "control": "single",
+            "control_accuracy": 0.74,
+            "control_correct": 74,
+            "measure": "complementary_switch_2_frozen_parallel_trained_seed_2",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.73,
+            "candidate_correct": 73,
+            "control": "single",
+            "control_accuracy": 0.75,
+            "control_correct": 75,
+            "measure": "complementary_switch_2_frozen_single_trained_seed_2",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel_trained",
+            "candidate_accuracy": 0.73,
+            "candidate_correct": 73,
+            "control": "single_trained",
+            "control_accuracy": 0.73,
+            "control_correct": 73,
+            "measure": "complementary_switch_2_frozen_parallel_route_seed_2",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel_trained",
+            "candidate_accuracy": 0.74,
+            "candidate_correct": 74,
+            "control": "single_trained",
+            "control_accuracy": 0.75,
+            "control_correct": 75,
+            "measure": "complementary_switch_2_frozen_single_route_seed_2",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.75,
+            "candidate_correct": 75,
+            "control": "single",
+            "control_accuracy": 0.75,
+            "control_correct": 75,
+            "measure": "complementary_switch_2_online_seed_2",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.75,
+            "candidate_correct": 75,
+            "control": "mixture",
+            "control_accuracy": 0.61,
+            "control_correct": 61,
+            "measure": "complementary_switch_2_online_seed_2",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.735,
+            "candidate_correct": 735,
+            "control": "single",
+            "control_accuracy": 0.737,
+            "control_correct": 737,
+            "measure": "complementary_retention_b_seed_2",
+            "trials": 1000
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.735,
+            "candidate_correct": 735,
+            "control": "mixture",
+            "control_accuracy": 0.508,
+            "control_correct": 508,
+            "measure": "complementary_retention_b_seed_2",
+            "trials": 1000
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.22,
+            "candidate_correct": 22,
+            "control": "single",
+            "control_accuracy": 0.22,
+            "control_correct": 22,
+            "measure": "complementary_switch_1_frozen_parallel_trained_seed_3",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.22,
+            "candidate_correct": 22,
+            "control": "single",
+            "control_accuracy": 0.22,
+            "control_correct": 22,
+            "measure": "complementary_switch_1_frozen_single_trained_seed_3",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel_trained",
+            "candidate_accuracy": 0.22,
+            "candidate_correct": 22,
+            "control": "single_trained",
+            "control_accuracy": 0.22,
+            "control_correct": 22,
+            "measure": "complementary_switch_1_frozen_parallel_route_seed_3",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel_trained",
+            "candidate_accuracy": 0.22,
+            "candidate_correct": 22,
+            "control": "single_trained",
+            "control_accuracy": 0.22,
+            "control_correct": 22,
+            "measure": "complementary_switch_1_frozen_single_route_seed_3",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.59,
+            "candidate_correct": 59,
+            "control": "single",
+            "control_accuracy": 0.63,
+            "control_correct": 63,
+            "measure": "complementary_switch_1_online_seed_3",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.59,
+            "candidate_correct": 59,
+            "control": "mixture",
+            "control_accuracy": 0.57,
+            "control_correct": 57,
+            "measure": "complementary_switch_1_online_seed_3",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.73,
+            "candidate_correct": 73,
+            "control": "single",
+            "control_accuracy": 0.73,
+            "control_correct": 73,
+            "measure": "complementary_switch_2_frozen_parallel_trained_seed_3",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.73,
+            "candidate_correct": 73,
+            "control": "single",
+            "control_accuracy": 0.73,
+            "control_correct": 73,
+            "measure": "complementary_switch_2_frozen_single_trained_seed_3",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel_trained",
+            "candidate_accuracy": 0.73,
+            "candidate_correct": 73,
+            "control": "single_trained",
+            "control_accuracy": 0.73,
+            "control_correct": 73,
+            "measure": "complementary_switch_2_frozen_parallel_route_seed_3",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel_trained",
+            "candidate_accuracy": 0.73,
+            "candidate_correct": 73,
+            "control": "single_trained",
+            "control_accuracy": 0.73,
+            "control_correct": 73,
+            "measure": "complementary_switch_2_frozen_single_route_seed_3",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.71,
+            "candidate_correct": 71,
+            "control": "single",
+            "control_accuracy": 0.71,
+            "control_correct": 71,
+            "measure": "complementary_switch_2_online_seed_3",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.71,
+            "candidate_correct": 71,
+            "control": "mixture",
+            "control_accuracy": 0.64,
+            "control_correct": 64,
+            "measure": "complementary_switch_2_online_seed_3",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.751,
+            "candidate_correct": 751,
+            "control": "single",
+            "control_accuracy": 0.753,
+            "control_correct": 753,
+            "measure": "complementary_retention_b_seed_3",
+            "trials": 1000
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.751,
+            "candidate_correct": 751,
+            "control": "mixture",
+            "control_accuracy": 0.489,
+            "control_correct": 489,
+            "measure": "complementary_retention_b_seed_3",
+            "trials": 1000
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.35,
+            "candidate_correct": 35,
+            "control": "single",
+            "control_accuracy": 0.35,
+            "control_correct": 35,
+            "measure": "complementary_switch_1_frozen_parallel_trained_seed_4",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.35,
+            "candidate_correct": 35,
+            "control": "single",
+            "control_accuracy": 0.35,
+            "control_correct": 35,
+            "measure": "complementary_switch_1_frozen_single_trained_seed_4",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel_trained",
+            "candidate_accuracy": 0.35,
+            "candidate_correct": 35,
+            "control": "single_trained",
+            "control_accuracy": 0.35,
+            "control_correct": 35,
+            "measure": "complementary_switch_1_frozen_parallel_route_seed_4",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel_trained",
+            "candidate_accuracy": 0.35,
+            "candidate_correct": 35,
+            "control": "single_trained",
+            "control_accuracy": 0.35,
+            "control_correct": 35,
+            "measure": "complementary_switch_1_frozen_single_route_seed_4",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.45,
+            "candidate_correct": 45,
+            "control": "single",
+            "control_accuracy": 0.47,
+            "control_correct": 47,
+            "measure": "complementary_switch_1_online_seed_4",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.45,
+            "candidate_correct": 45,
+            "control": "mixture",
+            "control_accuracy": 0.52,
+            "control_correct": 52,
+            "measure": "complementary_switch_1_online_seed_4",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.75,
+            "candidate_correct": 75,
+            "control": "single",
+            "control_accuracy": 0.75,
+            "control_correct": 75,
+            "measure": "complementary_switch_2_frozen_parallel_trained_seed_4",
+            "trials": 100
+          },
+          {
+            "candidate": "parallel",
+            "candidate_accuracy": 0.74,
+            "candidate_correct": 74,
+            "control": "single",
+            "control_accuracy": 0.74,
+            "control_correct": 74,
+            "measure": "complementary_switch_2_frozen_single_trained_seed_4",
+            "trials": 100
+          }
+        ],
+        "warnings": [
+          "additional follow-up records were omitted"
+        ]
+      },
+      "idea": {
+        "approach": "Implemented single-timescale context routing with reversible per-entry consolidation: surprising observations assigned to a memory gradually restore its plasticity. Added a fixed-consolidation control and a crossed training-history-by-routing follow-up. The required offline tests passed.",
+        "falsification": "Compare reversible and fixed consolidation on paired streams for retention and switch accuracy; no retention benefit or slower adaptation would weigh against the proposal. In the crossed follow-up, a deficit following training history rather than frozen routing would support a learned-memory contribution to the earlier parallel-filter deficit. Any required mean accuracy more than two percentage points below the mixture fails the campaign criterion.",
+        "hypothesis": "Releasing consolidation when assigned observations repeatedly contradict a memory may allow stale rules to adapt while preserving protection against interference. The earlier parallel-filter switch deficit is observed; routing, learned-memory changes, and their interaction remain competing explanations.",
+        "limitations": "Surprise can reflect noise or an incorrect context assignment, so releasing consolidation may damage useful memories. The mechanism test verifies changed consolidation on a simple sequence, not improved accuracy. The crossed follow-up uses frozen, reset inference and cannot reproduce online adaptation. No candidate development or evaluation score was measured.",
+        "question": "Can surprise-sensitive consolidation preserve earlier rules while improving adaptation relative to fixed consolidation and the mixture baseline?"
+      },
+      "index": 3,
+      "status": "complete"
+    }
+  ]
+}

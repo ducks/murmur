@@ -10,6 +10,7 @@ import argparse
 import csv
 import json
 import os
+import re
 import shutil
 import signal
 from pathlib import Path
@@ -74,12 +75,14 @@ def make_plan(index, idea, protocol='legacy'):
     return plan
 
 
-def init(directory, goal, max_ideas, agent_seconds, test_seconds, local_provider=None, model=None, prior_campaign=None, protocol='milestone', diagnostic_seconds=120, diagnose_failures=True):
+def init(directory, goal, max_ideas, agent_seconds, test_seconds, local_provider=None, model=None, prior_campaign=None, protocol='milestone', diagnostic_seconds=120, diagnose_failures=True, max_reported_input_tokens=None):
     runner.text_field(goal, 'goal')
     if not (1 <= max_ideas <= 100 and 10 <= agent_seconds <= 7200 and 10 <= test_seconds <= 7200):
         raise runner.PlanError('limits outside supported ranges')
     if not 10 <= diagnostic_seconds <= 7200:
         raise runner.PlanError('diagnostic time outside supported range')
+    if max_reported_input_tokens is not None and (isinstance(max_reported_input_tokens, bool) or not isinstance(max_reported_input_tokens, int) or max_reported_input_tokens < 1):
+        raise runner.PlanError('reported input-token budget must be positive')
     if local_provider not in (None, 'ollama', 'lmstudio'):
         raise runner.PlanError('unsupported local provider')
     if protocol not in ('milestone', 'legacy'):
@@ -102,6 +105,7 @@ def init(directory, goal, max_ideas, agent_seconds, test_seconds, local_provider
               'base_commit': git(runner.ROOT, 'rev-parse', 'HEAD'), 'prior_history': prior,
               'protocol': protocol,
               'diagnose_failures': diagnose_failures, 'diagnostic_seconds': diagnostic_seconds,
+              'max_reported_input_tokens': max_reported_input_tokens,
               'scope': 'binary hidden-context sequence task; candidate Rust model only',
               'limits': 'LLM token/cost limits and blind holdouts are not enforced.'}
     runner.write_json(dest / 'campaign.json', config)
@@ -162,7 +166,7 @@ Research memory (observations are not proven explanations; campaign evidence is 
 For an apparent failure, distinguish observations from possible explanations and propose a discriminating test in your hypothesis and falsification. The full index for this round is saved alongside the agent logs as research-memory.json; the prompt may include only recent campaign rounds.
 If the preceding round contains a completed diagnosis, try to design a focused test that distinguishes its competing explanations, with an explicit control. If the proposed test cannot fit the candidate and test-file scope, state that limitation in your response and select another testable idea. A diagnosis is an unverified hypothesis, not an established cause.
 Prior candidate commits are available locally: when building on a previous idea, inspect its candidate source with git show <commit>:toolkit/src/agent_candidate.rs and adapt it within the permitted files. Starting a new campaign does not automatically check out the prior candidate.
-For any quantitative follow-up in agent_generated.rs, print one single-line record per measurement using this exact prefix and JSON shape: MURMUR_FOLLOWUP {{"measure":"name","candidate":"name","control":"name","candidate_correct":1,"control_correct":1,"trials":2}}. Counts must refer to the same paired observations. The supervisor preserves and checks the arithmetic but does not independently verify the experimental design. Do not emit a record for a test you did not run.
+For any quantitative follow-up in agent_generated.rs, print one single-line record per aggregate measurement using this exact prefix and JSON shape: MURMUR_FOLLOWUP {{"measure":"name","candidate":"name","control":"name","candidate_correct":1,"control_correct":1,"trials":2}}. Counts must refer to the same paired observations. Prefer aggregate counts by task and measure, not one record per seed; keep any per-seed details in the test log. The supervisor preserves and checks the arithmetic but does not independently verify the experimental design. Do not emit a record for a test you did not run.
 
 Edit ONLY toolkit/src/agent_candidate.rs and toolkit/tests/agent_generated.rs. The latter must contain at least one meaningful Rust test for your proposed mechanism. Do not alter evaluator, baseline, configs, docs, Git metadata, or any other file; do not commit. The supervisor rejects other changes. Preserve Candidate's Clone, new(seed, rate), reset(), predict(x)->f64 and observe(x,y,learn) interface. `predict` must happen without seeing y; output must be finite in [0,1]. In `observe(..., false)`, do not change learned parameters, though context inference state may update. reset clears transient inference state without erasing learned parameters. Candidate may use local Rust standard library and existing local crates only; no network, pretrained weights, external APIs, hidden future data, environment data, or provided true context. Model-code restrictions are reviewed/tested, not a complete security boundary.
 
@@ -251,7 +255,7 @@ def agent_usage(path):
     return totals or None
 
 
-def followup_metrics(path):
+def followup_metrics(path, preview_limit=10, max_records=10000):
     """Read optional, agent-reported paired counts; never treat them as verified science."""
     records, warnings = [], []
     marker = 'MURMUR_FOLLOWUP '
@@ -260,7 +264,7 @@ def followup_metrics(path):
         for line in source:
             if marker not in line:
                 continue
-            if len(records) + len(warnings) >= 50:
+            if len(records) + len(warnings) >= max_records:
                 warnings.append('additional follow-up records were omitted')
                 break
             try:
@@ -282,7 +286,28 @@ def followup_metrics(path):
                 records.append(item)
             except (ValueError, json.JSONDecodeError, runner.PlanError, TypeError) as exc:
                 warnings.append(f'invalid agent-reported follow-up: {exc}')
-    return {'records': records, 'warnings': warnings,
+    groups = {}
+    for item in records:
+        match = re.fullmatch(r'(.+)_seed_([0-9]+)', item['measure'])
+        if not match:
+            continue
+        key = (match.group(1), item['candidate'], item['control'])
+        groups.setdefault(key, []).append((match.group(2), item))
+    aggregates = []
+    for (measure, candidate, control), values in sorted(groups.items()):
+        if len({seed for seed, _ in values}) != len(values):
+            warnings.append(f'duplicate seed in agent-reported group: {measure}; group not aggregated')
+            continue
+        trials = sum(item['trials'] for _, item in values)
+        candidate_correct = sum(item['candidate_correct'] for _, item in values)
+        control_correct = sum(item['control_correct'] for _, item in values)
+        aggregates.append({'measure': measure, 'candidate': candidate, 'control': control, 'seeds': len(values),
+                           'trials': trials, 'candidate_accuracy': candidate_correct / trials, 'control_accuracy': control_correct / trials})
+    full_path = Path(path).parent / 'followup-records.json'
+    runner.write_json(full_path, {'records': records, 'aggregates': aggregates, 'warnings': warnings})
+    return {'records': records[:preview_limit], 'record_count': len(records), 'records_shown': min(len(records), preview_limit),
+            'aggregates': aggregates[:50], 'aggregate_count': len(aggregates),
+            'full_records_path': str(full_path), 'warnings': warnings,
             'qualification': 'Agent-authored test output; arithmetic checked, experimental design not independently verified.'}
 
 
@@ -293,6 +318,9 @@ Candidate hypothesis and implementation summary:
 
 Development and evaluation reports (evaluation may be null):
 {json.dumps({'development': result.get('development'), 'evaluation': result.get('evaluation')}, indent=2)}
+
+Agent-reported follow-up output (not independently validated):
+{json.dumps(result.get('followups'), indent=2)}
 
 The full local evidence and logs are in {round_dir}. You may inspect candidate source and existing evidence with read-only commands. Do not edit files, run new training, change Git state, or inspect an unrun evaluation split. Distinguish what the data show from competing explanations; do not claim a mechanism is proven by correlation. Propose ONE feasible follow-up that compares an intervention with an explicit control and states what observations would distinguish the hypotheses. The next agent can edit only toolkit/src/agent_candidate.rs and toolkit/tests/agent_generated.rs; use that scope where practical, or state clearly if an additional evaluator is required. The supervisor has not executed your proposed follow-up. Return only the requested structured JSON with concise single-line strings.
 '''
@@ -339,7 +367,24 @@ def diagnose_failure(config, worktree, round_dir, result, diagnoser=None):
     try:
         return (diagnoser or call_diagnoser)(config, worktree, round_dir, result)
     except (runner.PlanError, OSError, subprocess.SubprocessError) as exc:
-        return {'status': 'failed', 'error': str(exc), 'qualification': 'No diagnosis was produced.'}
+        return {'status': 'failed', 'error': str(exc), 'usage': agent_usage(round_dir / 'diagnosis-events.jsonl'),
+                'qualification': 'No diagnosis was produced.'}
+
+
+def reported_input_usage(completed):
+    total = 0
+    for item in completed:
+        usage = item.get('agent_usage')
+        if not isinstance(usage, dict) or not isinstance(usage.get('input_tokens'), int) or isinstance(usage['input_tokens'], bool) or usage['input_tokens'] < 0:
+            return None
+        total += usage['input_tokens']
+        diagnosis = item.get('diagnosis') or {}
+        if diagnosis.get('status') in ('complete', 'failed'):
+            usage = diagnosis.get('usage')
+            if not isinstance(usage, dict) or not isinstance(usage.get('input_tokens'), int) or isinstance(usage['input_tokens'], bool) or usage['input_tokens'] < 0:
+                return None
+            total += usage['input_tokens']
+    return total
 
 
 def changed_paths(worktree):
@@ -412,7 +457,7 @@ def cleanup_round(directory, config, item):
     return {'index': index, 'status': 'removed'}
 
 
-def cleanup_completed(directory, config, state):
+def cleanup_completed(directory, config, state, budget_finished=False):
     results = []
     for item in state.get('completed', []):
         if item.get('status') != 'complete':
@@ -424,7 +469,8 @@ def cleanup_completed(directory, config, state):
         results.append(outcome)
     cache_status = 'retained'
     cache = directory / 'build-cache'
-    if state.get('status') == 'ready' and len(state.get('completed', [])) >= config['max_ideas'] and all(x['status'] != 'retained' for x in results):
+    finished = len(state.get('completed', [])) >= config['max_ideas'] or (budget_finished and bool(state.get('completed')))
+    if state.get('status') == 'ready' and finished and all(x.get('status') == 'complete' for x in state['completed']) and all(x['status'] != 'retained' for x in results):
         if not cache.exists() and not cache.is_symlink():
             cache_status = 'absent'
         else:
@@ -554,7 +600,16 @@ def _run_locked(directory, max_new=None, agent=call_agent):
     if count < 0:
         raise runner.PlanError('invalid campaign iteration limit')
     results = []
+    budget_action = None
     for _ in range(count):
+        budget = config.get('max_reported_input_tokens')
+        used = reported_input_usage(state['completed']) if budget is not None else None
+        if budget is not None and used is None:
+            budget_action = 'inspect_usage'
+            break
+        if budget is not None and used >= budget:
+            budget_action = 'reported_budget_reached'
+            break
         result = execute_round(directory, config, state, agent)
         results.append({'index': result['index'], 'status': result['status'], 'commit': result.get('commit'),
                         'development': (result.get('development') or {}).get('outcome'),
@@ -562,8 +617,19 @@ def _run_locked(directory, max_new=None, agent=call_agent):
                         'diagnosis': (result.get('diagnosis') or {}).get('status'), 'error': result.get('error')})
         if result['status'] != 'complete':
             break
-    action = 'inspect_failure' if state['status'] != 'ready' else ('review_results' if len(state['completed']) >= config['max_ideas'] else 'continue')
-    return {'action': action, 'rounds': results, 'completed': len(state['completed']), 'limit': config['max_ideas']}
+    budget = config.get('max_reported_input_tokens')
+    if budget is not None and budget_action is None and len(state['completed']) < config['max_ideas']:
+        used = reported_input_usage(state['completed'])
+        if used is None:
+            budget_action = 'inspect_usage'
+        elif used >= budget:
+            budget_action = 'reported_budget_reached'
+    action = 'inspect_failure' if state['status'] != 'ready' else ('review_results' if len(state['completed']) >= config['max_ideas'] else (budget_action or 'continue'))
+    if action == 'reported_budget_reached':
+        cleanup_completed(directory, config, state, budget_finished=True)
+    return {'action': action, 'rounds': results, 'completed': len(state['completed']), 'limit': config['max_ideas'],
+            'reported_input_tokens': reported_input_usage(state['completed']),
+            'max_reported_input_tokens': config.get('max_reported_input_tokens')}
 
 
 def main(argv=None):
@@ -576,12 +642,13 @@ def main(argv=None):
     p.add_argument('--protocol', choices=('milestone', 'legacy'), default='milestone')
     p.add_argument('--diagnostic-seconds', type=int, default=120)
     p.add_argument('--no-diagnosis', action='store_true', help='skip the separate failure-analysis agent')
+    p.add_argument('--max-reported-input-tokens', type=int, help='stop between rounds when reported total reaches this threshold (not a hard cap)')
     p = sub.add_parser('run'); p.add_argument('directory'); p.add_argument('--ideas', type=int)
     p = sub.add_parser('cleanup'); p.add_argument('directory')
     args = parser.parse_args(argv)
     try:
         if args.command == 'init':
-            result = init(args.directory, args.goal, args.max_ideas, args.agent_seconds, args.test_seconds, args.local_provider, args.model, args.prior_campaign, args.protocol, args.diagnostic_seconds, not args.no_diagnosis)
+            result = init(args.directory, args.goal, args.max_ideas, args.agent_seconds, args.test_seconds, args.local_provider, args.model, args.prior_campaign, args.protocol, args.diagnostic_seconds, not args.no_diagnosis, args.max_reported_input_tokens)
         elif args.command == 'cleanup':
             result = cleanup(args.directory)
         else:

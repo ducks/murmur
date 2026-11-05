@@ -91,11 +91,26 @@ def campaign_records(directory):
         # Failed agents may have written an idea before a later test failed.
         if idea is None and (round_dir / 'idea.json').is_file():
             idea = runner.read_json(round_dir / 'idea.json')
+        followups = item.get('followups')
+        recovered = round_dir / 'followup-records.json'
+        if isinstance(followups, dict) and not followups.get('full_records_path') and recovered.is_file():
+            full = runner.read_json(recovered)
+            if not isinstance(full, dict) or not isinstance(full.get('records'), list):
+                raise runner.PlanError(f'invalid recovered follow-up records: {recovered}')
+            if not isinstance(full.get('aggregates', []), list):
+                raise runner.PlanError(f'invalid recovered follow-up aggregates: {recovered}')
+            if not isinstance(full.get('warnings', []), list):
+                raise runner.PlanError(f'invalid recovered follow-up warnings: {recovered}')
+            followups = {**followups, 'records': full['records'][:10], 'record_count': len(full['records']),
+                         'records_shown': min(10, len(full['records'])), 'full_records_path': str(recovered),
+                         'aggregates': full.get('aggregates', [])[:50], 'aggregate_count': len(full.get('aggregates', [])),
+                         'original_warnings': followups.get('warnings', []), 'warnings': full.get('warnings', []),
+                         'recovered_from': 'tests.log after the original round'}
         records.append({'id': f"{config['campaign_id']}:{item['index']:03d}",
                         'campaign_id': config['campaign_id'], 'round': item['index'],
                         'campaign_goal': config.get('goal'), 'protocol': config.get('protocol', 'legacy'),
                         'status': item.get('status'), 'incomplete': incomplete, 'candidate_commit': item.get('commit'),
-                        'idea': idea, 'followups': item.get('followups'), 'development': checks(item.get('development')),
+                        'idea': idea, 'followups': followups, 'development': checks(item.get('development')),
                         'evaluation': checks(item.get('evaluation')), 'diagnosis': item.get('diagnosis'), 'error': item.get('error'),
                         'evidence_directory': str(round_dir),
                         'verification': 'indexed from campaign state; evidence hashes were not rechecked'})

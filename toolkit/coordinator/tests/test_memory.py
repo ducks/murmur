@@ -69,6 +69,17 @@ class MemoryTests(unittest.TestCase):
         record=result['campaign_rounds'][1]
         self.assertTrue(record['incomplete']);self.assertEqual(record['status'],'running')
         self.assertEqual(record['idea']['question'],'unfinished idea')
+    def test_recovered_followup_records_are_linked_without_rewriting_history(self):
+        p=self.write_campaign('campaign')
+        state=runner.read_json(p/'state.json');state['completed'][0]['followups']={'records':[],'warnings':['omitted']}
+        runner.write_json(p/'state.json',state)
+        round_dir=p/'idea-001';round_dir.mkdir()
+        runner.write_json(round_dir/'followup-records.json',{'records':[{'n':i} for i in range(55)],'warnings':[]})
+        record=memory.campaign_records(p)[0]
+        self.assertEqual(record['followups']['record_count'],55)
+        self.assertEqual(record['followups']['records_shown'],10)
+        self.assertEqual(record['followups']['recovered_from'],'tests.log after the original round')
+        self.assertEqual(runner.read_json(p/'state.json')['completed'][0]['followups']['records'],[])
     def test_call_agent_includes_snapshot_in_prompt(self):
         round_dir=self.root/'idea-001';round_dir.mkdir()
         worktree=round_dir/'worktree';worktree.mkdir()

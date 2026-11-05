@@ -60,5 +60,52 @@ class DiagnosisTests(unittest.TestCase):
         self.assertEqual(result['records'][0]['control_accuracy'],0.5)
         self.assertEqual(len(result['warnings']),1)
         self.assertIn('not independently verified',result['qualification'])
+    def test_followup_preview_is_bounded_but_full_records_are_preserved(self):
+        path=self.root/'tests.log'
+        record={'measure':'switch','candidate':'revised','control':'original','candidate_correct':1,'control_correct':0,'trials':1}
+        path.write_text(('MURMUR_FOLLOWUP '+json.dumps(record)+'\n')*55)
+        result=campaign.followup_metrics(path)
+        self.assertEqual(result['record_count'],55);self.assertEqual(result['records_shown'],10)
+        self.assertEqual(len(result['records']),10)
+        self.assertEqual(len(runner.read_json(Path(result['full_records_path']))['records']),55)
+    def test_seed_labeled_followups_are_aggregated_without_losing_records(self):
+        path=self.root/'tests.log'
+        records=[{'measure':f'switch_seed_{n}','candidate':'a','control':'b','candidate_correct':n,'control_correct':0,'trials':2} for n in (1,2)]
+        path.write_text(''.join('MURMUR_FOLLOWUP '+json.dumps(x)+'\n' for x in records))
+        result=campaign.followup_metrics(path)
+        group=result['aggregates'][0]
+        self.assertEqual(group['seeds'],2);self.assertEqual(group['trials'],4)
+        self.assertEqual(group['candidate_accuracy'],0.75)
+        self.assertEqual(len(runner.read_json(Path(result['full_records_path']))['records']),2)
+    def test_reported_usage_includes_diagnostic_and_missing_usage_is_unknown(self):
+        item={'agent_usage':{'input_tokens':100},'diagnosis':{'status':'complete','usage':{'input_tokens':30}}}
+        self.assertEqual(campaign.reported_input_usage([item]),130)
+        item['diagnosis']['usage']=None
+        self.assertIsNone(campaign.reported_input_usage([item]))
+    def test_reported_budget_stops_between_rounds(self):
+        runner.write_json(self.root/'campaign.json',{'schema_version':1,'max_ideas':3,'max_reported_input_tokens':100})
+        runner.write_json(self.root/'state.json',{'schema_version':1,'completed':[],'status':'ready'})
+        def completed(directory,config,state,agent):
+            state['completed'].append({'status':'complete','agent_usage':{'input_tokens':120},'diagnosis':{'status':'not_needed'}})
+            return {'index':1,'status':'complete'}
+        with patch.object(campaign,'execute_round',side_effect=completed) as execute, patch.object(campaign,'cleanup_completed') as cleanup:
+            result=campaign.run(self.root)
+        self.assertEqual(execute.call_count,1);self.assertEqual(result['action'],'reported_budget_reached')
+        self.assertEqual(result['reported_input_tokens'],120)
+        self.assertTrue(cleanup.call_args.kwargs['budget_finished'])
+    def test_reported_budget_does_not_assume_missing_usage_is_zero(self):
+        runner.write_json(self.root/'campaign.json',{'schema_version':1,'max_ideas':3,'max_reported_input_tokens':100})
+        runner.write_json(self.root/'state.json',{'schema_version':1,'completed':[{'status':'complete','agent_usage':None}],'status':'ready'})
+        with patch.object(campaign,'execute_round') as execute:
+            result=campaign.run(self.root)
+        execute.assert_not_called();self.assertEqual(result['action'],'inspect_usage')
+        self.assertIsNone(result['reported_input_tokens'])
+    def test_budget_finish_cleans_owned_cache_only_after_round_checks(self):
+        config={'campaign_id':'test','max_ideas':3};state={'status':'ready','completed':[{'index':1,'status':'complete'}]}
+        campaign.build_environment(self.root,config)
+        with patch.object(campaign,'cleanup_round',return_value={'index':1,'status':'already_absent'}):
+            self.assertEqual(campaign.cleanup_completed(self.root,config,state)['cache'],'retained')
+            self.assertEqual(campaign.cleanup_completed(self.root,config,state,budget_finished=True)['cache'],'removed')
+        self.assertFalse((self.root/'build-cache').exists())
 
 if __name__=='__main__':unittest.main()

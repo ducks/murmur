@@ -1,0 +1,509 @@
+{
+  "config_sha256": "0d3bc671bc90d5799890fb3ebe130a76f603dd74f082b2c15c45f95748744362",
+  "metrics_sha256": {
+    "idea_1": "05af7fc35482dd81382624cb2457554fb35524f00074dbda3d6a8dbc4429867e",
+    "idea_2": "7f7a2cfcde78078734a2f46d9ac2df59d8253d0d9590f019ebb616c28cf00d60"
+  },
+  "paired": {
+    "mixed_rules:retention_b": {
+      "bootstrap_95_percentile": [
+        0.07970000000000001,
+        0.15936666666666666
+      ],
+      "idea_1_mean": 0.4966333333333333,
+      "idea_2_mean": 0.6162333333333333,
+      "idea_2_minus_idea_1": 0.1196,
+      "mixture_mean": 0.4819333333333333,
+      "wins_losses_ties": [
+        17,
+        3,
+        10
+      ]
+    },
+    "mixed_rules:switch_to_a": {
+      "bootstrap_95_percentile": [
+        0.04866666666666665,
+        0.08333333333333334
+      ],
+      "idea_1_mean": 0.773,
+      "idea_2_mean": 0.8386666666666667,
+      "idea_2_minus_idea_1": 0.06566666666666666,
+      "mixture_mean": 0.8043333333333333,
+      "wins_losses_ties": [
+        26,
+        1,
+        3
+      ]
+    },
+    "mixed_rules:switch_to_b": {
+      "bootstrap_95_percentile": [
+        0.025,
+        0.05366666666666666
+      ],
+      "idea_1_mean": 0.5743333333333334,
+      "idea_2_mean": 0.6133333333333333,
+      "idea_2_minus_idea_1": 0.03899999999999999,
+      "mixture_mean": 0.5886666666666667,
+      "wins_losses_ties": [
+        25,
+        2,
+        3
+      ]
+    },
+    "reversed_asym:retention_b": {
+      "bootstrap_95_percentile": [
+        0.24373333333333336,
+        0.4154333333333334
+      ],
+      "idea_1_mean": 0.35423333333333334,
+      "idea_2_mean": 0.6853666666666667,
+      "idea_2_minus_idea_1": 0.33113333333333334,
+      "mixture_mean": 0.3688,
+      "wins_losses_ties": [
+        24,
+        1,
+        5
+      ]
+    },
+    "reversed_asym:switch_to_a": {
+      "bootstrap_95_percentile": [
+        0.06833333333333334,
+        0.11933333333333336
+      ],
+      "idea_1_mean": 0.6043333333333333,
+      "idea_2_mean": 0.6976666666666667,
+      "idea_2_minus_idea_1": 0.09333333333333334,
+      "mixture_mean": 0.627,
+      "wins_losses_ties": [
+        27,
+        1,
+        2
+      ]
+    },
+    "reversed_asym:switch_to_b": {
+      "bootstrap_95_percentile": [
+        0.10833333333333332,
+        0.16033333333333333
+      ],
+      "idea_1_mean": 0.5163333333333333,
+      "idea_2_mean": 0.6503333333333333,
+      "idea_2_minus_idea_1": 0.13399999999999998,
+      "mixture_mean": 0.5893333333333334,
+      "wins_losses_ties": [
+        29,
+        1,
+        0
+      ]
+    },
+    "shifted_bias:retention_b": {
+      "bootstrap_95_percentile": [
+        0.06833333333333334,
+        0.23623333333333332
+      ],
+      "idea_1_mean": 0.6014666666666667,
+      "idea_2_mean": 0.7505000000000001,
+      "idea_2_minus_idea_1": 0.14903333333333335,
+      "mixture_mean": 0.5371333333333334,
+      "wins_losses_ties": [
+        14,
+        15,
+        1
+      ]
+    },
+    "shifted_bias:switch_to_a": {
+      "bootstrap_95_percentile": [
+        0.011333333333333329,
+        0.03133333333333334
+      ],
+      "idea_1_mean": 0.7376666666666667,
+      "idea_2_mean": 0.7586666666666667,
+      "idea_2_minus_idea_1": 0.020999999999999994,
+      "mixture_mean": 0.7143333333333334,
+      "wins_losses_ties": [
+        18,
+        3,
+        9
+      ]
+    },
+    "shifted_bias:switch_to_b": {
+      "bootstrap_95_percentile": [
+        0.04566666666666665,
+        0.07199999999999998
+      ],
+      "idea_1_mean": 0.581,
+      "idea_2_mean": 0.6393333333333333,
+      "idea_2_minus_idea_1": 0.05833333333333332,
+      "mixture_mean": 0.5993333333333333,
+      "wins_losses_ties": [
+        29,
+        1,
+        0
+      ]
+    },
+    "similar_rules:retention_b": {
+      "bootstrap_95_percentile": [
+        -0.0030999999999999917,
+        0.0
+      ],
+      "idea_1_mean": 0.8479,
+      "idea_2_mean": 0.8468666666666667,
+      "idea_2_minus_idea_1": -0.0010333333333333306,
+      "mixture_mean": 0.8479,
+      "wins_losses_ties": [
+        0,
+        1,
+        29
+      ]
+    },
+    "similar_rules:switch_to_a": {
+      "bootstrap_95_percentile": [
+        0.0,
+        0.0
+      ],
+      "idea_1_mean": 0.831,
+      "idea_2_mean": 0.831,
+      "idea_2_minus_idea_1": 0.0,
+      "mixture_mean": 0.831,
+      "wins_losses_ties": [
+        0,
+        0,
+        30
+      ]
+    },
+    "similar_rules:switch_to_b": {
+      "bootstrap_95_percentile": [
+        -0.0030000000000000027,
+        0.0
+      ],
+      "idea_1_mean": 0.842,
+      "idea_2_mean": 0.8406666666666667,
+      "idea_2_minus_idea_1": -0.0013333333333333346,
+      "mixture_mean": 0.8433333333333334,
+      "wins_losses_ties": [
+        0,
+        3,
+        27
+      ]
+    }
+  },
+  "protocol": {
+    "bootstrap": {
+      "draws": 10000,
+      "interval": "descriptive percentile 95%, paired by seed, no multiplicity adjustment",
+      "seed": 20261104
+    },
+    "candidates": {
+      "idea_1": "e22d28cf8a64a3719b1be31521ee37bcb61a7e71",
+      "idea_2": "9c8f02b9551aa59b52f2f59400329783bad5514b"
+    },
+    "comparison": "Mean paired accuracy difference over 30 shared seeds for each family, final B probe, and first 100 predictions after both switches.",
+    "configuration": "toolkit/configs/milestone-comparison/evaluation.cfg",
+    "interpretation": "Selected after inspecting development results. Evaluation rules and code are public, so this is not a blind holdout. Non-inferiority is not novelty or statistical proof; timing is diagnostic.",
+    "max_accuracy_drop_vs_mixture": 0.02,
+    "purpose": "Follow up after idea 2 passed the matched development scorecard; compare both saved candidates on different public rule families and fresh seeds.",
+    "schema_version": 1,
+    "split": "evaluation"
+  },
+  "scorecards": {
+    "idea_1": {
+      "baseline": "mixture",
+      "candidate": "candidate",
+      "checks": {
+        "mixed_rules:retention_b": true,
+        "mixed_rules:switch_to_a": false,
+        "mixed_rules:switch_to_b": true,
+        "reversed_asym:retention_b": true,
+        "reversed_asym:switch_to_a": false,
+        "reversed_asym:switch_to_b": false,
+        "shifted_bias:retention_b": true,
+        "shifted_bias:switch_to_a": true,
+        "shifted_bias:switch_to_b": true,
+        "similar_rules:retention_b": true,
+        "similar_rules:switch_to_a": true,
+        "similar_rules:switch_to_b": true
+      },
+      "comparisons": {
+        "mixed_rules:retention_b": {
+          "baseline_accuracy": 0.4819333333333333,
+          "candidate_accuracy": 0.49663333333333337,
+          "losses": 1,
+          "mean_paired_difference": 0.014699999999999998,
+          "ties": 25,
+          "wins": 4
+        },
+        "mixed_rules:switch_to_a": {
+          "baseline_accuracy": 0.8043333333333333,
+          "candidate_accuracy": 0.773,
+          "losses": 23,
+          "mean_paired_difference": -0.03133333333333334,
+          "ties": 3,
+          "wins": 4
+        },
+        "mixed_rules:switch_to_b": {
+          "baseline_accuracy": 0.5886666666666667,
+          "candidate_accuracy": 0.5743333333333334,
+          "losses": 18,
+          "mean_paired_difference": -0.01433333333333333,
+          "ties": 3,
+          "wins": 9
+        },
+        "reversed_asym:retention_b": {
+          "baseline_accuracy": 0.3688,
+          "candidate_accuracy": 0.35423333333333334,
+          "losses": 4,
+          "mean_paired_difference": -0.01456666666666667,
+          "ties": 20,
+          "wins": 6
+        },
+        "reversed_asym:switch_to_a": {
+          "baseline_accuracy": 0.627,
+          "candidate_accuracy": 0.6043333333333333,
+          "losses": 22,
+          "mean_paired_difference": -0.02266666666666667,
+          "ties": 4,
+          "wins": 4
+        },
+        "reversed_asym:switch_to_b": {
+          "baseline_accuracy": 0.5893333333333334,
+          "candidate_accuracy": 0.5163333333333333,
+          "losses": 22,
+          "mean_paired_difference": -0.07300000000000001,
+          "ties": 2,
+          "wins": 6
+        },
+        "shifted_bias:retention_b": {
+          "baseline_accuracy": 0.5371333333333334,
+          "candidate_accuracy": 0.6014666666666667,
+          "losses": 5,
+          "mean_paired_difference": 0.06433333333333334,
+          "ties": 5,
+          "wins": 20
+        },
+        "shifted_bias:switch_to_a": {
+          "baseline_accuracy": 0.7143333333333334,
+          "candidate_accuracy": 0.7376666666666666,
+          "losses": 8,
+          "mean_paired_difference": 0.023333333333333338,
+          "ties": 6,
+          "wins": 16
+        },
+        "shifted_bias:switch_to_b": {
+          "baseline_accuracy": 0.5993333333333334,
+          "candidate_accuracy": 0.581,
+          "losses": 22,
+          "mean_paired_difference": -0.018333333333333313,
+          "ties": 3,
+          "wins": 5
+        },
+        "similar_rules:retention_b": {
+          "baseline_accuracy": 0.8478999999999999,
+          "candidate_accuracy": 0.8478999999999999,
+          "losses": 0,
+          "mean_paired_difference": 0.0,
+          "ties": 30,
+          "wins": 0
+        },
+        "similar_rules:switch_to_a": {
+          "baseline_accuracy": 0.831,
+          "candidate_accuracy": 0.831,
+          "losses": 0,
+          "mean_paired_difference": 0.0,
+          "ties": 30,
+          "wins": 0
+        },
+        "similar_rules:switch_to_b": {
+          "baseline_accuracy": 0.8433333333333334,
+          "candidate_accuracy": 0.8420000000000001,
+          "losses": 1,
+          "mean_paired_difference": -0.0013333333333333346,
+          "ties": 29,
+          "wins": 0
+        }
+      },
+      "limitations": [
+        "Thresholds on means are operational, not statistical guarantees.",
+        "Non-inferiority alone does not demonstrate novelty; copying the baseline could pass.",
+        "Task families and evaluation seeds are locally visible and can be overfit.",
+        "The oracle receives context labels.",
+        "Inline bytes exclude heap allocations; peak memory is not measured.",
+        "Per-model training times include clock overhead, exclude probes, and are noisy; resource budgets are not matched."
+      ],
+      "max_accuracy_drop": 0.02,
+      "outcome": "criteria_not_met",
+      "resources": {
+        "candidate": {
+          "inline_bytes": 72,
+          "training_ns_total": 9651693,
+          "training_steps": 360000
+        },
+        "mixture": {
+          "inline_bytes": 72,
+          "training_ns_total": 10049450,
+          "training_steps": 360000
+        },
+        "oracle": {
+          "inline_bytes": 48,
+          "training_ns_total": 7013713,
+          "training_steps": 360000
+        },
+        "single": {
+          "inline_bytes": 48,
+          "training_ns_total": 6765647,
+          "training_steps": 360000
+        }
+      },
+      "seeds": 30
+    },
+    "idea_2": {
+      "baseline": "mixture",
+      "candidate": "candidate",
+      "checks": {
+        "mixed_rules:retention_b": true,
+        "mixed_rules:switch_to_a": true,
+        "mixed_rules:switch_to_b": true,
+        "reversed_asym:retention_b": true,
+        "reversed_asym:switch_to_a": true,
+        "reversed_asym:switch_to_b": true,
+        "shifted_bias:retention_b": true,
+        "shifted_bias:switch_to_a": true,
+        "shifted_bias:switch_to_b": true,
+        "similar_rules:retention_b": true,
+        "similar_rules:switch_to_a": true,
+        "similar_rules:switch_to_b": true
+      },
+      "comparisons": {
+        "mixed_rules:retention_b": {
+          "baseline_accuracy": 0.4819333333333333,
+          "candidate_accuracy": 0.6162333333333334,
+          "losses": 1,
+          "mean_paired_difference": 0.1343,
+          "ties": 9,
+          "wins": 20
+        },
+        "mixed_rules:switch_to_a": {
+          "baseline_accuracy": 0.8043333333333333,
+          "candidate_accuracy": 0.8386666666666667,
+          "losses": 5,
+          "mean_paired_difference": 0.034333333333333334,
+          "ties": 5,
+          "wins": 20
+        },
+        "mixed_rules:switch_to_b": {
+          "baseline_accuracy": 0.5886666666666667,
+          "candidate_accuracy": 0.6133333333333333,
+          "losses": 4,
+          "mean_paired_difference": 0.024666666666666667,
+          "ties": 3,
+          "wins": 23
+        },
+        "reversed_asym:retention_b": {
+          "baseline_accuracy": 0.3688,
+          "candidate_accuracy": 0.6853666666666667,
+          "losses": 1,
+          "mean_paired_difference": 0.31656666666666666,
+          "ties": 3,
+          "wins": 26
+        },
+        "reversed_asym:switch_to_a": {
+          "baseline_accuracy": 0.627,
+          "candidate_accuracy": 0.6976666666666667,
+          "losses": 2,
+          "mean_paired_difference": 0.07066666666666667,
+          "ties": 1,
+          "wins": 27
+        },
+        "reversed_asym:switch_to_b": {
+          "baseline_accuracy": 0.5893333333333334,
+          "candidate_accuracy": 0.6503333333333333,
+          "losses": 1,
+          "mean_paired_difference": 0.060999999999999985,
+          "ties": 0,
+          "wins": 29
+        },
+        "shifted_bias:retention_b": {
+          "baseline_accuracy": 0.5371333333333334,
+          "candidate_accuracy": 0.7505000000000001,
+          "losses": 13,
+          "mean_paired_difference": 0.21336666666666668,
+          "ties": 1,
+          "wins": 16
+        },
+        "shifted_bias:switch_to_a": {
+          "baseline_accuracy": 0.7143333333333334,
+          "candidate_accuracy": 0.7586666666666667,
+          "losses": 4,
+          "mean_paired_difference": 0.044333333333333336,
+          "ties": 3,
+          "wins": 23
+        },
+        "shifted_bias:switch_to_b": {
+          "baseline_accuracy": 0.5993333333333334,
+          "candidate_accuracy": 0.6393333333333333,
+          "losses": 1,
+          "mean_paired_difference": 0.04000000000000001,
+          "ties": 1,
+          "wins": 28
+        },
+        "similar_rules:retention_b": {
+          "baseline_accuracy": 0.8478999999999999,
+          "candidate_accuracy": 0.8468666666666667,
+          "losses": 1,
+          "mean_paired_difference": -0.0010333333333333306,
+          "ties": 29,
+          "wins": 0
+        },
+        "similar_rules:switch_to_a": {
+          "baseline_accuracy": 0.831,
+          "candidate_accuracy": 0.831,
+          "losses": 0,
+          "mean_paired_difference": 0.0,
+          "ties": 30,
+          "wins": 0
+        },
+        "similar_rules:switch_to_b": {
+          "baseline_accuracy": 0.8433333333333334,
+          "candidate_accuracy": 0.8406666666666667,
+          "losses": 3,
+          "mean_paired_difference": -0.002666666666666669,
+          "ties": 27,
+          "wins": 0
+        }
+      },
+      "limitations": [
+        "Thresholds on means are operational, not statistical guarantees.",
+        "Non-inferiority alone does not demonstrate novelty; copying the baseline could pass.",
+        "Task families and evaluation seeds are locally visible and can be overfit.",
+        "The oracle receives context labels.",
+        "Inline bytes exclude heap allocations; peak memory is not measured.",
+        "Per-model training times include clock overhead, exclude probes, and are noisy; resource budgets are not matched."
+      ],
+      "max_accuracy_drop": 0.02,
+      "outcome": "criteria_met",
+      "resources": {
+        "candidate": {
+          "inline_bytes": 72,
+          "training_ns_total": 13935689,
+          "training_steps": 360000
+        },
+        "mixture": {
+          "inline_bytes": 72,
+          "training_ns_total": 9967258,
+          "training_steps": 360000
+        },
+        "oracle": {
+          "inline_bytes": 48,
+          "training_ns_total": 6848113,
+          "training_steps": 360000
+        },
+        "single": {
+          "inline_bytes": 48,
+          "training_ns_total": 6795940,
+          "training_steps": 360000
+        }
+      },
+      "seeds": 30
+    }
+  },
+  "source_dirty": false,
+  "source_revision": "5094f4308c72212bef8bce93d617efcabed3d9b8"
+}

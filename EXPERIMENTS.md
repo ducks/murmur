@@ -1112,3 +1112,38 @@ nix-shell --run 'python3 -B -m toolkit.coordinator.campaign run toolkit/runs/my-
 ```
 
 Campaign identifiers produce different seeds, and a coding agent is nondeterministic; this reproduces the protocol, not the generated candidate or exact scores. Hosted-agent usage may incur costs. Review candidate source before trusting claims, since the evaluator does not sandbox arbitrary model code as a complete security boundary.
+
+## Matched validation of milestone candidates
+
+The two candidate commits from the first milestone campaign, `e22d28c` and `9c8f02b`, were compared on the same 30 new development seeds. The candidate revisions, seed configuration, four development rule families, 12 non-inferiority checks, and paired descriptive bootstrap procedure were frozen in commit `1b1eb45` before the comparison. The runner checked that the evaluator and baseline files agree between the candidate commits and verified every per-seed control metric matched across runs. Both candidates received the same inputs, initialization seeds and scoring rules. The threshold remained a maximum 0.02 mean accuracy drop versus the mixture on final B recall and the first 100 steps after each switch, per family.
+
+Idea 1 passed 8/12 checks and idea 2 passed 12/12. Selected matched mean accuracies:
+
+| Development condition | Mixture | Idea 1 | Idea 2 | Idea 2 − idea 1 |
+|---|---:|---:|---:|---:|
+| Complementary: frozen B recall | 0.3988 | 0.3871 | 0.7228 | +0.3357 |
+| Complementary: first 100 after A→B | 0.5557 | 0.4453 | 0.6067 | +0.1613 |
+| Asymmetric: first 100 after B→A | 0.6867 | 0.6350 | 0.7673 | +0.1323 |
+| Unequal noise: frozen B recall | 0.3407 | 0.4658 | 0.3949 | -0.0709 |
+
+Because idea 2 passed development, both unchanged candidates were then run on 30 different seeds and four separate, already-public evaluation rule families. The evaluation seed list and protocol were committed as `5094f43` after the development result and before the follow-up. Seed roles are disjoint between these two runs. Idea 1 passed 9/12 checks; idea 2 passed 12/12. Selected means:
+
+| Separate-rule condition | Mixture | Idea 1 | Idea 2 | Idea 2 − idea 1 |
+|---|---:|---:|---:|---:|
+| Mixed rules: frozen B recall | 0.4819 | 0.4966 | 0.6162 | +0.1196 |
+| Reversed asymmetric: frozen B recall | 0.3688 | 0.3542 | 0.6854 | +0.3311 |
+| Reversed asymmetric: first 100 after A→B | 0.5893 | 0.5163 | 0.6503 | +0.1340 |
+| Similar rules: frozen B recall | 0.8479 | 0.8479 | 0.8469 | -0.0010 |
+
+Idea 2 shows a consistent advantage over idea 1 on several tested switch and recall measures, but not all: its development unequal-noise B recall was lower. Some means conceal high seed variability: on separate-rule shifted-bias B recall, idea 2's mean advantage over idea 1 was 0.1490 even though it won on 14 seeds and lost on 15. The versioned summary includes per-measure wins/losses/ties and 10,000-draw seed-paired percentile bootstrap intervals; these are descriptive, unadjusted for multiple comparisons and not evidence of general superiority. The test families, evaluator and candidate source were publicly visible, and evaluation was selected after development inspection. These are not blind holdouts. Both candidates use the existing two-slot mixture structure, so the outcome does not establish architectural novelty. The non-inferiority threshold could be passed by an exact copy of the baseline.
+
+The same four development and four evaluation pairs cover only selected binary first-order processes. Candidate-level training time is approximate, includes per-step clock overhead, and excludes probe computation; inline size excludes heap memory. No compute or memory matching was enforced. Next, a useful follow-up is a controlled ablation of the two update rules on genuinely held-out or broader task families, with multiple initialization seeds and switch rates, before expanding the agent search.
+
+Reproduce using local Git commits and a Nix shell (new output directories are required):
+
+```sh
+nix-shell --run 'python3 -B toolkit/scripts/compare_milestone_candidates.py toolkit/configs/milestone-comparison/protocol.json toolkit/runs/milestone-matched-reproduction'
+nix-shell --run 'python3 -B toolkit/scripts/compare_milestone_candidates.py toolkit/configs/milestone-comparison/evaluation-protocol.json toolkit/runs/milestone-evaluation-reproduction'
+```
+
+[Development summary](toolkit/experiment-results/milestone-matched/development/summary.json) and [evaluation summary](toolkit/experiment-results/milestone-matched/evaluation/summary.json) contain full scorecards and paired comparisons. Compressed per-seed metrics and resource diagnostics are versioned beside them. The runner uses temporary detached Git worktrees with one shared Cargo target directory and removes them after completion. Timing results are not expected to reproduce byte-for-byte. The Nix package set remains unpinned.

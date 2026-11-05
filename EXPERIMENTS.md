@@ -1197,3 +1197,27 @@ nix-shell --run 'cargo test --offline --manifest-path toolkit/Cargo.toml --bin m
 nix-shell --run 'cargo run --offline --release --manifest-path toolkit/Cargo.toml --bin memory_intervention -- toolkit/configs/memory-intervention/matched.cfg toolkit/runs/memory-intervention-reproduction'
 python3 -B toolkit/scripts/summarize_memory_intervention.py toolkit/runs/memory-intervention-reproduction/metrics.csv
 ```
+
+## Online inactive-slot protection
+
+After the privileged restoration study, the fixed [protocol](toolkit/configs/online-protection/protocol.json) and simulator were committed as `daa1cc3` before running 30 fresh paired seeds. The proposed online variant starts from idea 2's two-memory model. Before seeing each target it computes the predicted context belief; when one slot exceeds 0.8 probability it freezes the other slot for that update. It receives no true context label and stores no privileged end-of-B checkpoint. The idea-2 candidate is the unchanged saved source. The random-slot control instead chooses a uniformly random slot to freeze whenever *its own* predictive context belief exceeds 0.8. Each control has its own changing belief, so its freeze times and counts are not exactly matched to the proposed policy. The mixture is a further baseline.
+
+Each model saw identical streams on four public binary rule families, with A–B–A phases of 400 and 1,000 transitions. Changing phase length also changes training exposure. Final frozen probes and the first 100 online predictions after both switches were measured. Selected means:
+
+| Family, phase length, measure | Mixture | Idea 2 | Protect inactive | Random-slot control |
+|---|---:|---:|---:|---:|
+| Uneven bias, 400, final B recall | 0.7928 | 0.7543 | 0.7233 | 0.7927 |
+| Uneven bias, 1,000, final B recall | 0.2481 | 0.3270 | 0.2930 | 0.5091 |
+| Complementary, 1,000, final B recall | 0.4269 | 0.7006 | 0.6161 | 0.6373 |
+| Shifted bias, 1,000, final B recall | 0.7482 | 0.8297 | 0.7793 | 0.8487 |
+| No change, 1,000, final B recall | 0.800 | 0.800 | 0.800 | 0.800 |
+
+This first protection rule did **not** meet its hypothesis: it reduced mean B recall relative to idea 2 in the first four rows, and the random-slot control had higher mean recall in those same conditions. On uneven bias at length 400, protection versus idea 2 had a mean paired difference of -0.0310 and 6/10/14 wins/losses/ties. Protection froze one slot on 88.1% of training steps on average; the random control froze one on 89.8%. At length 1,000, the rates were 80.5% and 86.9%. This makes overly broad protection or confidently wrong routing plausible failure explanations, not established causes: we did not record whether the inferred assignment was correct or isolate freeze timing. The random control's independently evolving state also prevents a strictly step-matched comparison.
+
+The [summary](toolkit/experiment-results/online-protection/summary.json) reports paired differences, wins/losses/ties, unadjusted descriptive bootstrap intervals, adaptation metrics and suppression fractions for every condition. [Per-seed metrics](toolkit/experiment-results/online-protection/metrics.csv.gz) and [suppression counts](toolkit/experiment-results/online-protection/suppression.csv) are preserved. A second invocation reproduced both raw files byte-for-byte. The sample and task set are small and public; the fixed 0.8 threshold was not optimized; no compute matching or formal multiple-comparison correction was used.
+
+```sh
+nix-shell --run 'cargo test --offline --manifest-path toolkit/Cargo.toml --bin online_protection'
+nix-shell --run 'cargo run --offline --release --manifest-path toolkit/Cargo.toml --bin online_protection -- toolkit/configs/online-protection/matched.cfg toolkit/runs/online-protection-reproduction'
+python3 -B toolkit/scripts/summarize_online_protection.py toolkit/configs/online-protection/protocol.json toolkit/configs/online-protection/matched.cfg toolkit/runs/online-protection-reproduction
+```

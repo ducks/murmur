@@ -72,6 +72,25 @@
       "candidate_commits": [
         "9c8f02b9551aa59b52f2f59400329783bad5514b"
       ]
+    },
+    {
+      "id": "online-protection-negative-2026-11",
+      "question": "Does freezing the less likely slot when predictive confidence exceeds 0.8 improve retention?",
+      "observation": "On 30 fresh paired seeds for uneven bias with 400-step phases, final B accuracy was 0.7233 with protection, 0.7543 for idea 2 and 0.7927 for the random-slot control. The protection policy froze a slot on 88.1% of steps; the random policy on 89.8%. On complementary 1000-step phases, protection scored 0.6161 versus idea 2 at 0.7006.",
+      "hypothesis": "A fixed high-confidence gate may freeze useful updates or become confident in the wrong assignment, but the measured suppression counts do not establish which mechanism caused the deficit.",
+      "next_test": "Inspect predictive beliefs and assignment accuracy around switches, compare narrower or learned protection only under a predeclared matched protocol, and avoid assuming every inactivity gate helps.",
+      "limitations": "Public synthetic tasks, one threshold, exploratory condition selection, unadjusted descriptive comparisons. Random control has independent beliefs and freezes on different steps; no matched compute.",
+      "evidence": [
+        "EXPERIMENTS.md",
+        "toolkit/experiment-results/online-protection/summary.json",
+        "toolkit/experiment-results/online-protection/suppression.csv"
+      ],
+      "related_findings": [
+        "memory-restoration-intervention-2026-11"
+      ],
+      "candidate_commits": [
+        "9c8f02b9551aa59b52f2f59400329783bad5514b"
+      ]
     }
   ]
 }

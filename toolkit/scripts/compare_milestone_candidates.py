@@ -75,8 +75,8 @@ def main():
     if not config_path.is_relative_to(ROOT):
         raise ValueError('config must be in repository')
     cfg = runner.config_parse(config_path.read_text())
-    if len(cfg['seeds']) != 30 or protocol['split'] != 'development':
-        raise ValueError('this protocol requires 30 development seeds')
+    if len(cfg['seeds']) != 30 or protocol['split'] not in ('development', 'evaluation'):
+        raise ValueError('this protocol requires 30 seeds and a supported split')
     commits = protocol['candidates']
     # The runners and baselines must be identical; only the candidate is varied.
     common = ['toolkit/src/bin/milestone_context.rs', 'toolkit/src/unlabeled_context.rs',
@@ -104,7 +104,8 @@ def main():
             plan['criteria']['max_accuracy_drop'] = protocol['max_accuracy_drop_vs_mixture']
             reports[label] = runner.analyze_milestone(plan, cfg, output / label, protocol['split'])
         first, second = (read_metrics(output / label / 'metrics.csv') for label in ('idea_1', 'idea_2'))
-        paired = compare(first, second, cfg['seeds'], runner.MILESTONE_FAMILIES,
+        families = runner.MILESTONE_EVAL_FAMILIES if protocol['split'] == 'evaluation' else runner.MILESTONE_FAMILIES
+        paired = compare(first, second, cfg['seeds'], families,
                          protocol['bootstrap']['draws'], protocol['bootstrap']['seed'])
         summary = {'protocol': protocol, 'config_sha256': runner.file_digest(config_path),
                    'source_revision': call(['git', 'rev-parse', 'HEAD'], cwd=ROOT, capture_output=True, text=True).stdout.strip(),

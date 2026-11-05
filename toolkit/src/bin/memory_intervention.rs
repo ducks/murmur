@@ -1,5 +1,4 @@
 //! Causal diagnostic: restore one saved slot after A returns, then probe.
-#[allow(dead_code)]
 #[path="../milestone_candidates/idea2.rs"] mod idea2;
 pub mod unlabeled_context { pub use murmur_research_runner::unlabeled_context::*; }
 use murmur::data::Rng;
@@ -29,6 +28,12 @@ fn main()->Result<(),Box<dyn std::error::Error>> {
   for (i,&(x,y)) in data.iter().enumerate() {
    let p=observe(&mut model,x,y,true);assert!((p-original.predict(x)).abs()<1e-12);original.observe(x,y,true);baseline.step(x,y,true);
    if i+1==2*n {saved=model.p;selected=usize::from(saved[1][0]+saved[1][1]>saved[0][0]+saved[0][1]);}
+  }
+  // Verify that the saved candidate and the inspectable copy also agree
+  // while context beliefs evolve during a frozen probe.
+  let mut inspection=model.clone();inspection.reset();original.reset();
+  for &(x,y) in &probes[1] {
+   let p=observe(&mut inspection,x,y,false);assert!((p-original.predict(x)).abs()<1e-12);original.observe(x,y,false);
   }
   let sham=model.clone();let mut selected_restore=model.clone();selected_restore.p[selected]=saved[selected];let mut other_restore=model.clone();other_restore.p[1-selected]=saved[1-selected];
   for (arm,m,weighted) in [("sham",sham,true),("restore_selected",selected_restore,true),("restore_other",other_restore,true),("mixture",baseline,false)] {

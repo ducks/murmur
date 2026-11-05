@@ -161,6 +161,8 @@ Research memory (observations are not proven explanations; campaign evidence is 
 
 For an apparent failure, distinguish observations from possible explanations and propose a discriminating test in your hypothesis and falsification. The full index for this round is saved alongside the agent logs as research-memory.json; the prompt may include only recent campaign rounds.
 If the preceding round contains a completed diagnosis, try to design a focused test that distinguishes its competing explanations, with an explicit control. If the proposed test cannot fit the candidate and test-file scope, state that limitation in your response and select another testable idea. A diagnosis is an unverified hypothesis, not an established cause.
+Prior candidate commits are available locally: when building on a previous idea, inspect its candidate source with git show <commit>:toolkit/src/agent_candidate.rs and adapt it within the permitted files. Starting a new campaign does not automatically check out the prior candidate.
+For any quantitative follow-up in agent_generated.rs, print one single-line record per measurement using this exact prefix and JSON shape: MURMUR_FOLLOWUP {{"measure":"name","candidate":"name","control":"name","candidate_correct":1,"control_correct":1,"trials":2}}. Counts must refer to the same paired observations. The supervisor preserves and checks the arithmetic but does not independently verify the experimental design. Do not emit a record for a test you did not run.
 
 Edit ONLY toolkit/src/agent_candidate.rs and toolkit/tests/agent_generated.rs. The latter must contain at least one meaningful Rust test for your proposed mechanism. Do not alter evaluator, baseline, configs, docs, Git metadata, or any other file; do not commit. The supervisor rejects other changes. Preserve Candidate's Clone, new(seed, rate), reset(), predict(x)->f64 and observe(x,y,learn) interface. `predict` must happen without seeing y; output must be finite in [0,1]. In `observe(..., false)`, do not change learned parameters, though context inference state may update. reset clears transient inference state without erasing learned parameters. Candidate may use local Rust standard library and existing local crates only; no network, pretrained weights, external APIs, hidden future data, environment data, or provided true context. Model-code restrictions are reviewed/tested, not a complete security boundary.
 
@@ -247,6 +249,41 @@ def agent_usage(path):
                 if isinstance(value, int) and not isinstance(value, bool) and value >= 0:
                     totals[key] = totals.get(key, 0) + value
     return totals or None
+
+
+def followup_metrics(path):
+    """Read optional, agent-reported paired counts; never treat them as verified science."""
+    records, warnings = [], []
+    marker = 'MURMUR_FOLLOWUP '
+    required = {'measure', 'candidate', 'control', 'candidate_correct', 'control_correct', 'trials'}
+    with Path(path).open(encoding='utf-8', errors='replace') as source:
+        for line in source:
+            if marker not in line:
+                continue
+            if len(records) + len(warnings) >= 50:
+                warnings.append('additional follow-up records were omitted')
+                break
+            try:
+                raw = line.split(marker, 1)[1].strip()
+                item = json.loads(raw, object_pairs_hook=runner.object_no_duplicates,
+                                  parse_constant=lambda _: (_ for _ in ()).throw(ValueError('invalid number')))
+                runner.exact_keys(item, required, 'follow-up record')
+                for key in ('measure', 'candidate', 'control'):
+                    runner.text_field(item[key], key)
+                    if len(item[key]) > 200:
+                        raise runner.PlanError('follow-up label too long')
+                for key in ('candidate_correct', 'control_correct', 'trials'):
+                    if isinstance(item[key], bool) or not isinstance(item[key], int):
+                        raise runner.PlanError('follow-up counts must be integers')
+                if item['trials'] < 1 or any(not 0 <= item[k] <= item['trials'] for k in ('candidate_correct', 'control_correct')):
+                    raise runner.PlanError('follow-up counts are inconsistent')
+                item['candidate_accuracy'] = item['candidate_correct'] / item['trials']
+                item['control_accuracy'] = item['control_correct'] / item['trials']
+                records.append(item)
+            except (ValueError, json.JSONDecodeError, runner.PlanError, TypeError) as exc:
+                warnings.append(f'invalid agent-reported follow-up: {exc}')
+    return {'records': records, 'warnings': warnings,
+            'qualification': 'Agent-authored test output; arithmetic checked, experimental design not independently verified.'}
 
 
 def diagnosis_prompt(result, round_dir):
@@ -448,11 +485,12 @@ def execute_round(directory, config, state, agent=call_agent):
         runner.write_json(worktree / 'toolkit/plans/agent-candidate.json', plan)
         with (round_dir / 'tests.log').open('wb') as out:
             tests = bounded_process(['cargo', 'test', '--offline', '--manifest-path', 'toolkit/Cargo.toml',
-                                     '--test', 'candidate_context', '--test', 'agent_generated'],
+                                     '--test', 'candidate_context', '--test', 'agent_generated', '--', '--nocapture'],
                                     cwd=worktree, stdout=out, stderr=subprocess.STDOUT, timeout=config['test_seconds'],
                                     env=build_environment(directory, config))
         if tests:
             raise runner.PlanError(f'candidate tests failed ({tests}); see tests.log')
+        result['followups'] = followup_metrics(round_dir / 'tests.log')
         unexpected = changed_paths(worktree) - ALLOWED - GENERATED
         if unexpected:
             raise runner.PlanError(f'unexpected changes after tests: {sorted(unexpected)}')
@@ -482,7 +520,7 @@ def execute_round(directory, config, state, agent=call_agent):
     except (runner.PlanError, OSError, subprocess.SubprocessError) as exc:
         result.update(status='failed', error=str(exc))
     runner.write_json(round_dir / 'result.json', result)
-    state['completed'].append({k: result.get(k) for k in ('index', 'status', 'commit', 'idea', 'agent_elapsed_seconds', 'agent_usage', 'development', 'evaluation', 'final_probe_matrix', 'diagnosis', 'error')})
+    state['completed'].append({k: result.get(k) for k in ('index', 'status', 'commit', 'idea', 'agent_elapsed_seconds', 'agent_usage', 'followups', 'development', 'evaluation', 'final_probe_matrix', 'diagnosis', 'error')})
     state['next_index'] += 1
     state['status'] = 'ready' if result['status'] == 'complete' else 'inspect_failure'
     runner.write_json(directory / 'state.json', state)

@@ -49,5 +49,16 @@ class DiagnosisTests(unittest.TestCase):
         record=memory.campaign_records(root)[0]
         self.assertEqual(record['diagnosis']['analysis'],self.analysis)
         self.assertEqual(record['diagnosis']['qualification'],'unverified')
+    def test_followup_records_validate_paired_counts_and_warn_on_invalid(self):
+        path=self.root/'tests.log'
+        good={'measure':'switch','candidate':'revised','control':'original','candidate_correct':60,'control_correct':50,'trials':100}
+        bad=dict(good, candidate_correct=101)
+        path.write_text('test ablation ... MURMUR_FOLLOWUP '+json.dumps(good)+'\nMURMUR_FOLLOWUP '+json.dumps(bad)+'\n')
+        result=campaign.followup_metrics(path)
+        self.assertEqual(len(result['records']),1)
+        self.assertEqual(result['records'][0]['candidate_accuracy'],0.6)
+        self.assertEqual(result['records'][0]['control_accuracy'],0.5)
+        self.assertEqual(len(result['warnings']),1)
+        self.assertIn('not independently verified',result['qualification'])
 
 if __name__=='__main__':unittest.main()

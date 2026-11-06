@@ -16,8 +16,9 @@ class AutoMilestoneTests(unittest.TestCase):
         self.worktree = self.round / 'worktree'
         self.worktree.mkdir()
         runner.write_json(self.root / 'milestone-output-schema.json', campaign.MILESTONE_SCHEMA)
-        self.config = {'goal': 'learn', 'diagnostic_seconds': 10, 'local_provider': None, 'model': None}
-        self.milestone = {field: field + ' text' for field in campaign.MILESTONE_FIELDS}
+        self.config = {'goal': 'learn', 'diagnostic_seconds': 10, 'local_provider': None, 'model': None, 'milestone_schema_version': 2}
+        self.milestone = {field: field + ' text' for field in campaign.MILESTONE_V2_FIELDS}
+        self.milestone['scope'] = 'test_only'
 
     def tearDown(self):
         self.tmp.cleanup()
@@ -44,6 +45,37 @@ class AutoMilestoneTests(unittest.TestCase):
         with patch.object(campaign, 'bounded_process', return_value=1):
             with self.assertRaises(runner.PlanError):
                 campaign.plan_milestone(self.config, self.worktree, self.round, [], {'agent_context': {}})
+
+    def test_test_only_scope_blocks_candidate_changes(self):
+        with patch.object(campaign, 'changed_paths', return_value={'toolkit/src/agent_candidate.rs'}):
+            with self.assertRaises(runner.PlanError):
+                campaign.enforce_milestone_scope(self.worktree, self.milestone)
+            campaign.enforce_milestone_scope(self.worktree, {**self.milestone, 'scope': 'model_change'})
+        with patch.object(campaign, 'changed_paths', return_value={'toolkit/tests/agent_generated.rs'}):
+            campaign.enforce_milestone_scope(self.worktree, self.milestone)
+
+    def test_primary_record_matches_all_labels_beyond_preview(self):
+        path = self.round / 'tests.log'
+        def record(measure, candidate, control):
+            return {'measure': measure, 'candidate': candidate, 'control': control,
+                    'candidate_correct': 1, 'control_correct': 0, 'trials': 2}
+        rows = [record('unrelated', 'a', 'b')] * 11 + [record(self.milestone['primary_measure'],
+                self.milestone['candidate_label'], self.milestone['control_label'])]
+        path.write_text(''.join('MURMUR_FOLLOWUP ' + json.dumps(row) + '\n' for row in rows))
+        followups = campaign.followup_metrics(path)
+        evidence = campaign.assess_milestone_evidence(self.milestone, followups)
+        self.assertEqual(evidence['status'], 'primary_record_reported_unverified')
+        self.assertEqual(evidence['matching_records'], 1)
+        self.assertEqual(campaign.assess_milestone_evidence({**self.milestone, 'control_label': 'other'}, followups)['status'], 'missing_primary_record')
+
+    def test_v1_milestone_still_accepts_original_fields(self):
+        old = {field: field + ' text' for field in campaign.MILESTONE_FIELDS}
+        def process(*args, **kwargs):
+            runner.write_json(self.round / 'milestone.json', old)
+            return 0
+        with patch.object(campaign, 'bounded_process', side_effect=process):
+            result = campaign.plan_milestone({**self.config, 'milestone_schema_version': 1}, self.worktree, self.round, [], {'agent_context': {}})
+        self.assertEqual(result, old)
 
     def test_planner_usage_is_included_and_missing_is_unknown(self):
         item = {'agent_usage': {'input_tokens': 4}, 'milestone': self.milestone,

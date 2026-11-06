@@ -32,9 +32,12 @@ SCHEMA = {
     'required': ['question', 'hypothesis', 'falsification', 'approach', 'limitations'],
 }
 MILESTONE_FIELDS = ('question', 'motivation', 'intervention', 'control', 'measurement', 'decision_rule', 'limitations')
+MILESTONE_V2_FIELDS = MILESTONE_FIELDS + ('scope', 'primary_measure', 'candidate_label', 'control_label')
 MILESTONE_SCHEMA = {'type': 'object', 'additionalProperties': False,
-                    'properties': {key: {'type': 'string', 'minLength': 1, 'maxLength': 1000} for key in MILESTONE_FIELDS},
-                    'required': list(MILESTONE_FIELDS)}
+                    'properties': {**{key: {'type': 'string', 'minLength': 1, 'maxLength': 1000} for key in MILESTONE_FIELDS},
+                                   'scope': {'type': 'string', 'enum': ['test_only', 'model_change']},
+                                   **{key: {'type': 'string', 'minLength': 1, 'maxLength': 200} for key in ('primary_measure', 'candidate_label', 'control_label')}},
+                    'required': list(MILESTONE_V2_FIELDS)}
 DIAGNOSIS_FIELDS = ('observation', 'hypothesis', 'alternative', 'followup_test', 'expected_evidence', 'limitations')
 DIAGNOSIS_SCHEMA = {'type': 'object', 'additionalProperties': False,
                     'properties': {key: {'type': 'string', 'minLength': 1, 'maxLength': 1000} for key in DIAGNOSIS_FIELDS},
@@ -158,7 +161,7 @@ def init(directory, goal, max_ideas, agent_seconds, test_seconds, local_provider
               'protocol': protocol,
               'diagnose_failures': diagnose_failures, 'diagnostic_seconds': diagnostic_seconds,
               'review_successes': review_successes and diagnose_failures,
-              'auto_milestones': True,
+              'auto_milestones': True, 'milestone_schema_version': 2,
               'max_reported_input_tokens': max_reported_input_tokens,
               'scope': 'binary hidden-context sequence task; candidate Rust model only',
               'limits': 'LLM token/cost limits and blind holdouts are not enforced.'}
@@ -216,7 +219,7 @@ Overall goal: {config['goal']}
 
 Frozen round milestone (a proposal, not a validated result):
 {json.dumps(milestone, indent=2)}
-If a milestone is supplied, address its intervention, control, measurement and decision rule in a focused test. If it cannot be implemented within the permitted scope, explicitly state why in limitations; do not imply it was completed.
+If a milestone is supplied, address its intervention, control, measurement and decision rule in a focused test. For scope test_only do not modify toolkit/src/agent_candidate.rs; for model_change implement only changes needed for the specified intervention. Emit at least one valid MURMUR_FOLLOWUP record with the exact planned primary_measure, candidate_label and control_label. If it cannot be implemented within the permitted scope, explicitly state why in limitations; do not imply it was completed.
 
 Propose and implement ONE genuinely motivated candidate model for the existing hidden-context binary sequence task. Read RESEARCH.md, EXPERIMENTS.md, toolkit/src/unlabeled_context.rs, toolkit/src/candidate_context.rs{evaluator_reference}, toolkit/src/agent_candidate.rs and toolkit/tests/candidate_context.rs. The existing mixture and other controls are fixed; seek an improvement over the mixture, not an attractive demonstration. A copy of the baseline can pass a non-inferiority threshold but is not a novel mechanism. Consider varied ideas, not only stronger thresholds. This is one limited task, not a claim of general language modeling or novelty.
 
@@ -299,6 +302,7 @@ Goal: {config['goal']}
 Recent campaign history: {json.dumps(history[-5:])}
 Research memory: {json.dumps(research_index['agent_context'])}
 Pick a question grounded in evidence or a clearly stated uncertainty. Specify an intervention, an explicit control, a measurable outcome, and a decision rule. Prefer a test that fits edits to toolkit/src/agent_candidate.rs and toolkit/tests/agent_generated.rs. The existing evaluator and public task rules cannot be changed. Do not claim a finding has been established. If a proposed question needs a different evaluator, choose a feasible smaller step or clearly explain the limitation. Do not edit files or run experiments. Return only the structured JSON.
+{('Choose scope test_only if no model source change is needed; otherwise choose model_change. For test_only the candidate file must remain byte-for-byte unchanged. For model_change describe exactly the necessary change and avoid adding unrelated mechanisms. Set primary_measure, candidate_label, and control_label to concise exact labels for one MURMUR_FOLLOWUP record reporting the primary comparison.' if config.get('milestone_schema_version') == 2 else '')}
 """
     (round_dir / 'milestone-prompt.txt').write_text(prompt, encoding='utf-8')
     with (round_dir / 'milestone-events.jsonl').open('wb') as out, (round_dir / 'milestone-stderr.log').open('wb') as err:
@@ -309,11 +313,20 @@ Pick a question grounded in evidence or a clearly stated uncertainty. Specify an
     if code:
         raise runner.PlanError(f'milestone planner exited {code}; inspect milestone logs')
     milestone = runner.read_json(response)
-    runner.exact_keys(milestone, MILESTONE_FIELDS, 'milestone')
+    fields = MILESTONE_V2_FIELDS if config.get('milestone_schema_version') == 2 else MILESTONE_FIELDS
+    runner.exact_keys(milestone, fields, 'milestone')
     for key, value in milestone.items():
         runner.text_field(value, key)
         if len(value) > 1000:
             raise runner.PlanError(f'milestone field {key} too long')
+    if config.get('milestone_schema_version') == 2:
+        if milestone['scope'] not in ('test_only', 'model_change'):
+            raise runner.PlanError('invalid milestone scope')
+        for key in ('primary_measure', 'candidate_label', 'control_label'):
+            if len(milestone[key]) > 200:
+                raise runner.PlanError(f'milestone field {key} too long')
+        if milestone['candidate_label'] == milestone['control_label']:
+            raise runner.PlanError('milestone candidate and control labels must differ')
     return milestone
 
 
@@ -415,6 +428,9 @@ def diagnosis_prompt(result, round_dir):
              'The candidate passed the operational checks. A pass does not show that its added mechanism helped. Identify untested causal claims, possible regressions or complexity costs, and propose a matched ablation against an explicit control before adding more complexity.')
     return f'''You are a research investigator analyzing one completed candidate evaluation.
 {focus}
+Frozen milestone and evidence status:
+{json.dumps({'milestone': result.get('milestone'), 'evidence': result.get('milestone_evidence')}, indent=2)}
+Check whether the candidate changes and test actually address the planned intervention and primary comparison; explicitly flag any unrelated mechanism or unablated model change. Matching record labels are not verification.
 Candidate hypothesis and implementation summary:
 {json.dumps(result.get('idea'), indent=2)}
 
@@ -503,6 +519,26 @@ def changed_paths(worktree):
         raw = subprocess.run(['git', *args], cwd=worktree, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True).stdout
         paths.update(os.fsdecode(x) for x in raw.split(b'\0') if x)
     return paths
+
+
+def enforce_milestone_scope(worktree, milestone):
+    """Enforce file-level protection, not semantic correctness of model changes."""
+    if milestone and milestone.get('scope') == 'test_only' and 'toolkit/src/agent_candidate.rs' in changed_paths(worktree):
+        raise runner.PlanError('test-only milestone changed candidate model; preserve worktree for inspection')
+
+
+def assess_milestone_evidence(milestone, followups):
+    qualification = ('Matching labels only confirm that an arithmetically valid record was reported; '
+                     'they do not verify the intervention, seed pairing, decision rule, or correctness.')
+    if 'primary_measure' not in milestone:  # campaigns created before schema v2
+        return {'status': 'reported_unverified' if followups['record_count'] else 'no_structured_followup',
+                'qualification': qualification}
+    full = runner.read_json(followups['full_records_path'])
+    expected = (milestone['primary_measure'], milestone['candidate_label'], milestone['control_label'])
+    matches = [r for r in full['records'] if (r['measure'], r['candidate'], r['control']) == expected]
+    return {'status': 'primary_record_reported_unverified' if matches else 'missing_primary_record',
+            'matching_records': len(matches), 'model_change_review_required': milestone['scope'] == 'model_change',
+            'qualification': qualification}
 
 
 def verify_agent_changes(worktree, base):
@@ -643,6 +679,7 @@ def execute_round(directory, config, state, agent=call_agent):
         result['agent_elapsed_seconds'] = time.monotonic() - agent_started
         result['agent_usage'] = agent_usage(round_dir / 'agent-events.jsonl')
         verify_agent_changes(worktree, base)
+        enforce_milestone_scope(worktree, result.get('milestone'))
         dev, evaluation = seed_configs(index, config['seed_base'])
         plan = make_plan(index, idea, config.get('protocol', 'legacy'))
         runner.validate_plan(plan, dev, evaluation)
@@ -660,8 +697,11 @@ def execute_round(directory, config, state, agent=call_agent):
             raise runner.PlanError(f'candidate tests failed ({tests}); see tests.log')
         result['followups'] = followup_metrics(round_dir / 'tests.log')
         if result.get('milestone'):
-            result['milestone_evidence'] = {'status': 'reported_unverified' if result['followups']['record_count'] else 'no_structured_followup',
-                                            'qualification': 'Structured records do not verify that the planned intervention or decision rule was followed; inspect tests and logs.'}
+            enforce_milestone_scope(worktree, result['milestone'])
+            result['milestone_evidence'] = assess_milestone_evidence(result['milestone'], result['followups'])
+            runner.write_json(round_dir / 'result.json', result)
+            if result['milestone_evidence']['status'] == 'missing_primary_record':
+                raise runner.PlanError('planned primary follow-up record was not reported; inspect tests and milestone')
         unexpected = changed_paths(worktree) - ALLOWED - GENERATED
         if unexpected:
             raise runner.PlanError(f'unexpected changes after tests: {sorted(unexpected)}')

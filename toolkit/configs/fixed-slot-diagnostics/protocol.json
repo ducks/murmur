@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "candidate_commit": "16963a2a04af6564d89cb0d996013c2f438671dd",
+  "question": "Does unguarded retrospective correction improve adaptation, retention, or fixed-slot diagnostic errors compared with no correction?",
+  "hypothesis": "Correction may improve hidden-context assignment and memory retention, or may increase contamination around switches.",
+  "arms": ["correction", "no_correction", "mixture"],
+  "families": {
+    "inverse_bias": [[0.85,0.90],[0.10,0.25]],
+    "moderate_noise": [[0.35,0.65],[0.65,0.35]],
+    "new_asymmetric": [[0.17,0.70],[0.80,0.35]],
+    "new_constant": [[0.12,0.12],[0.82,0.82]]
+  },
+  "phase_lengths": [400,1000],
+  "mapping": "At the end of first A, independently for each model, assign the slot with smallest squared error to the known A rule (tie to slot 0); assign the other slot to B. Freeze this mapping for all later diagnostics. The known rule and true context are used only by the evaluator, not by any model.",
+  "diagnostics": ["pre-observation soft assignment error", "post-observation soft assignment error", "mean squared prediction error against known B rule"],
+  "primary_metrics": ["first 100 online predictions after each switch", "final frozen B recall"],
+  "meaningful_effect": 0.01,
+  "bootstrap": {"draws": 10000, "seed": 20261105, "interval": "descriptive 95% seed-paired percentile; unadjusted across conditions"},
+  "limitations": "Post-selection public tasks and model; fresh seeds only, not a blind holdout. The fixed mapping uses a known synthetic A rule and can be wrong. Belief diagnostics describe the slow context filter, not the corrected previous assignment. No compute matching."
+}

@@ -1272,3 +1272,34 @@ A new two-idea campaign started from `9d1830a`, seeded from candidate `0c8d03de`
 In the agent-authored test, complementary low-noise 200-step switch accuracy was 0.84225 with guarded correction and 0.84220 unguarded; no correction scored 0.84215. On complementary high-noise 200-step final B recall, no correction scored 0.67095 versus guarded correction's 0.66252. The agent's mean guard value for the first condition was approximately 0.991. These are sampled conditions from an exploratory, agent-authored comparison, not proof of equivalence or general superiority. Both switch directions were combined in the test's switch aggregate, assignment accuracy against synthetic labels was not reported, and 12 of the 100 test seeds reused the earlier agent's same stream seeds; they are not a fully fresh or blind holdout. The no-correction candidate retains the control machinery and diagnostics, so this test alone does not demonstrate a smaller implementation or lower resource cost. The review reported 312 inline bytes versus 72 for the mixture and noisy whole-model training time roughly 4.3 times higher; heap and peak memory were not measured.
 
 The first candidate and its review reported 976,637 and 69,338 input tokens respectively. Their total of 1,045,975 exceeded the configured 1,000,000 reported-input threshold during the round, so the driver stopped before idea 2. The threshold is checked between rounds and is not a hard token or spending cap. The candidate worktree and campaign cache were removed; [campaign summary](toolkit/experiment-results/seeded-correction-study/campaign-summary.json), [all structured follow-up records](toolkit/experiment-results/seeded-correction-study/followup-records.json.gz), and [complete test output](toolkit/experiment-results/seeded-correction-study/tests.log.gz) are versioned. Detailed local evidence remains under `toolkit/runs/seeded-correction-study/`. A separate matched test on genuinely fresh tasks and seeds is needed before deciding whether correction should be removed.
+
+## Independent correction and guard ablation
+
+After the seeded agent's exploratory ablation, an independent local comparison was frozen at `9069731`. It loads a byte-for-byte snapshot of candidate `48a5c283` and compares its guarded correction, unguarded correction, no-correction default and original mixture on identical observations. The test uses 30 new configured seeds; their stream, probe and model-initialization seed roles did not overlap any of 17 compatible versioned configurations checked. The earlier agent's small manually generated seed ranges were also distinct. Six public binary first-order rule families and A–B–A phase lengths of 400 and 1,000 were selected after the earlier experiment; changing phase length changes exposure as well as switch timing. The exact [protocol](toolkit/configs/correction-validation/protocol.json) was committed before this run.
+
+The prior review named a one-percentage-point switch-accuracy benefit as a meaningful effect. Across the 24 separate task/length/direction switch conditions, guarded versus unguarded correction differed in mean accuracy by at most **0.133 percentage points**; the upper end of every individual unadjusted 95% seed-paired percentile bootstrap interval was below one percentage point. This is descriptive evidence against a large guard benefit in these conditions, not a formal equivalence test or a general proof of no effect. Guarded versus no correction was mixed:
+
+| Condition | Guarded | Unguarded | No correction | Mixture |
+|---|---:|---:|---:|---:|
+| Shifted bias, length 1,000, first 100 after A→B | 0.7573 | 0.7570 | 0.7400 | 0.7227 |
+| Uneven bias, length 1,000, first 100 after A→B | 0.6980 | 0.6980 | 0.6840 | 0.6550 |
+| High entropy, length 1,000, final B probe | 0.4857 | 0.4854 | 0.4998 | 0.4015 |
+| Shifted bias, length 400, final B probe | 0.8283 | 0.8284 | 0.8551 | 0.8212 |
+
+The maximum mean correction advantage versus no correction in the measured switch windows was 0.0173; the largest absolute B-recall difference was -0.0268. Confidence intervals and per-seed wins/losses/ties for all conditions appear in the [summary](toolkit/experiment-results/correction-validation/summary.json); they were not adjusted for multiple comparisons. The exercise tests predictions, not the proposed reduction in context-assignment error. Models and rules were public, the candidate was selected adaptively, and no held-out distribution, compute matching, peak-memory measurement, or formal significance claim is provided. The code was not simplified or merged based on these results.
+
+The [compressed per-seed metrics](toolkit/experiment-results/correction-validation/metrics.csv.gz) and [hash manifest](toolkit/experiment-results/correction-validation/manifest.json) are versioned. The simulation reproduced byte-for-byte in a second local run. The Nix package set remains unpinned.
+
+```sh
+nix-shell --run 'cargo test --offline --manifest-path toolkit/Cargo.toml --bin correction_validation'
+nix-shell --run 'cargo run --offline --release --manifest-path toolkit/Cargo.toml --bin correction_validation -- toolkit/configs/correction-validation/matched.cfg toolkit/runs/correction-validation-reproduction'
+python3 -B toolkit/scripts/summarize_correction_validation.py toolkit/configs/correction-validation/protocol.json toolkit/configs/correction-validation/matched.cfg toolkit/runs/correction-validation-reproduction/metrics.csv
+```
+
+After inspecting those scores, post-hoc instrumentation was committed at `c536985` and the same study rerun. The original per-seed prediction metrics remained byte-for-byte identical. The trace uses the saved candidate's own correction diagnostic to record the mean guard and mean absolute applied correction per seed and phase window. Across the 24 first-100 switch conditions, condition-level mean guard values ranged from **0.9882 to 0.9918**; the smallest *seed-window mean* was 0.9807. A guard of 1 leaves the correction unattenuated, so these averages provide a plausible explanation for why guarded and unguarded accuracy was so similar: on average, the guard changed the correction by only about 1%. They do not rule out rare individual events with much lower guard values, and the trace is observational rather than an intervention.
+
+The [guard summary](toolkit/experiment-results/correction-validation/guard-summary.json) and [per-seed window diagnostics](toolkit/experiment-results/correction-validation/guard-diagnostics.csv.gz) are versioned; the manifest records the post-hoc evaluator revision and hashes separately from the original frozen experiment. To regenerate the post-hoc summary after the reproduction command above:
+
+```sh
+python3 -B toolkit/scripts/summarize_guard_diagnostics.py toolkit/configs/correction-validation/protocol.json toolkit/configs/correction-validation/matched.cfg toolkit/runs/correction-validation-reproduction/guard-diagnostics.csv
+```

@@ -1,0 +1,20 @@
+{
+  "candidate_commit": "48a5c2836142b2fd7d711c42e9d8a77134297fc3",
+  "notes": "Nixpkgs not pinned; resource use not measured; public synthetic tasks.",
+  "posthoc_diagnostics": {
+    "evaluator_sha256": "3d80e278896e24786127ce290877ce31bed8bf6dead255552c245734e7293355",
+    "guard_diagnostics_sha256": "9939a7fdc05b0b656707141d6615124bffeccb78e5ae225773a01fe9a32d7f9c",
+    "guard_summary_sha256": "a04c343b14314ebd64b4cf73dc7a96d64485854775ed64b7d0787e4761f7bb9f",
+    "note": "Post-hoc instrumentation; original metrics reproduced byte-for-byte.",
+    "source_commit": "c536985"
+  },
+  "sha256": {
+    "candidate": "43fb6c7aebb47d0f969600ea8d4274d2ebfdbccb02b3e24bd3409e4c3f6c678c",
+    "config": "03ef86468d6d2e28c8a4db2beb438e01215a8bada2621bfb2e226ff45a4d7b0c",
+    "evaluator": "3d26560f8fbd7bf55832037871cad085cf460c235f7a6c3dc3072fdbcd090329",
+    "metrics": "7e0757a3bcf0e8d8072a12950119b5a48c7e9ae245ee688d9b9f318c71550e31",
+    "protocol": "8a59e70689883b1af1e9ebcdb08770ea3dad9444cddbebcd9104fb834c85b0d6",
+    "summary": "2fe049f10a782ab23cb9b1e034dbb96f3e8bc34c965a8ce1f65792acd75916e2"
+  },
+  "source_commit": "9069731"
+}

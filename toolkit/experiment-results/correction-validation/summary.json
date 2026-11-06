@@ -1,0 +1,3307 @@
+{
+  "bootstrap": "10,000 paired seed percentile resamples, descriptive and unadjusted",
+  "conditions": {
+    "high_entropy:1000:final_a": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.016566666666666667,
+            -0.007200000000000002
+          ],
+          "mean_difference": -0.012133333333333333,
+          "median_difference": -0.01200000000000001,
+          "wins_losses_ties": [
+            2,
+            24,
+            4
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.0013333333333333346,
+            0.0011666666666666676
+          ],
+          "mean_difference": -6.666666666666672e-05,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            12,
+            12,
+            6
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            -0.00023333333333333355,
+            0.00013333333333333345
+          ],
+          "mean_difference": -6.666666666666672e-05,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            1,
+            4,
+            25
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.585,
+        "mixture": 0.5971333333333333,
+        "no_correction": 0.5850666666666666,
+        "unguarded": 0.5850666666666666
+      },
+      "mean_logloss": {
+        "guarded": 0.6796095486666667,
+        "mixture": 0.6777825043333333,
+        "no_correction": 0.6797903863333333,
+        "unguarded": 0.679589616
+      }
+    },
+    "high_entropy:1000:final_b": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            0.06526666666666665,
+            0.104
+          ],
+          "mean_difference": 0.08416666666666665,
+          "median_difference": 0.0905,
+          "wins_losses_ties": [
+            28,
+            0,
+            2
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.024833333333333332,
+            -0.005366666666666666
+          ],
+          "mean_difference": -0.014100000000000001,
+          "median_difference": -0.0015000000000000013,
+          "wins_losses_ties": [
+            8,
+            18,
+            4
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            -0.0002666666666666669,
+            0.0010666666666666676
+          ],
+          "mean_difference": 0.00030000000000000024,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            6,
+            5,
+            19
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.4857,
+        "mixture": 0.40153333333333335,
+        "no_correction": 0.4998,
+        "unguarded": 0.4854
+      },
+      "mean_logloss": {
+        "guarded": 0.707054832,
+        "mixture": 0.755071007,
+        "no_correction": 0.7038677786666666,
+        "unguarded": 0.7071110863333333
+      }
+    },
+    "high_entropy:1000:phase_b_online": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.00963333333333332,
+            -0.00353333333333334
+          ],
+          "mean_difference": -0.006599999999999998,
+          "median_difference": -0.006500000000000006,
+          "wins_losses_ties": [
+            5,
+            25,
+            0
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            6.666666666667412e-05,
+            0.0024333333333333242
+          ],
+          "mean_difference": 0.001200000000000001,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            14,
+            11,
+            5
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            -0.00016666666666666682,
+            0.00010000000000000009
+          ],
+          "mean_difference": -3.333333333333336e-05,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            2,
+            3,
+            25
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.5800666666666666,
+        "mixture": 0.5866666666666667,
+        "no_correction": 0.5788666666666666,
+        "unguarded": 0.5801
+      },
+      "mean_logloss": {
+        "guarded": 0.6823520836666667,
+        "mixture": 0.6804367373333333,
+        "no_correction": 0.6828105366666667,
+        "unguarded": 0.6823419586666667
+      }
+    },
+    "high_entropy:1000:switch_to_a": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.005000000000000001,
+            0.022000000000000002
+          ],
+          "mean_difference": 0.007666666666666666,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            12,
+            14,
+            4
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.012999999999999994,
+            -0.0020000000000000018
+          ],
+          "mean_difference": -0.007333333333333332,
+          "median_difference": -0.010000000000000009,
+          "wins_losses_ties": [
+            7,
+            18,
+            5
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            -0.0013333333333333346,
+            0.0023333333333333335
+          ],
+          "mean_difference": 0.0006666666666666655,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            4,
+            1,
+            25
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.49566666666666664,
+        "mixture": 0.488,
+        "no_correction": 0.503,
+        "unguarded": 0.495
+      },
+      "mean_logloss": {
+        "guarded": 0.7060264173333334,
+        "mixture": 0.7097221926666667,
+        "no_correction": 0.704808131,
+        "unguarded": 0.7060666296666667
+      }
+    },
+    "high_entropy:1000:switch_to_b": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.013333333333333338,
+            0.007333333333333323
+          ],
+          "mean_difference": -0.0030000000000000044,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            14,
+            13,
+            3
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.009666666666666667,
+            0.0003333333333333392
+          ],
+          "mean_difference": -0.004666666666666664,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            4,
+            11,
+            15
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            0.0,
+            0.0010000000000000009
+          ],
+          "mean_difference": 0.00033333333333333365,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            1,
+            0,
+            29
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.4886666666666667,
+        "mixture": 0.4916666666666667,
+        "no_correction": 0.49333333333333335,
+        "unguarded": 0.48833333333333334
+      },
+      "mean_logloss": {
+        "guarded": 0.706641128,
+        "mixture": 0.704629954,
+        "no_correction": 0.7060801383333333,
+        "unguarded": 0.706652994
+      }
+    },
+    "high_entropy:400:final_a": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.0123,
+            0.005099999999999997
+          ],
+          "mean_difference": -0.00453333333333333,
+          "median_difference": -0.009000000000000008,
+          "wins_losses_ties": [
+            4,
+            21,
+            5
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.0010000000000000009,
+            0.0020000000000000018
+          ],
+          "mean_difference": 0.0005333333333333338,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            12,
+            11,
+            7
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            -0.0004666666666666671,
+            3.333333333333336e-05
+          ],
+          "mean_difference": -0.00020000000000000017,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            1,
+            4,
+            25
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.5742333333333334,
+        "mixture": 0.5787666666666667,
+        "no_correction": 0.5737,
+        "unguarded": 0.5744333333333334
+      },
+      "mean_logloss": {
+        "guarded": 0.6818842983333333,
+        "mixture": 0.6802877706666667,
+        "no_correction": 0.6825070566666667,
+        "unguarded": 0.6818720816666667
+      }
+    },
+    "high_entropy:400:final_b": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            0.04906666666666666,
+            0.10043333333333332
+          ],
+          "mean_difference": 0.07459999999999999,
+          "median_difference": 0.06,
+          "wins_losses_ties": [
+            22,
+            4,
+            4
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.013566666666666673,
+            0.0031333333333333304
+          ],
+          "mean_difference": -0.005266666666666668,
+          "median_difference": -0.0005000000000000004,
+          "wins_losses_ties": [
+            11,
+            15,
+            4
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            -0.00033333333333333365,
+            0.00030000000000000024
+          ],
+          "mean_difference": -3.333333333333336e-05,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            3,
+            6,
+            21
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.5052333333333333,
+        "mixture": 0.43063333333333337,
+        "no_correction": 0.5105,
+        "unguarded": 0.5052666666666666
+      },
+      "mean_logloss": {
+        "guarded": 0.701380785,
+        "mixture": 0.73563078,
+        "no_correction": 0.6989224563333333,
+        "unguarded": 0.7014121966666667
+      }
+    },
+    "high_entropy:400:phase_b_online": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.007083333333333312,
+            0.0018333333333333368
+          ],
+          "mean_difference": -0.002416666666666654,
+          "median_difference": -0.0025000000000000022,
+          "wins_losses_ties": [
+            10,
+            17,
+            3
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.0063333333333333245,
+            0.0011666666666666713
+          ],
+          "mean_difference": -0.0019999999999999944,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            8,
+            13,
+            9
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            0.0,
+            0.00041666666666666886
+          ],
+          "mean_difference": 0.00016666666666666682,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            2,
+            0,
+            28
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.5585,
+        "mixture": 0.5609166666666666,
+        "no_correction": 0.5605,
+        "unguarded": 0.5583333333333333
+      },
+      "mean_logloss": {
+        "guarded": 0.689387285,
+        "mixture": 0.687306959,
+        "no_correction": 0.6897096673333334,
+        "unguarded": 0.6893825923333333
+      }
+    },
+    "high_entropy:400:switch_to_a": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.0009999999999999972,
+            0.025666666666666667
+          ],
+          "mean_difference": 0.012333333333333339,
+          "median_difference": 0.014999999999999986,
+          "wins_losses_ties": [
+            18,
+            9,
+            3
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.009333333333333336,
+            0.0009999999999999935
+          ],
+          "mean_difference": -0.004000000000000005,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            9,
+            14,
+            7
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            0.0,
+            0.0
+          ],
+          "mean_difference": 0.0,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            0,
+            30
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.5153333333333333,
+        "mixture": 0.503,
+        "no_correction": 0.5193333333333333,
+        "unguarded": 0.5153333333333333
+      },
+      "mean_logloss": {
+        "guarded": 0.7015825283333333,
+        "mixture": 0.7063323986666666,
+        "no_correction": 0.700849699,
+        "unguarded": 0.7015930606666667
+      }
+    },
+    "high_entropy:400:switch_to_b": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.014666666666666663,
+            0.010000000000000014
+          ],
+          "mean_difference": -0.001666666666666657,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            14,
+            14,
+            2
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.01533333333333333,
+            0.003000000000000001
+          ],
+          "mean_difference": -0.004666666666666665,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            6,
+            10,
+            14
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            0.0,
+            0.0010000000000000009
+          ],
+          "mean_difference": 0.00033333333333333365,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            1,
+            0,
+            29
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.52,
+        "mixture": 0.5216666666666667,
+        "no_correction": 0.5246666666666667,
+        "unguarded": 0.5196666666666667
+      },
+      "mean_logloss": {
+        "guarded": 0.7007362663333333,
+        "mixture": 0.6990806086666667,
+        "no_correction": 0.700631219,
+        "unguarded": 0.700732765
+      }
+    },
+    "reverse_asymmetric:1000:final_a": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.014433333333333347,
+            -0.006700000000000006
+          ],
+          "mean_difference": -0.01070000000000001,
+          "median_difference": -0.014000000000000012,
+          "wins_losses_ties": [
+            6,
+            24,
+            0
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            0.0,
+            0.001200000000000001
+          ],
+          "mean_difference": 0.0006000000000000005,
+          "median_difference": 0.0005000000000000004,
+          "wins_losses_ties": [
+            15,
+            6,
+            9
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            -0.00020000000000000017,
+            0.00010000000000000009
+          ],
+          "mean_difference": -3.333333333333336e-05,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            1,
+            1,
+            28
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.729,
+        "mixture": 0.7397,
+        "no_correction": 0.7283999999999999,
+        "unguarded": 0.7290333333333333
+      },
+      "mean_logloss": {
+        "guarded": 0.5793451363333333,
+        "mixture": 0.5768845746666666,
+        "no_correction": 0.5803392773333333,
+        "unguarded": 0.5793363406666666
+      }
+    },
+    "reverse_asymmetric:1000:final_b": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            0.29460000000000003,
+            0.4479
+          ],
+          "mean_difference": 0.37423333333333336,
+          "median_difference": 0.5045,
+          "wins_losses_ties": [
+            25,
+            4,
+            1
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.00030000000000000024,
+            0.0010333333333333342
+          ],
+          "mean_difference": 0.00033333333333333365,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            12,
+            7,
+            11
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            -0.0004333333333333337,
+            3.333333333333336e-05
+          ],
+          "mean_difference": -0.00016666666666666682,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            1,
+            3,
+            26
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.7663333333333333,
+        "mixture": 0.3921,
+        "no_correction": 0.766,
+        "unguarded": 0.7665
+      },
+      "mean_logloss": {
+        "guarded": 0.5485424096666667,
+        "mixture": 0.8004791433333334,
+        "no_correction": 0.5480992143333333,
+        "unguarded": 0.5486300443333334
+      }
+    },
+    "reverse_asymmetric:1000:phase_b_online": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.0035333333333333367,
+            0.0013333333333333346
+          ],
+          "mean_difference": -0.0011333333333333343,
+          "median_difference": -0.0010000000000000009,
+          "wins_losses_ties": [
+            8,
+            20,
+            2
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            0.00013333333333333345,
+            0.0017666666666666683
+          ],
+          "mean_difference": 0.0009000000000000008,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            14,
+            8,
+            8
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            0.0,
+            0.00010000000000000009
+          ],
+          "mean_difference": 3.333333333333336e-05,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            1,
+            0,
+            29
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.7534333333333333,
+        "mixture": 0.7545666666666667,
+        "no_correction": 0.7525333333333334,
+        "unguarded": 0.7534
+      },
+      "mean_logloss": {
+        "guarded": 0.5570122813333334,
+        "mixture": 0.5612100216666667,
+        "no_correction": 0.5575691566666666,
+        "unguarded": 0.5570250666666667
+      }
+    },
+    "reverse_asymmetric:1000:switch_to_a": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            0.04033333333333333,
+            0.077
+          ],
+          "mean_difference": 0.058666666666666666,
+          "median_difference": 0.050000000000000044,
+          "wins_losses_ties": [
+            27,
+            2,
+            1
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.002333333333333339,
+            0.01699999999999999
+          ],
+          "mean_difference": 0.004999999999999995,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            6,
+            7,
+            17
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            0.0,
+            0.0
+          ],
+          "mean_difference": 0.0,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            0,
+            30
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.693,
+        "mixture": 0.6343333333333333,
+        "no_correction": 0.688,
+        "unguarded": 0.693
+      },
+      "mean_logloss": {
+        "guarded": 0.614445399,
+        "mixture": 0.6563290606666666,
+        "no_correction": 0.6197801753333333,
+        "unguarded": 0.614375031
+      }
+    },
+    "reverse_asymmetric:1000:switch_to_b": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            0.0009999999999999898,
+            0.04233333333333332
+          ],
+          "mean_difference": 0.02166666666666665,
+          "median_difference": 0.019999999999999907,
+          "wins_losses_ties": [
+            19,
+            10,
+            1
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.0013333333333333346,
+            0.006999999999999998
+          ],
+          "mean_difference": 0.0026666666666666635,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            8,
+            5,
+            17
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            0.0,
+            0.0010000000000000009
+          ],
+          "mean_difference": 0.00033333333333333365,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            1,
+            0,
+            29
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.6223333333333333,
+        "mixture": 0.6006666666666667,
+        "no_correction": 0.6196666666666667,
+        "unguarded": 0.622
+      },
+      "mean_logloss": {
+        "guarded": 0.666998014,
+        "mixture": 0.6850052353333334,
+        "no_correction": 0.6685796453333334,
+        "unguarded": 0.667120781
+      }
+    },
+    "reverse_asymmetric:400:final_a": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.002033333333333339,
+            0.004033333333333322
+          ],
+          "mean_difference": 0.0009999999999999972,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            13,
+            13,
+            4
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            0.00013333333333333345,
+            0.001266666666666668
+          ],
+          "mean_difference": 0.000733333333333334,
+          "median_difference": 0.0010000000000000009,
+          "wins_losses_ties": [
+            16,
+            5,
+            9
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            0.0,
+            0.00016666666666666682
+          ],
+          "mean_difference": 6.666666666666672e-05,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            2,
+            0,
+            28
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.7300333333333333,
+        "mixture": 0.7290333333333333,
+        "no_correction": 0.7293,
+        "unguarded": 0.7299666666666667
+      },
+      "mean_logloss": {
+        "guarded": 0.5788305983333333,
+        "mixture": 0.581971839,
+        "no_correction": 0.5795836856666666,
+        "unguarded": 0.5788257786666666
+      }
+    },
+    "reverse_asymmetric:400:final_b": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            0.009466666666666667,
+            0.1135
+          ],
+          "mean_difference": 0.0558,
+          "median_difference": -0.0040000000000000036,
+          "wins_losses_ties": [
+            6,
+            19,
+            5
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.0004333333333333337,
+            0.00030000000000000024
+          ],
+          "mean_difference": -6.666666666666672e-05,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            7,
+            9,
+            14
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            -0.00016666666666666682,
+            0.0
+          ],
+          "mean_difference": -6.666666666666672e-05,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            2,
+            28
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.7652666666666667,
+        "mixture": 0.7094666666666667,
+        "no_correction": 0.7653333333333333,
+        "unguarded": 0.7653333333333333
+      },
+      "mean_logloss": {
+        "guarded": 0.5558617766666667,
+        "mixture": 0.6036396376666666,
+        "no_correction": 0.5545734733333333,
+        "unguarded": 0.5559202223333334
+      }
+    },
+    "reverse_asymmetric:400:phase_b_online": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -8.333333333334265e-05,
+            0.00433333333333333
+          ],
+          "mean_difference": 0.002083333333333326,
+          "median_difference": 0.0024999999999999467,
+          "wins_losses_ties": [
+            16,
+            9,
+            5
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.0008333333333333304,
+            0.0040833333333333355
+          ],
+          "mean_difference": 0.0010833333333333324,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            8,
+            10,
+            12
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            0.0,
+            0.0
+          ],
+          "mean_difference": 0.0,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            0,
+            30
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.7376666666666667,
+        "mixture": 0.7355833333333334,
+        "no_correction": 0.7365833333333334,
+        "unguarded": 0.7376666666666667
+      },
+      "mean_logloss": {
+        "guarded": 0.5716273196666667,
+        "mixture": 0.5761610473333333,
+        "no_correction": 0.5727997633333334,
+        "unguarded": 0.571642734
+      }
+    },
+    "reverse_asymmetric:400:switch_to_a": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            0.0013333333333333272,
+            0.009666666666666667
+          ],
+          "mean_difference": 0.005333333333333334,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            12,
+            4,
+            14
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.0040000000000000036,
+            0.0006666666666666673
+          ],
+          "mean_difference": -0.0013333333333333346,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            2,
+            4,
+            24
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            0.0,
+            0.0
+          ],
+          "mean_difference": 0.0,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            0,
+            30
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.6976666666666667,
+        "mixture": 0.6923333333333334,
+        "no_correction": 0.699,
+        "unguarded": 0.6976666666666667
+      },
+      "mean_logloss": {
+        "guarded": 0.606575451,
+        "mixture": 0.611552676,
+        "no_correction": 0.606456713,
+        "unguarded": 0.606534217
+      }
+    },
+    "reverse_asymmetric:400:switch_to_b": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            0.00800000000000001,
+            0.02199999999999998
+          ],
+          "mean_difference": 0.014666666666666665,
+          "median_difference": 0.010000000000000009,
+          "wins_losses_ties": [
+            21,
+            4,
+            5
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.0020000000000000018,
+            0.013666666666666667
+          ],
+          "mean_difference": 0.003999999999999996,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            4,
+            5,
+            21
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            0.0,
+            0.0
+          ],
+          "mean_difference": 0.0,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            0,
+            30
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.6523333333333333,
+        "mixture": 0.6376666666666667,
+        "no_correction": 0.6483333333333333,
+        "unguarded": 0.6523333333333333
+      },
+      "mean_logloss": {
+        "guarded": 0.638768396,
+        "mixture": 0.6501184196666667,
+        "no_correction": 0.6431182196666667,
+        "unguarded": 0.6388112676666666
+      }
+    },
+    "shifted_bias:1000:final_a": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.006633333333333339,
+            0.0010333333333333342
+          ],
+          "mean_difference": -0.002766666666666669,
+          "median_difference": -0.003500000000000003,
+          "wins_losses_ties": [
+            10,
+            19,
+            1
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            0.001933333333333335,
+            0.005300000000000004
+          ],
+          "mean_difference": 0.0036333333333333365,
+          "median_difference": 0.0030000000000000027,
+          "wins_losses_ties": [
+            27,
+            2,
+            1
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            -0.00010000000000000009,
+            0.00010000000000000009
+          ],
+          "mean_difference": 0.0,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            1,
+            1,
+            28
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.8720333333333333,
+        "mixture": 0.8748,
+        "no_correction": 0.8684,
+        "unguarded": 0.8720333333333333
+      },
+      "mean_logloss": {
+        "guarded": 0.3691783473333333,
+        "mixture": 0.37319774333333333,
+        "no_correction": 0.3736625726666667,
+        "unguarded": 0.369077561
+      }
+    },
+    "shifted_bias:1000:final_b": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            0.025866666666666663,
+            0.19736666666666666
+          ],
+          "mean_difference": 0.10103333333333334,
+          "median_difference": 0.0010000000000000009,
+          "wins_losses_ties": [
+            16,
+            12,
+            2
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.0007666666666666673,
+            0.004200000000000004
+          ],
+          "mean_difference": 0.0011333333333333343,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            10,
+            12,
+            8
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            -0.00013333333333333345,
+            6.666666666666672e-05
+          ],
+          "mean_difference": -3.333333333333336e-05,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            1,
+            2,
+            27
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.8558666666666667,
+        "mixture": 0.7548333333333334,
+        "no_correction": 0.8547333333333333,
+        "unguarded": 0.8559
+      },
+      "mean_logloss": {
+        "guarded": 0.3980694846666667,
+        "mixture": 0.5976132166666667,
+        "no_correction": 0.411861833,
+        "unguarded": 0.397817384
+      }
+    },
+    "shifted_bias:1000:phase_b_online": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            0.001833333333333335,
+            0.006433333333333335
+          ],
+          "mean_difference": 0.004233333333333334,
+          "median_difference": 0.007000000000000006,
+          "wins_losses_ties": [
+            22,
+            7,
+            1
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            0.001666666666666668,
+            0.00416666666666667
+          ],
+          "mean_difference": 0.0028666666666666693,
+          "median_difference": 0.0030000000000000027,
+          "wins_losses_ties": [
+            23,
+            3,
+            4
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            -6.666666666666672e-05,
+            0.000366666666666667
+          ],
+          "mean_difference": 0.00013333333333333345,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            5,
+            2,
+            23
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.8392,
+        "mixture": 0.8349666666666666,
+        "no_correction": 0.8363333333333333,
+        "unguarded": 0.8390666666666666
+      },
+      "mean_logloss": {
+        "guarded": 0.405549622,
+        "mixture": 0.41512783333333336,
+        "no_correction": 0.4082862463333333,
+        "unguarded": 0.40555065333333334
+      }
+    },
+    "shifted_bias:1000:switch_to_a": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            0.0033333333333333327,
+            0.034
+          ],
+          "mean_difference": 0.018000000000000002,
+          "median_difference": 0.009999999999999953,
+          "wins_losses_ties": [
+            16,
+            8,
+            6
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.003999999999999996,
+            0.008333333333333326
+          ],
+          "mean_difference": 0.0013333333333333346,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            4,
+            9,
+            17
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            -0.0010000000000000009,
+            0.0010000000000000009
+          ],
+          "mean_difference": 0.0,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            1,
+            1,
+            28
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.8353333333333334,
+        "mixture": 0.8173333333333334,
+        "no_correction": 0.834,
+        "unguarded": 0.8353333333333334
+      },
+      "mean_logloss": {
+        "guarded": 0.4323867946666667,
+        "mixture": 0.45647750466666664,
+        "no_correction": 0.436448629,
+        "unguarded": 0.43200535
+      }
+    },
+    "shifted_bias:1000:switch_to_b": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            0.01699999999999999,
+            0.052
+          ],
+          "mean_difference": 0.034666666666666665,
+          "median_difference": 0.030000000000000027,
+          "wins_losses_ties": [
+            24,
+            5,
+            1
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            0.00733333333333334,
+            0.028333333333333332
+          ],
+          "mean_difference": 0.017333333333333333,
+          "median_difference": 0.010000000000000009,
+          "wins_losses_ties": [
+            19,
+            2,
+            9
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            0.0,
+            0.0010000000000000009
+          ],
+          "mean_difference": 0.00033333333333333365,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            1,
+            0,
+            29
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.7573333333333333,
+        "mixture": 0.7226666666666667,
+        "no_correction": 0.74,
+        "unguarded": 0.757
+      },
+      "mean_logloss": {
+        "guarded": 0.5281625146666666,
+        "mixture": 0.5671863986666666,
+        "no_correction": 0.546918216,
+        "unguarded": 0.528232771
+      }
+    },
+    "shifted_bias:400:final_a": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.009299999999999998,
+            0.0007000000000000006
+          ],
+          "mean_difference": -0.0031999999999999993,
+          "median_difference": -0.0010000000000000009,
+          "wins_losses_ties": [
+            12,
+            16,
+            2
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            0.00023333333333333355,
+            0.0030666666666666694
+          ],
+          "mean_difference": 0.0016333333333333347,
+          "median_difference": 0.0010000000000000009,
+          "wins_losses_ties": [
+            20,
+            5,
+            5
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            -0.00030000000000000024,
+            0.0
+          ],
+          "mean_difference": -0.00013333333333333345,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            3,
+            27
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.8726,
+        "mixture": 0.8758,
+        "no_correction": 0.8709666666666667,
+        "unguarded": 0.8727333333333334
+      },
+      "mean_logloss": {
+        "guarded": 0.3685612953333333,
+        "mixture": 0.36949641466666666,
+        "no_correction": 0.36872913766666665,
+        "unguarded": 0.36849364566666665
+      }
+    },
+    "shifted_bias:400:final_b": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.06023333333333332,
+            0.07733333333333334
+          ],
+          "mean_difference": 0.0071000000000000065,
+          "median_difference": -0.0010000000000000009,
+          "wins_losses_ties": [
+            10,
+            17,
+            3
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.07926666666666667,
+            0.0032999999999999956
+          ],
+          "mean_difference": -0.026766666666666664,
+          "median_difference": -0.0005000000000000004,
+          "wins_losses_ties": [
+            8,
+            15,
+            7
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            -0.00020000000000000017,
+            6.666666666666672e-05
+          ],
+          "mean_difference": -6.666666666666672e-05,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            1,
+            3,
+            26
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.8283333333333334,
+        "mixture": 0.8212333333333333,
+        "no_correction": 0.8551,
+        "unguarded": 0.8284
+      },
+      "mean_logloss": {
+        "guarded": 0.414943029,
+        "mixture": 0.46235869933333335,
+        "no_correction": 0.4146830436666667,
+        "unguarded": 0.41454531633333336
+      }
+    },
+    "shifted_bias:400:phase_b_online": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.00300000000000001,
+            0.006749999999999986
+          ],
+          "mean_difference": 0.0019999999999999905,
+          "median_difference": 0.004999999999999949,
+          "wins_losses_ties": [
+            18,
+            8,
+            4
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.00041666666666666886,
+            0.002166666666666654
+          ],
+          "mean_difference": 0.0008333333333333304,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            14,
+            11,
+            5
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            -0.000333333333333341,
+            0.00016666666666667422
+          ],
+          "mean_difference": -8.333333333333156e-05,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            1,
+            2,
+            27
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.8253333333333334,
+        "mixture": 0.8233333333333334,
+        "no_correction": 0.8245,
+        "unguarded": 0.8254166666666667
+      },
+      "mean_logloss": {
+        "guarded": 0.422324293,
+        "mixture": 0.427434841,
+        "no_correction": 0.42421891,
+        "unguarded": 0.422316307
+      }
+    },
+    "shifted_bias:400:switch_to_a": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.007333333333333332,
+            0.012666666666666666
+          ],
+          "mean_difference": 0.0026666666666666653,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            9,
+            11,
+            10
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.0010000000000000009,
+            0.006333333333333339
+          ],
+          "mean_difference": 0.0020000000000000018,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            4,
+            3,
+            23
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            0.0,
+            0.0010000000000000009
+          ],
+          "mean_difference": 0.00033333333333333365,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            1,
+            0,
+            29
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.8443333333333334,
+        "mixture": 0.8416666666666667,
+        "no_correction": 0.8423333333333334,
+        "unguarded": 0.844
+      },
+      "mean_logloss": {
+        "guarded": 0.418827919,
+        "mixture": 0.425988153,
+        "no_correction": 0.4230966566666667,
+        "unguarded": 0.41877805166666665
+      }
+    },
+    "shifted_bias:400:switch_to_b": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.002333333333333317,
+            0.012333333333333333
+          ],
+          "mean_difference": 0.005000000000000012,
+          "median_difference": 0.010000000000000009,
+          "wins_losses_ties": [
+            19,
+            7,
+            4
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            0.001666666666666668,
+            0.010000000000000009
+          ],
+          "mean_difference": 0.005666666666666671,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            13,
+            2,
+            15
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            0.0,
+            0.0010000000000000009
+          ],
+          "mean_difference": 0.00033333333333333365,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            1,
+            0,
+            29
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.788,
+        "mixture": 0.783,
+        "no_correction": 0.7823333333333333,
+        "unguarded": 0.7876666666666666
+      },
+      "mean_logloss": {
+        "guarded": 0.48293104633333334,
+        "mixture": 0.491961245,
+        "no_correction": 0.48818402433333336,
+        "unguarded": 0.48295495233333335
+      }
+    },
+    "similar_rules:1000:final_a": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.00030000000000000024,
+            0.0
+          ],
+          "mean_difference": -0.00010000000000000009,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            1,
+            29
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.00030000000000000024,
+            0.0
+          ],
+          "mean_difference": -0.00010000000000000009,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            1,
+            29
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            -0.00010000000000000009,
+            0.0
+          ],
+          "mean_difference": -3.333333333333336e-05,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            1,
+            29
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.8507333333333333,
+        "mixture": 0.8508333333333333,
+        "no_correction": 0.8508333333333333,
+        "unguarded": 0.8507666666666667
+      },
+      "mean_logloss": {
+        "guarded": 0.408889827,
+        "mixture": 0.40351847166666666,
+        "no_correction": 0.40718621233333335,
+        "unguarded": 0.40887167
+      }
+    },
+    "similar_rules:1000:final_b": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.0016000000000000014,
+            0.0
+          ],
+          "mean_difference": -0.0005333333333333338,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            1,
+            29
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.0016000000000000014,
+            0.0
+          ],
+          "mean_difference": -0.0005333333333333338,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            1,
+            29
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            -0.00010000000000000009,
+            0.0
+          ],
+          "mean_difference": -3.333333333333336e-05,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            1,
+            29
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.8472666666666666,
+        "mixture": 0.8478,
+        "no_correction": 0.8478,
+        "unguarded": 0.8472999999999999
+      },
+      "mean_logloss": {
+        "guarded": 0.4441020863333333,
+        "mixture": 0.530962767,
+        "no_correction": 0.4474649866666667,
+        "unguarded": 0.4437952036666667
+      }
+    },
+    "similar_rules:1000:phase_b_online": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.002766666666666669,
+            -0.000633333333333334
+          ],
+          "mean_difference": -0.0016333333333333347,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            1,
+            11,
+            18
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.0014000000000000013,
+            3.333333333333336e-05
+          ],
+          "mean_difference": -0.0005666666666666671,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            3,
+            7,
+            20
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            -0.0005000000000000004,
+            3.333333333333336e-05
+          ],
+          "mean_difference": -0.00020000000000000017,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            1,
+            4,
+            25
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.8463333333333333,
+        "mixture": 0.8479666666666666,
+        "no_correction": 0.8469,
+        "unguarded": 0.8465333333333334
+      },
+      "mean_logloss": {
+        "guarded": 0.417677822,
+        "mixture": 0.4129505313333333,
+        "no_correction": 0.41745422833333334,
+        "unguarded": 0.417615199
+      }
+    },
+    "similar_rules:1000:switch_to_a": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.003333333333333336,
+            -0.0003333333333333299
+          ],
+          "mean_difference": -0.0016666666666666644,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            4,
+            26
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.001666666666666668,
+            0.0
+          ],
+          "mean_difference": -0.0006666666666666673,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            2,
+            28
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            -0.0010000000000000009,
+            0.0
+          ],
+          "mean_difference": -0.00033333333333333365,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            1,
+            29
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.834,
+        "mixture": 0.8356666666666667,
+        "no_correction": 0.8346666666666667,
+        "unguarded": 0.8343333333333334
+      },
+      "mean_logloss": {
+        "guarded": 0.4647099493333333,
+        "mixture": 0.47028055933333335,
+        "no_correction": 0.46530281566666665,
+        "unguarded": 0.464658845
+      }
+    },
+    "similar_rules:1000:switch_to_b": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.010333333333333342,
+            -0.0006666666666666673
+          ],
+          "mean_difference": -0.0046666666666666705,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            5,
+            25
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.007000000000000006,
+            0.0
+          ],
+          "mean_difference": -0.002666666666666669,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            3,
+            27
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            -0.0020000000000000018,
+            0.0
+          ],
+          "mean_difference": -0.0006666666666666673,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            1,
+            29
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.8343333333333334,
+        "mixture": 0.839,
+        "no_correction": 0.837,
+        "unguarded": 0.835
+      },
+      "mean_logloss": {
+        "guarded": 0.46657301766666665,
+        "mixture": 0.460758527,
+        "no_correction": 0.468804798,
+        "unguarded": 0.466524938
+      }
+    },
+    "similar_rules:400:final_a": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.001966666666666668,
+            -6.666666666666672e-05
+          ],
+          "mean_difference": -0.0007666666666666673,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            4,
+            26
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -6.666666666666672e-05,
+            0.0008000000000000007
+          ],
+          "mean_difference": 0.0002666666666666669,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            2,
+            1,
+            27
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            -0.00010000000000000009,
+            0.00010000000000000009
+          ],
+          "mean_difference": 0.0,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            1,
+            1,
+            28
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.8500666666666666,
+        "mixture": 0.8508333333333333,
+        "no_correction": 0.8498,
+        "unguarded": 0.8500666666666666
+      },
+      "mean_logloss": {
+        "guarded": 0.4093631956666667,
+        "mixture": 0.40578892033333336,
+        "no_correction": 0.408605479,
+        "unguarded": 0.40931025666666665
+      }
+    },
+    "similar_rules:400:final_b": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.005733333333333327,
+            -6.666666666666672e-05
+          ],
+          "mean_difference": -0.0023999999999999985,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            5,
+            25
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.0013666666666666569,
+            0.0008666666666666563
+          ],
+          "mean_difference": -0.00020000000000000017,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            1,
+            4,
+            25
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            -0.00020000000000000017,
+            0.0
+          ],
+          "mean_difference": -0.00010000000000000009,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            3,
+            27
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.8453999999999999,
+        "mixture": 0.8478,
+        "no_correction": 0.8456,
+        "unguarded": 0.8455
+      },
+      "mean_logloss": {
+        "guarded": 0.469919217,
+        "mixture": 0.4931183493333333,
+        "no_correction": 0.4705837726666667,
+        "unguarded": 0.46958500566666667
+      }
+    },
+    "similar_rules:400:phase_b_online": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.006750000000000001,
+            -0.0023333333333333244
+          ],
+          "mean_difference": -0.004416666666666662,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            1,
+            14,
+            15
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.001083333333333325,
+            0.00024999999999999095
+          ],
+          "mean_difference": -0.0004166666666666615,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            4,
+            7,
+            19
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            -0.0003333333333333262,
+            0.00016666666666667422
+          ],
+          "mean_difference": -8.333333333332786e-05,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            1,
+            2,
+            27
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.8400833333333333,
+        "mixture": 0.8445,
+        "no_correction": 0.8405,
+        "unguarded": 0.8401666666666667
+      },
+      "mean_logloss": {
+        "guarded": 0.43029111533333336,
+        "mixture": 0.4246640466666667,
+        "no_correction": 0.43075431033333333,
+        "unguarded": 0.4302463423333333
+      }
+    },
+    "similar_rules:400:switch_to_a": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.007333333333333336,
+            -0.0006666666666666673
+          ],
+          "mean_difference": -0.003666666666666666,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            5,
+            25
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            0.0,
+            0.0010000000000000009
+          ],
+          "mean_difference": 0.00033333333333333365,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            1,
+            0,
+            29
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            0.0,
+            0.0
+          ],
+          "mean_difference": 0.0,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            0,
+            30
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.843,
+        "mixture": 0.8466666666666667,
+        "no_correction": 0.8426666666666667,
+        "unguarded": 0.843
+      },
+      "mean_logloss": {
+        "guarded": 0.453503496,
+        "mixture": 0.4445445333333333,
+        "no_correction": 0.45366939166666664,
+        "unguarded": 0.453487071
+      }
+    },
+    "similar_rules:400:switch_to_b": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.0056666666666666645,
+            -0.0003333333333333299
+          ],
+          "mean_difference": -0.0026666666666666653,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            1,
+            5,
+            24
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.001666666666666668,
+            0.0
+          ],
+          "mean_difference": -0.0006666666666666673,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            2,
+            28
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            0.0,
+            0.0
+          ],
+          "mean_difference": 0.0,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            0,
+            30
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.855,
+        "mixture": 0.8576666666666667,
+        "no_correction": 0.8556666666666667,
+        "unguarded": 0.855
+      },
+      "mean_logloss": {
+        "guarded": 0.43768384866666665,
+        "mixture": 0.4308898626666667,
+        "no_correction": 0.4382004463333333,
+        "unguarded": 0.437653105
+      }
+    },
+    "stationary:1000:final_a": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            0.0,
+            0.0
+          ],
+          "mean_difference": 0.0,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            0,
+            30
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            0.0,
+            0.0
+          ],
+          "mean_difference": 0.0,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            0,
+            30
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            0.0,
+            0.0
+          ],
+          "mean_difference": 0.0,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            0,
+            30
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.8024333333333333,
+        "mixture": 0.8024333333333333,
+        "no_correction": 0.8024333333333333,
+        "unguarded": 0.8024333333333333
+      },
+      "mean_logloss": {
+        "guarded": 0.5002132363333334,
+        "mixture": 0.5027262703333333,
+        "no_correction": 0.4999235086666667,
+        "unguarded": 0.5001848743333334
+      }
+    },
+    "stationary:1000:final_b": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            0.0,
+            0.0
+          ],
+          "mean_difference": 0.0,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            0,
+            30
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            0.0,
+            0.0
+          ],
+          "mean_difference": 0.0,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            0,
+            30
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            0.0,
+            0.0
+          ],
+          "mean_difference": 0.0,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            0,
+            30
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.7967666666666667,
+        "mixture": 0.7967666666666667,
+        "no_correction": 0.7967666666666667,
+        "unguarded": 0.7967666666666667
+      },
+      "mean_logloss": {
+        "guarded": 0.5084499663333333,
+        "mixture": 0.5113206396666666,
+        "no_correction": 0.5084052063333333,
+        "unguarded": 0.5084503073333333
+      }
+    },
+    "stationary:1000:phase_b_online": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.0010000000000000009,
+            -6.666666666666672e-05
+          ],
+          "mean_difference": -0.0005000000000000004,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            1,
+            6,
+            23
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.00010000000000000009,
+            0.0005000000000000004
+          ],
+          "mean_difference": 0.00016666666666666682,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            5,
+            3,
+            22
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            0.0,
+            0.0
+          ],
+          "mean_difference": 0.0,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            0,
+            30
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.7998000000000001,
+        "mixture": 0.8003,
+        "no_correction": 0.7996333333333333,
+        "unguarded": 0.7998000000000001
+      },
+      "mean_logloss": {
+        "guarded": 0.508741125,
+        "mixture": 0.5072827406666667,
+        "no_correction": 0.5085557816666667,
+        "unguarded": 0.5086912936666667
+      }
+    },
+    "stationary:1000:switch_to_a": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            0.0,
+            0.0
+          ],
+          "mean_difference": 0.0,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            0,
+            30
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            0.0,
+            0.0
+          ],
+          "mean_difference": 0.0,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            0,
+            30
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            0.0,
+            0.0
+          ],
+          "mean_difference": 0.0,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            0,
+            30
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.79,
+        "mixture": 0.79,
+        "no_correction": 0.79,
+        "unguarded": 0.79
+      },
+      "mean_logloss": {
+        "guarded": 0.522350779,
+        "mixture": 0.522541949,
+        "no_correction": 0.5219477543333333,
+        "unguarded": 0.5222848633333333
+      }
+    },
+    "stationary:1000:switch_to_b": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.006666666666666672,
+            0.00033333333333333365
+          ],
+          "mean_difference": -0.002666666666666669,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            1,
+            3,
+            26
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.0013333333333333346,
+            0.0013333333333333233
+          ],
+          "mean_difference": -3.7007434154171884e-18,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            2,
+            2,
+            26
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            0.0,
+            0.0
+          ],
+          "mean_difference": 0.0,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            0,
+            30
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.7913333333333333,
+        "mixture": 0.794,
+        "no_correction": 0.7913333333333333,
+        "unguarded": 0.7913333333333333
+      },
+      "mean_logloss": {
+        "guarded": 0.519425721,
+        "mixture": 0.5169835376666667,
+        "no_correction": 0.5191137473333334,
+        "unguarded": 0.5193863573333334
+      }
+    },
+    "stationary:400:final_a": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.003333333333333336,
+            -0.0002666666666666669
+          ],
+          "mean_difference": -0.001666666666666668,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            5,
+            25
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.0020666666666666685,
+            0.00030000000000000024
+          ],
+          "mean_difference": -0.0006666666666666673,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            4,
+            3,
+            23
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            -0.00010000000000000009,
+            0.0
+          ],
+          "mean_difference": -3.333333333333336e-05,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            1,
+            29
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.8007666666666667,
+        "mixture": 0.8024333333333333,
+        "no_correction": 0.8014333333333333,
+        "unguarded": 0.8008000000000001
+      },
+      "mean_logloss": {
+        "guarded": 0.5061077413333334,
+        "mixture": 0.504898806,
+        "no_correction": 0.5057292976666666,
+        "unguarded": 0.5060590243333334
+      }
+    },
+    "stationary:400:final_b": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.003333333333333336,
+            -0.000366666666666667
+          ],
+          "mean_difference": -0.0016333333333333347,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            5,
+            25
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.0014000000000000013,
+            0.00013333333333333345
+          ],
+          "mean_difference": -0.0005333333333333338,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            2,
+            4,
+            24
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            -0.00016666666666666682,
+            0.0
+          ],
+          "mean_difference": -6.666666666666672e-05,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            2,
+            28
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.7951666666666667,
+        "mixture": 0.7968000000000001,
+        "no_correction": 0.7957000000000001,
+        "unguarded": 0.7952333333333333
+      },
+      "mean_logloss": {
+        "guarded": 0.5124523783333333,
+        "mixture": 0.5119676673333333,
+        "no_correction": 0.5124987246666667,
+        "unguarded": 0.5123977573333334
+      }
+    },
+    "stationary:400:phase_b_online": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.003666666666666666,
+            -0.0011666666666666676
+          ],
+          "mean_difference": -0.0023333333333333244,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            13,
+            17
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.00033333333333332253,
+            0.000666666666666682
+          ],
+          "mean_difference": 0.00016666666666667422,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            4,
+            3,
+            23
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            0.0,
+            0.0
+          ],
+          "mean_difference": 0.0,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            0,
+            30
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.7980833333333334,
+        "mixture": 0.8004166666666667,
+        "no_correction": 0.7979166666666666,
+        "unguarded": 0.7980833333333334
+      },
+      "mean_logloss": {
+        "guarded": 0.5121974956666666,
+        "mixture": 0.5119004816666667,
+        "no_correction": 0.512054415,
+        "unguarded": 0.512182116
+      }
+    },
+    "stationary:400:switch_to_a": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.009999999999999998,
+            -0.00033333333333333365
+          ],
+          "mean_difference": -0.004,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            4,
+            26
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.0010000000000000009,
+            0.0010000000000000009
+          ],
+          "mean_difference": 0.0,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            1,
+            1,
+            28
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            -0.0010000000000000009,
+            0.0
+          ],
+          "mean_difference": -0.00033333333333333365,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            1,
+            29
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.791,
+        "mixture": 0.795,
+        "no_correction": 0.791,
+        "unguarded": 0.7913333333333333
+      },
+      "mean_logloss": {
+        "guarded": 0.51891445,
+        "mixture": 0.5176729033333334,
+        "no_correction": 0.5186011276666667,
+        "unguarded": 0.5188793566666666
+      }
+    },
+    "stationary:400:switch_to_b": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.007999999999999988,
+            -0.00033333333333333365
+          ],
+          "mean_difference": -0.0033333333333333288,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            5,
+            25
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.0006666666666666673,
+            0.0023333333333333353
+          ],
+          "mean_difference": 0.0006666666666666673,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            2,
+            1,
+            27
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            0.0,
+            0.0
+          ],
+          "mean_difference": 0.0,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            0,
+            30
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.7953333333333333,
+        "mixture": 0.7986666666666666,
+        "no_correction": 0.7946666666666666,
+        "unguarded": 0.7953333333333333
+      },
+      "mean_logloss": {
+        "guarded": 0.5139830616666666,
+        "mixture": 0.514506181,
+        "no_correction": 0.5139088636666667,
+        "unguarded": 0.5139683506666667
+      }
+    },
+    "uneven_bias:1000:final_a": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.009999999999999976,
+            -0.0021999999999999797
+          ],
+          "mean_difference": -0.0060333333333333124,
+          "median_difference": -0.006500000000000006,
+          "wins_losses_ties": [
+            5,
+            24,
+            1
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            0.001166666666666675,
+            0.004033333333333325
+          ],
+          "mean_difference": 0.0025666666666666654,
+          "median_difference": 0.0015000000000000013,
+          "wins_losses_ties": [
+            21,
+            4,
+            5
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            -0.00013333333333333345,
+            0.00013333333333333345
+          ],
+          "mean_difference": 0.0,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            2,
+            2,
+            26
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.9308333333333334,
+        "mixture": 0.9368666666666666,
+        "no_correction": 0.9282666666666667,
+        "unguarded": 0.9308333333333334
+      },
+      "mean_logloss": {
+        "guarded": 0.23678101066666668,
+        "mixture": 0.245335935,
+        "no_correction": 0.23981659733333333,
+        "unguarded": 0.236707528
+      }
+    },
+    "uneven_bias:1000:final_b": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            0.3118666666666666,
+            0.52
+          ],
+          "mean_difference": 0.4191,
+          "median_difference": 0.5914999999999999,
+          "wins_losses_ties": [
+            25,
+            4,
+            1
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.001466666666666668,
+            0.0005000000000000004
+          ],
+          "mean_difference": -0.0002666666666666669,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            9,
+            6,
+            15
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            -0.0006666666666666673,
+            0.0
+          ],
+          "mean_difference": -0.00030000000000000024,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            1,
+            6,
+            23
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.8163,
+        "mixture": 0.3972,
+        "no_correction": 0.8165666666666667,
+        "unguarded": 0.8166
+      },
+      "mean_logloss": {
+        "guarded": 0.4816245596666667,
+        "mixture": 0.7975887703333333,
+        "no_correction": 0.5033335916666667,
+        "unguarded": 0.48097761566666664
+      }
+    },
+    "uneven_bias:1000:phase_b_online": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            0.002633333333333332,
+            0.010866666666666646
+          ],
+          "mean_difference": 0.006833333333333328,
+          "median_difference": 0.009499999999999953,
+          "wins_losses_ties": [
+            22,
+            8,
+            0
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            0.0012333333333333306,
+            0.004233333333333329
+          ],
+          "mean_difference": 0.0026666666666666653,
+          "median_difference": 0.0020000000000000018,
+          "wins_losses_ties": [
+            23,
+            7,
+            0
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            -0.00010000000000000009,
+            0.0006666666666666673
+          ],
+          "mean_difference": 0.00023333333333333355,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            5,
+            2,
+            23
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.7966666666666666,
+        "mixture": 0.7898333333333334,
+        "no_correction": 0.794,
+        "unguarded": 0.7964333333333333
+      },
+      "mean_logloss": {
+        "guarded": 0.49511335466666667,
+        "mixture": 0.502769193,
+        "no_correction": 0.496974356,
+        "unguarded": 0.49516120733333335
+      }
+    },
+    "uneven_bias:1000:switch_to_a": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.010333333333333335,
+            0.005000000000000008
+          ],
+          "mean_difference": -0.0030000000000000027,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            6,
+            13,
+            11
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.008999999999999992,
+            0.00333333333333334
+          ],
+          "mean_difference": -0.0029999999999999953,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            2,
+            8,
+            20
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            -0.0010000000000000009,
+            0.0
+          ],
+          "mean_difference": -0.00033333333333333365,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            1,
+            29
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.9003333333333333,
+        "mixture": 0.9033333333333333,
+        "no_correction": 0.9033333333333333,
+        "unguarded": 0.9006666666666667
+      },
+      "mean_logloss": {
+        "guarded": 0.29339236133333335,
+        "mixture": 0.30400876866666665,
+        "no_correction": 0.28922023733333335,
+        "unguarded": 0.292918843
+      }
+    },
+    "uneven_bias:1000:switch_to_b": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            0.01633333333333335,
+            0.06966666666666665
+          ],
+          "mean_difference": 0.043,
+          "median_difference": 0.03500000000000003,
+          "wins_losses_ties": [
+            22,
+            7,
+            1
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            0.001666666666666668,
+            0.028000000000000008
+          ],
+          "mean_difference": 0.014000000000000009,
+          "median_difference": 0.019999999999999907,
+          "wins_losses_ties": [
+            20,
+            6,
+            4
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            -0.0020000000000000018,
+            0.0020000000000000018
+          ],
+          "mean_difference": 0.0,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            4,
+            4,
+            22
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.698,
+        "mixture": 0.655,
+        "no_correction": 0.6839999999999999,
+        "unguarded": 0.698
+      },
+      "mean_logloss": {
+        "guarded": 0.633890712,
+        "mixture": 0.67295925,
+        "no_correction": 0.6440601006666666,
+        "unguarded": 0.63512802
+      }
+    },
+    "uneven_bias:400:final_a": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.001366666666666679,
+            0.013900000000000004
+          ],
+          "mean_difference": 0.006599999999999991,
+          "median_difference": 0.0044999999999999485,
+          "wins_losses_ties": [
+            20,
+            9,
+            1
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.0007333333333333377,
+            0.006133333333333316
+          ],
+          "mean_difference": 0.002599999999999995,
+          "median_difference": 0.0004999999999999449,
+          "wins_losses_ties": [
+            15,
+            2,
+            13
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            -0.00013333333333333345,
+            6.666666666666672e-05
+          ],
+          "mean_difference": -3.333333333333336e-05,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            1,
+            2,
+            27
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.9240666666666667,
+        "mixture": 0.9174666666666667,
+        "no_correction": 0.9214666666666667,
+        "unguarded": 0.9241
+      },
+      "mean_logloss": {
+        "guarded": 0.24398475666666666,
+        "mixture": 0.2585631463333333,
+        "no_correction": 0.24991893366666668,
+        "unguarded": 0.24390148833333333
+      }
+    },
+    "uneven_bias:400:final_b": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            0.002533333333333328,
+            0.10643333333333335
+          ],
+          "mean_difference": 0.045366666666666666,
+          "median_difference": 0.0005000000000000004,
+          "wins_losses_ties": [
+            15,
+            14,
+            1
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.009599999999999997,
+            -0.00013333333333333345
+          ],
+          "mean_difference": -0.0039,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            4,
+            10,
+            16
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            -0.00020000000000000017,
+            0.00013333333333333345
+          ],
+          "mean_difference": 0.0,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            2,
+            1,
+            27
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.8129666666666666,
+        "mixture": 0.7676,
+        "no_correction": 0.8168666666666666,
+        "unguarded": 0.8129666666666666
+      },
+      "mean_logloss": {
+        "guarded": 0.47802060166666666,
+        "mixture": 0.5515230543333334,
+        "no_correction": 0.47868849966666666,
+        "unguarded": 0.477865833
+      }
+    },
+    "uneven_bias:400:phase_b_online": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.004166666666666667,
+            0.007916666666666667
+          ],
+          "mean_difference": 0.002333333333333339,
+          "median_difference": 0.0050000000000000044,
+          "wins_losses_ties": [
+            19,
+            9,
+            2
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.0021666666666666614,
+            0.002583333333333345
+          ],
+          "mean_difference": 0.0005833333333333357,
+          "median_difference": 0.0012499999999999734,
+          "wins_losses_ties": [
+            15,
+            6,
+            9
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            -0.00033333333333333365,
+            0.0007499999999999951
+          ],
+          "mean_difference": 0.0002499999999999947,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            4,
+            1,
+            25
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.784,
+        "mixture": 0.7816666666666666,
+        "no_correction": 0.7834166666666667,
+        "unguarded": 0.7837500000000001
+      },
+      "mean_logloss": {
+        "guarded": 0.5064139613333334,
+        "mixture": 0.507165234,
+        "no_correction": 0.507275063,
+        "unguarded": 0.506367352
+      }
+    },
+    "uneven_bias:400:switch_to_a": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.0020000000000000204,
+            0.010999999999999977
+          ],
+          "mean_difference": 0.004333333333333315,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            12,
+            8,
+            10
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.0036666666666666774,
+            0.001666666666666668
+          ],
+          "mean_difference": -0.0010000000000000046,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            4,
+            6,
+            20
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            0.0,
+            0.0
+          ],
+          "mean_difference": 0.0,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            0,
+            0,
+            30
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.9026666666666666,
+        "mixture": 0.8983333333333333,
+        "no_correction": 0.9036666666666666,
+        "unguarded": 0.9026666666666666
+      },
+      "mean_logloss": {
+        "guarded": 0.27341703700000003,
+        "mixture": 0.281318409,
+        "no_correction": 0.27428634,
+        "unguarded": 0.27336230733333333
+      }
+    },
+    "uneven_bias:400:switch_to_b": {
+      "guarded_vs": {
+        "mixture": {
+          "bootstrap_95_percentile": [
+            -0.011666666666666662,
+            0.02333333333333334
+          ],
+          "mean_difference": 0.007000000000000003,
+          "median_difference": 0.014999999999999958,
+          "wins_losses_ties": [
+            18,
+            10,
+            2
+          ]
+        },
+        "no_correction": {
+          "bootstrap_95_percentile": [
+            -0.0016666666666666718,
+            0.008
+          ],
+          "mean_difference": 0.0033333333333333288,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            12,
+            6,
+            12
+          ]
+        },
+        "unguarded": {
+          "bootstrap_95_percentile": [
+            -0.00033333333333333365,
+            0.003333333333333336
+          ],
+          "mean_difference": 0.0013333333333333346,
+          "median_difference": 0.0,
+          "wins_losses_ties": [
+            4,
+            1,
+            25
+          ]
+        }
+      },
+      "mean_accuracy": {
+        "guarded": 0.7316666666666667,
+        "mixture": 0.7246666666666667,
+        "no_correction": 0.7283333333333334,
+        "unguarded": 0.7303333333333333
+      },
+      "mean_logloss": {
+        "guarded": 0.5814946433333333,
+        "mixture": 0.5812318123333333,
+        "no_correction": 0.585219262,
+        "unguarded": 0.5814502753333334
+      }
+    }
+  },
+  "schema_version": 1,
+  "seed_count": 30
+}

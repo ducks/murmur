@@ -91,6 +91,26 @@
       "candidate_commits": [
         "9c8f02b9551aa59b52f2f59400329783bad5514b"
       ]
+    },
+    {
+      "id": "correction-guard-ablation-2026-11",
+      "question": "Does the switch-aware guard materially improve prediction compared with unguarded retrospective correction?",
+      "observation": "In a 30-seed matched comparison across six public binary rule families and two phase lengths, all 24 individual switch-window mean differences between guarded and unguarded correction were within 0.14 percentage points; differences versus no correction were mixed. Post-hoc traces found mean guard values between 0.9882 and 0.9918 in the first 100 events after each switch, averaged by condition.",
+      "hypothesis": "The guard may have little practical effect on these tasks because its values are close to one on average; this correlation is not a causal proof. The correction itself may help some regimes and hurt others.",
+      "next_test": "Instrument the guard and correction magnitudes and compare wider switch rates or task types on predeclared fresh seeds before removing or endorsing either mechanism.",
+      "limitations": "This is exploratory and not an equivalence test; 30 seeds, unadjusted comparisons, visible synthetic rules, and no compute matching limit generalization. Guard traces are post-hoc window averages and do not rule out rare large per-event effects.",
+      "evidence": [
+        "EXPERIMENTS.md",
+        "toolkit/experiment-results/correction-validation/summary.json",
+        "toolkit/experiment-results/correction-validation/metrics.csv.gz",
+        "toolkit/experiment-results/correction-validation/guard-summary.json"
+      ],
+      "related_findings": [
+        "matched-idea2-2026-11"
+      ],
+      "candidate_commits": [
+        "48a5c2836142b2fd7d711c42e9d8a77134297fc3"
+      ]
     }
   ]
 }

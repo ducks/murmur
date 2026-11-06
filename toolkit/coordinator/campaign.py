@@ -31,6 +31,10 @@ SCHEMA = {
                    for key in ('question', 'hypothesis', 'falsification', 'approach', 'limitations')},
     'required': ['question', 'hypothesis', 'falsification', 'approach', 'limitations'],
 }
+MILESTONE_FIELDS = ('question', 'motivation', 'intervention', 'control', 'measurement', 'decision_rule', 'limitations')
+MILESTONE_SCHEMA = {'type': 'object', 'additionalProperties': False,
+                    'properties': {key: {'type': 'string', 'minLength': 1, 'maxLength': 1000} for key in MILESTONE_FIELDS},
+                    'required': list(MILESTONE_FIELDS)}
 DIAGNOSIS_FIELDS = ('observation', 'hypothesis', 'alternative', 'followup_test', 'expected_evidence', 'limitations')
 DIAGNOSIS_SCHEMA = {'type': 'object', 'additionalProperties': False,
                     'properties': {key: {'type': 'string', 'minLength': 1, 'maxLength': 1000} for key in DIAGNOSIS_FIELDS},
@@ -154,6 +158,7 @@ def init(directory, goal, max_ideas, agent_seconds, test_seconds, local_provider
               'protocol': protocol,
               'diagnose_failures': diagnose_failures, 'diagnostic_seconds': diagnostic_seconds,
               'review_successes': review_successes and diagnose_failures,
+              'auto_milestones': True,
               'max_reported_input_tokens': max_reported_input_tokens,
               'scope': 'binary hidden-context sequence task; candidate Rust model only',
               'limits': 'LLM token/cost limits and blind holdouts are not enforced.'}
@@ -161,6 +166,7 @@ def init(directory, goal, max_ideas, agent_seconds, test_seconds, local_provider
     runner.write_json(dest / 'state.json', {'schema_version': 1, 'completed': [], 'next_index': 1, 'base_commit': config['base_commit'], 'status': 'ready'})
     runner.write_json(dest / 'agent-output-schema.json', SCHEMA)
     runner.write_json(dest / 'diagnosis-output-schema.json', DIAGNOSIS_SCHEMA)
+    runner.write_json(dest / 'milestone-output-schema.json', MILESTONE_SCHEMA)
     return config
 
 
@@ -194,7 +200,7 @@ def prior_history(path):
     return history
 
 
-def prompt_for(config, history, research_memory=None):
+def prompt_for(config, history, research_memory=None, milestone=None):
     if config.get('protocol', 'legacy') == 'milestone':
         criteria_text = 'The supervisor checks final frozen B recall and the first 100 online predictions after each A→B and B→A switch, on each of four binary task families. The candidate must be within 2 percentage points of the unchanged mixture on each mean paired accuracy. Resource budgets apply to the entire stage; inline size and per-model training time are diagnostic only and heap memory is not measured.'
         evaluator_reference = ', toolkit/src/bin/milestone_context.rs'
@@ -207,6 +213,10 @@ def prompt_for(config, history, research_memory=None):
     return f'''You are one research agent in an automated, bounded model research campaign.
 Overall goal: {config['goal']}
 {seed_note}
+
+Frozen round milestone (a proposal, not a validated result):
+{json.dumps(milestone, indent=2)}
+If a milestone is supplied, address its intervention, control, measurement and decision rule in a focused test. If it cannot be implemented within the permitted scope, explicitly state why in limitations; do not imply it was completed.
 
 Propose and implement ONE genuinely motivated candidate model for the existing hidden-context binary sequence task. Read RESEARCH.md, EXPERIMENTS.md, toolkit/src/unlabeled_context.rs, toolkit/src/candidate_context.rs{evaluator_reference}, toolkit/src/agent_candidate.rs and toolkit/tests/candidate_context.rs. The existing mixture and other controls are fixed; seek an improvement over the mixture, not an attractive demonstration. A copy of the baseline can pass a non-inferiority threshold but is not a novel mechanism. Consider varied ideas, not only stronger thresholds. This is one limited task, not a claim of general language modeling or novelty.
 
@@ -273,11 +283,45 @@ def bounded_process(args, *, cwd, stdout, stderr, timeout, input_bytes=None, env
     return proc.returncode
 
 
+def plan_milestone(config, worktree, round_dir, history, research_index):
+    """Ask a read-only planner for one bounded next experiment before coding."""
+    response = round_dir / 'milestone.json'
+    args = ['codex', '-a', 'never', 'exec', '--sandbox', 'read-only', '--ephemeral', '--json',
+            '--cd', str(worktree), '--output-schema', str(round_dir.parent / 'milestone-output-schema.json'),
+            '--output-last-message', str(response)]
+    if config.get('local_provider'):
+        args += ['--oss', '--local-provider', config['local_provider']]
+    if config.get('model'):
+        args += ['--model', config['model']]
+    args.append('-')
+    prompt = f"""Plan ONE small, falsifiable next research milestone for this campaign.
+Goal: {config['goal']}
+Recent campaign history: {json.dumps(history[-5:])}
+Research memory: {json.dumps(research_index['agent_context'])}
+Pick a question grounded in evidence or a clearly stated uncertainty. Specify an intervention, an explicit control, a measurable outcome, and a decision rule. Prefer a test that fits edits to toolkit/src/agent_candidate.rs and toolkit/tests/agent_generated.rs. The existing evaluator and public task rules cannot be changed. Do not claim a finding has been established. If a proposed question needs a different evaluator, choose a feasible smaller step or clearly explain the limitation. Do not edit files or run experiments. Return only the structured JSON.
+"""
+    (round_dir / 'milestone-prompt.txt').write_text(prompt, encoding='utf-8')
+    with (round_dir / 'milestone-events.jsonl').open('wb') as out, (round_dir / 'milestone-stderr.log').open('wb') as err:
+        try:
+            code = bounded_process(args, cwd=worktree, stdout=out, stderr=err, input_bytes=prompt.encode('utf-8'), timeout=config['diagnostic_seconds'])
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            raise runner.PlanError(f'milestone planner could not complete: {exc}') from exc
+    if code:
+        raise runner.PlanError(f'milestone planner exited {code}; inspect milestone logs')
+    milestone = runner.read_json(response)
+    runner.exact_keys(milestone, MILESTONE_FIELDS, 'milestone')
+    for key, value in milestone.items():
+        runner.text_field(value, key)
+        if len(value) > 1000:
+            raise runner.PlanError(f'milestone field {key} too long')
+    return milestone
+
+
 def call_agent(config, worktree, round_dir, history):
     env = build_environment(round_dir.parent, config)
     args = agent_command(config, worktree, round_dir / 'idea.json', round_dir.parent / 'agent-output-schema.json')
     index = runner.read_json(round_dir / 'research-memory.json')
-    (round_dir / 'prompt.txt').write_text(prompt_for(config, history, index['agent_context']), encoding='utf-8')
+    (round_dir / 'prompt.txt').write_text(prompt_for(config, history, index['agent_context'], runner.read_json(round_dir / 'milestone.json') if (round_dir / 'milestone.json').is_file() else None), encoding='utf-8')
     try:
         with (round_dir / 'agent-events.jsonl').open('wb') as stdout, (round_dir / 'agent-stderr.log').open('wb') as stderr:
             result = bounded_process(args, cwd=worktree, input_bytes=(round_dir / 'prompt.txt').read_bytes(), stdout=stdout,
@@ -438,6 +482,11 @@ def reported_input_usage(completed):
         if not isinstance(usage, dict) or not isinstance(usage.get('input_tokens'), int) or isinstance(usage['input_tokens'], bool) or usage['input_tokens'] < 0:
             return None
         total += usage['input_tokens']
+        if item.get('milestone') is not None or 'milestone_usage' in item and item['milestone_usage'] is not None:
+            planning = item.get('milestone_usage')
+            if not isinstance(planning, dict) or not isinstance(planning.get('input_tokens'), int) or isinstance(planning['input_tokens'], bool) or planning['input_tokens'] < 0:
+                return None
+            total += planning['input_tokens']
         diagnosis = item.get('diagnosis') or {}
         if diagnosis.get('status') in ('complete', 'failed'):
             usage = diagnosis.get('usage')
@@ -581,6 +630,14 @@ def execute_round(directory, config, state, agent=call_agent):
         research_index['agent_context'] = memory.snapshot_for_agent(research_index, config['campaign_id'])
         research_index['agent_context']['full_snapshot_path'] = str(round_dir / 'research-memory.json')
         runner.write_json(round_dir / 'research-memory.json', research_index)
+        if config.get('auto_milestones', False):
+            try:
+                result['milestone'] = plan_milestone(config, worktree, round_dir, config.get('prior_history', []) + state['completed'], research_index)
+            finally:
+                result['milestone_usage'] = agent_usage(round_dir / 'milestone-events.jsonl')
+            if git(worktree, 'rev-parse', 'HEAD') != base or changed_paths(worktree):
+                raise runner.PlanError('worktree changed during milestone planning; preserve it for inspection')
+            runner.write_json(round_dir / 'result.json', result)
         agent_started = time.monotonic()
         idea = agent(config, worktree, round_dir, config.get('prior_history', []) + state['completed'])
         result['agent_elapsed_seconds'] = time.monotonic() - agent_started
@@ -602,6 +659,9 @@ def execute_round(directory, config, state, agent=call_agent):
         if tests:
             raise runner.PlanError(f'candidate tests failed ({tests}); see tests.log')
         result['followups'] = followup_metrics(round_dir / 'tests.log')
+        if result.get('milestone'):
+            result['milestone_evidence'] = {'status': 'reported_unverified' if result['followups']['record_count'] else 'no_structured_followup',
+                                            'qualification': 'Structured records do not verify that the planned intervention or decision rule was followed; inspect tests and logs.'}
         unexpected = changed_paths(worktree) - ALLOWED - GENERATED
         if unexpected:
             raise runner.PlanError(f'unexpected changes after tests: {sorted(unexpected)}')
@@ -631,7 +691,7 @@ def execute_round(directory, config, state, agent=call_agent):
     except (runner.PlanError, OSError, subprocess.SubprocessError) as exc:
         result.update(status='failed', error=str(exc))
     runner.write_json(round_dir / 'result.json', result)
-    state['completed'].append({k: result.get(k) for k in ('index', 'status', 'base_commit', 'seed_candidate_commit', 'commit', 'idea', 'agent_elapsed_seconds', 'agent_usage', 'followups', 'development', 'evaluation', 'final_probe_matrix', 'diagnosis', 'error')})
+    state['completed'].append({k: result.get(k) for k in ('index', 'status', 'base_commit', 'seed_candidate_commit', 'commit', 'idea', 'milestone', 'milestone_usage', 'milestone_evidence', 'agent_elapsed_seconds', 'agent_usage', 'followups', 'development', 'evaluation', 'final_probe_matrix', 'diagnosis', 'error')})
     state['next_index'] += 1
     state['status'] = 'ready' if result['status'] == 'complete' else 'inspect_failure'
     runner.write_json(directory / 'state.json', state)

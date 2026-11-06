@@ -1334,3 +1334,7 @@ nix-shell --run 'cargo test --offline --manifest-path toolkit/Cargo.toml --bin f
 nix-shell --run 'cargo run --offline --release --manifest-path toolkit/Cargo.toml --bin fixed_slot_diagnostics -- toolkit/configs/fixed-slot-diagnostics/matched.cfg toolkit/runs/fixed-slot-diagnostics-reproduction'
 python3 -B toolkit/scripts/summarize_fixed_slot_diagnostics.py toolkit/configs/fixed-slot-diagnostics/protocol.json toolkit/configs/fixed-slot-diagnostics/matched.cfg toolkit/runs/fixed-slot-diagnostics-reproduction
 ```
+
+## Autonomous small-milestone planning
+
+The campaign framework can now ask a separate read-only agent to propose one bounded milestone before each coding round, grounded in the recorded research memory and recent outcomes. It freezes the proposed question, intervention, control, measurement, decision rule and limitations, then passes them to the coding agent. The round records whether any structured follow-up was reported, but this is explicitly unverified and is not an automated determination that the milestone was met. Invalid or failed planning stops the round. Planner token usage is included in the existing between-round reported-input accounting. Existing campaigns remain compatible; new campaigns enable planning by default. Coordinator tests exercise the planner interface, failure handling, usage accounting and memory indexing. No live model campaign was run for this change, so the quality or usefulness of generated milestones remains unmeasured. See [the workflow](toolkit/coordinator/AGENT_WORKFLOW.md) for limitations.

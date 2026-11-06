@@ -1,0 +1,15 @@
+{
+  "frozen_experiment_commit": "720b78a",
+  "candidate_commit": "16963a2a04af6564d89cb0d996013c2f438671dd",
+  "sha256": {
+    "toolkit/configs/fixed-slot-diagnostics/protocol.json": "e7481e6b8839d2c3042154c3ff94553b7a4e892ea185a99b9ea98a009b67efa7",
+    "toolkit/configs/fixed-slot-diagnostics/matched.cfg": "5db4cf3c162342c46cfdc3bf64f92c70a47f683e6ca55711f091baa11d397184",
+    "toolkit/src/validated_candidates/diagnostic_candidate.rs": "ed4df427c3635623923968f5a4c5161c84e3dc9bb8cd4a642de654a29b6f14d0",
+    "toolkit/src/bin/fixed_slot_diagnostics.rs": "af4c41e1e8bad77582b0ed436abb5b632b7e6b9699f76f19be37a4e4c64bd742",
+    "toolkit/scripts/summarize_fixed_slot_diagnostics.py": "7eac8479e1f3462d210e40860d145fa07b6dd6d5350a4414bd8333146e97e9fb",
+    "toolkit/experiment-results/fixed-slot-diagnostics/summary.json": "570414e8629f3dda2199dfbfd71b321cc43ef189b3f3bc36b805069ee0187e3a",
+    "toolkit/runs/fixed-slot-diagnostics-01/metrics.csv": "a053c316abe0bc9436f6883861b0d6a21c0c97df159c0320ac9967611cf4ca1f",
+    "toolkit/runs/fixed-slot-diagnostics-01/diagnostics.csv": "c158b1f37cc5851be63eac54c712c07a569c4c11aa63acb4037084b0f97a871d"
+  },
+  "reproduction": "Second local run produced byte-identical CSV files. Nix package set is unpinned."
+}

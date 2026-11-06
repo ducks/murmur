@@ -131,6 +131,25 @@
         "fd6de66042c6f4b1f3d16f280aad8a1a945ef0f1",
         "16963a2a04af6564d89cb0d996013c2f438671dd"
       ]
+    },
+    {
+      "id": "fixed-slot-correction-2026-11",
+      "question": "Does retrospective correction improve accuracy and fixed-label context diagnostics on fresh seeds?",
+      "observation": "Across four public rule families, two phase lengths and 30 matched seeds, correction had mixed effects. First-100 A-to-B accuracy improved by 1.57 percentage points on new constant bias with 1000-step phases but fell by 0.90 points on moderate noise at that length. The latter had 11 of 30 correction runs with alignment margins below 0.01.",
+      "hypothesis": "Correction may trade off adaptation and retention in a task-dependent way; ambiguous initial labels limit interpretation of the internal diagnostics.",
+      "next_test": "Test label-invariant diagnostics or controlled interventions that can distinguish slot identity errors from memory drift; predeclare a primary outcome and use fresh tasks.",
+      "limitations": "Exploratory public tasks, oracle-assisted fixed mapping that can be wrong, unadjusted bootstrap intervals, no compute matching, and slow-filter rather than corrected prior assignment diagnostics.",
+      "evidence": [
+        "EXPERIMENTS.md",
+        "toolkit/experiment-results/fixed-slot-diagnostics/summary.json",
+        "toolkit/experiment-results/fixed-slot-diagnostics/diagnostics.csv.gz"
+      ],
+      "related_findings": [
+        "seeded-guard-agent-diagnostics-2026-11"
+      ],
+      "candidate_commits": [
+        "16963a2a04af6564d89cb0d996013c2f438671dd"
+      ]
     }
   ]
 }

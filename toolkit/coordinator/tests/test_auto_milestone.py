@@ -89,10 +89,11 @@ class AutoMilestoneTests(unittest.TestCase):
         runner.write_json(self.root / 'campaign.json', {'schema_version': 1, 'campaign_id': 'id'})
         evidence = {'status': 'reported_unverified'}
         runner.write_json(self.root / 'state.json', {'schema_version': 1, 'completed': [
-            {'index': 1, 'status': 'complete', 'milestone': self.milestone, 'milestone_evidence': evidence}]})
+            {'index': 1, 'status': 'complete', 'milestone': self.milestone, 'milestone_evidence': evidence, 'milestone_review': {'status': 'unclear'}}]})
         result = memory.campaign_records(self.root)[0]
         self.assertEqual(result['milestone'], self.milestone)
         self.assertEqual(result['milestone_evidence'], evidence)
+        self.assertEqual(result['milestone_review']['status'], 'unclear')
 
 
 if __name__ == '__main__':

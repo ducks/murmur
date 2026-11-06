@@ -39,9 +39,12 @@ MILESTONE_SCHEMA = {'type': 'object', 'additionalProperties': False,
                                    **{key: {'type': 'string', 'minLength': 1, 'maxLength': 200} for key in ('primary_measure', 'candidate_label', 'control_label')}},
                     'required': list(MILESTONE_V2_FIELDS)}
 DIAGNOSIS_FIELDS = ('observation', 'hypothesis', 'alternative', 'followup_test', 'expected_evidence', 'limitations')
+DIAGNOSIS_V2_FIELDS = DIAGNOSIS_FIELDS + ('milestone_status', 'milestone_evidence', 'milestone_deviations')
 DIAGNOSIS_SCHEMA = {'type': 'object', 'additionalProperties': False,
-                    'properties': {key: {'type': 'string', 'minLength': 1, 'maxLength': 1000} for key in DIAGNOSIS_FIELDS},
-                    'required': list(DIAGNOSIS_FIELDS)}
+                    'properties': {**{key: {'type': 'string', 'minLength': 1, 'maxLength': 1000} for key in DIAGNOSIS_FIELDS},
+                                   'milestone_status': {'type': 'string', 'enum': ['followed', 'partial', 'not_followed', 'unclear']},
+                                   **{key: {'type': 'string', 'minLength': 1, 'maxLength': 1000} for key in ('milestone_evidence', 'milestone_deviations')}},
+                    'required': list(DIAGNOSIS_V2_FIELDS)}
 
 
 def git(cwd, *args):
@@ -161,7 +164,7 @@ def init(directory, goal, max_ideas, agent_seconds, test_seconds, local_provider
               'protocol': protocol,
               'diagnose_failures': diagnose_failures, 'diagnostic_seconds': diagnostic_seconds,
               'review_successes': review_successes and diagnose_failures,
-              'auto_milestones': True, 'milestone_schema_version': 2,
+              'auto_milestones': True, 'milestone_schema_version': 2, 'diagnosis_schema_version': 2,
               'max_reported_input_tokens': max_reported_input_tokens,
               'scope': 'binary hidden-context sequence task; candidate Rust model only',
               'limits': 'LLM token/cost limits and blind holdouts are not enforced.'}
@@ -230,7 +233,7 @@ Research memory (observations are not proven explanations; campaign evidence is 
 {json.dumps(research_memory or {}, indent=2)}
 
 For an apparent failure, distinguish observations from possible explanations and propose a discriminating test in your hypothesis and falsification. The full index for this round is saved alongside the agent logs as research-memory.json; the prompt may include only recent campaign rounds.
-If the preceding round contains a completed diagnosis, try to design a focused test that distinguishes its competing explanations, with an explicit control. If the proposed test cannot fit the candidate and test-file scope, state that limitation in your response and select another testable idea. A diagnosis is an unverified hypothesis, not an established cause.
+If a previous milestone review says partial, not_followed, unclear, or unavailable, treat that as an unresolved issue, not a completed result. If the preceding round contains a completed diagnosis, try to design a focused test that distinguishes its competing explanations, with an explicit control. If the proposed test cannot fit the candidate and test-file scope, state that limitation in your response and select another testable idea. A diagnosis is an unverified hypothesis, not an established cause.
 Prior candidate commits are available locally: when building on a previous idea, inspect its candidate source with git show <commit>:toolkit/src/agent_candidate.rs and adapt it within the permitted files. Starting a new campaign does not automatically check out the prior candidate.
 For any quantitative follow-up in agent_generated.rs, print one single-line record per aggregate measurement using this exact prefix and JSON shape: MURMUR_FOLLOWUP {{"measure":"name","candidate":"name","control":"name","candidate_correct":1,"control_correct":1,"trials":2}}. Counts must refer to the same paired observations. Prefer aggregate counts by task and measure, not one record per seed; keep any per-seed details in the test log. The supervisor preserves and checks the arithmetic but does not independently verify the experimental design. Do not emit a record for a test you did not run.
 
@@ -421,13 +424,14 @@ def followup_metrics(path, preview_limit=10, max_records=10000):
             'qualification': 'Agent-authored test output; arithmetic checked, experimental design not independently verified.'}
 
 
-def diagnosis_prompt(result, round_dir):
+def diagnosis_prompt(result, round_dir, structured_assessment=False):
     reports = [result.get('development'), result.get('evaluation')]
     failed = any(isinstance(x, dict) and x.get('outcome') == 'criteria_not_met' for x in reports)
     focus = ('Identify failed checks and competing explanations.' if failed else
              'The candidate passed the operational checks. A pass does not show that its added mechanism helped. Identify untested causal claims, possible regressions or complexity costs, and propose a matched ablation against an explicit control before adding more complexity.')
     return f'''You are a research investigator analyzing one completed candidate evaluation.
 {focus}
+{'Assess whether the milestone was followed, partially followed, not followed, or is unclear; cite specific file paths, test functions, or logs as evidence, and describe deviations or say none found. Use unclear when evidence is insufficient. Your assessment is an unverified review, not proof.' if structured_assessment else ''}
 Frozen milestone and evidence status:
 {json.dumps({'milestone': result.get('milestone'), 'evidence': result.get('milestone_evidence')}, indent=2)}
 Check whether the candidate changes and test actually address the planned intervention and primary comparison; explicitly flag any unrelated mechanism or unablated model change. Matching record labels are not verification.
@@ -454,7 +458,7 @@ def call_diagnoser(config, worktree, round_dir, result):
     if config.get('model'):
         args += ['--model', config['model']]
     args.append('-')
-    prompt = diagnosis_prompt(result, round_dir)
+    prompt = diagnosis_prompt(result, round_dir, config.get('diagnosis_schema_version') == 2)
     (round_dir / 'diagnosis-prompt.txt').write_text(prompt, encoding='utf-8')
     started = time.monotonic()
     try:
@@ -466,11 +470,14 @@ def call_diagnoser(config, worktree, round_dir, result):
     if code:
         raise runner.PlanError(f'diagnosis agent exited {code}; inspect diagnosis logs')
     diagnosis = runner.read_json(response)
-    runner.exact_keys(diagnosis, DIAGNOSIS_FIELDS, 'diagnosis')
+    fields = DIAGNOSIS_V2_FIELDS if config.get('diagnosis_schema_version') == 2 else DIAGNOSIS_FIELDS
+    runner.exact_keys(diagnosis, fields, 'diagnosis')
     for key, value in diagnosis.items():
         runner.text_field(value, key)
         if len(value) > 1000:
             raise runner.PlanError(f'diagnosis field {key} too long')
+    if config.get('diagnosis_schema_version') == 2 and diagnosis['milestone_status'] not in ('followed', 'partial', 'not_followed', 'unclear'):
+        raise runner.PlanError('invalid milestone review status')
     return {'status': 'complete', 'analysis': diagnosis, 'elapsed_seconds': time.monotonic() - started,
             'usage': agent_usage(round_dir / 'diagnosis-events.jsonl'),
             'qualification': 'Agent-proposed explanations and follow-up are unverified.'}
@@ -489,6 +496,20 @@ def diagnose_failure(config, worktree, round_dir, result, diagnoser=None):
     except (runner.PlanError, OSError, subprocess.SubprocessError) as exc:
         return {'status': 'failed', 'error': str(exc), 'usage': agent_usage(round_dir / 'diagnosis-events.jsonl'),
                 'qualification': 'No diagnosis was produced.'}
+
+
+def milestone_review(diagnosis):
+    """Expose a review separately from deterministic evidence checks; never infer success."""
+    if diagnosis.get('status') != 'complete':
+        return {'status': 'unavailable', 'reason': diagnosis.get('status', 'unknown'),
+                'qualification': 'No milestone assessment was produced.'}
+    analysis = diagnosis.get('analysis') or {}
+    if 'milestone_status' not in analysis:
+        return {'status': 'unavailable', 'reason': 'legacy_review',
+                'qualification': 'This review did not use the structured milestone assessment.'}
+    return {'status': analysis['milestone_status'], 'evidence': analysis['milestone_evidence'],
+            'deviations': analysis['milestone_deviations'],
+            'qualification': 'Reviewer judgment only; not independent verification or a completion guarantee.'}
 
 
 def reported_input_usage(completed):
@@ -723,6 +744,7 @@ def execute_round(directory, config, state, agent=call_agent):
         matrix = probe_matrix(study / evidence_stage / 'evidence' / 'probes.csv')
         result.update(status='complete', commit=commit, idea=idea, development=development, evaluation=evaluation, final_probe_matrix=matrix)
         result['diagnosis'] = diagnose_failure(config, worktree, round_dir, result)
+        result['milestone_review'] = milestone_review(result['diagnosis'])
         if git(worktree, 'rev-parse', 'HEAD') != commit or changed_paths(worktree):
             raise runner.PlanError('worktree changed during diagnosis; preserve it for inspection')
         if runner.stage_state(study, 'development') != 'complete' or (evaluation is not None and runner.stage_state(study, 'evaluation') != 'complete'):
@@ -731,7 +753,7 @@ def execute_round(directory, config, state, agent=call_agent):
     except (runner.PlanError, OSError, subprocess.SubprocessError) as exc:
         result.update(status='failed', error=str(exc))
     runner.write_json(round_dir / 'result.json', result)
-    state['completed'].append({k: result.get(k) for k in ('index', 'status', 'base_commit', 'seed_candidate_commit', 'commit', 'idea', 'milestone', 'milestone_usage', 'milestone_evidence', 'agent_elapsed_seconds', 'agent_usage', 'followups', 'development', 'evaluation', 'final_probe_matrix', 'diagnosis', 'error')})
+    state['completed'].append({k: result.get(k) for k in ('index', 'status', 'base_commit', 'seed_candidate_commit', 'commit', 'idea', 'milestone', 'milestone_usage', 'milestone_evidence', 'milestone_review', 'agent_elapsed_seconds', 'agent_usage', 'followups', 'development', 'evaluation', 'final_probe_matrix', 'diagnosis', 'error')})
     state['next_index'] += 1
     state['status'] = 'ready' if result['status'] == 'complete' else 'inspect_failure'
     runner.write_json(directory / 'state.json', state)
@@ -779,7 +801,8 @@ def _run_locked(directory, max_new=None, agent=call_agent):
         results.append({'index': result['index'], 'status': result['status'], 'commit': result.get('commit'),
                         'development': (result.get('development') or {}).get('outcome'),
                         'evaluation': (result.get('evaluation') or {}).get('outcome'),
-                        'diagnosis': (result.get('diagnosis') or {}).get('status'), 'error': result.get('error')})
+                        'diagnosis': (result.get('diagnosis') or {}).get('status'),
+                        'milestone_review': (result.get('milestone_review') or {}).get('status'), 'error': result.get('error')})
         if result['status'] != 'complete':
             break
     budget = config.get('max_reported_input_tokens')

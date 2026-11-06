@@ -45,6 +45,28 @@ class DiagnosisTests(unittest.TestCase):
         self.assertEqual(result['analysis'],self.analysis)
         prompt=campaign.prompt_for({'goal':'goal','protocol':'milestone'},[{'diagnosis':result}])
         self.assertIn('followup_test text',prompt)
+    def test_structured_review_requires_status_and_evidence(self):
+        config={**self.config, 'diagnosis_schema_version':2}
+        analysis={**self.analysis, 'milestone_status':'partial', 'milestone_evidence':'tests/example.rs: test_x', 'milestone_deviations':'missing baseline'}
+        def process(args, **kwargs):
+            self.assertIn('Use unclear when evidence is insufficient', kwargs['input_bytes'].decode())
+            runner.write_json(self.round/'diagnosis.json', analysis)
+            return 0
+        with patch.object(campaign, 'bounded_process', side_effect=process):
+            diagnosis=campaign.call_diagnoser(config,self.worktree,self.round,self.failed)
+        review=campaign.milestone_review(diagnosis)
+        self.assertEqual(review['status'],'partial')
+        self.assertEqual(review['deviations'],'missing baseline')
+        self.assertIn('not independent verification',review['qualification'])
+        analysis['milestone_status']='guaranteed'
+        with patch.object(campaign,'bounded_process',side_effect=process):
+            with self.assertRaises(runner.PlanError):campaign.call_diagnoser(config,self.worktree,self.round,self.failed)
+
+    def test_missing_or_legacy_review_never_implies_completion(self):
+        self.assertEqual(campaign.milestone_review({'status':'failed'})['status'],'unavailable')
+        self.assertEqual(campaign.milestone_review({'status':'disabled'})['status'],'unavailable')
+        self.assertEqual(campaign.milestone_review({'status':'complete','analysis':self.analysis})['reason'],'legacy_review')
+
     def test_malformed_diagnosis_is_rejected(self):
         def process(*args,**kwargs):
             runner.write_json(self.round/'diagnosis.json',{'observation':'missing fields'});return 0

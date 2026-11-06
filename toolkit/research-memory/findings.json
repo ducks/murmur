@@ -111,6 +111,26 @@
       "candidate_commits": [
         "48a5c2836142b2fd7d711c42e9d8a77134297fc3"
       ]
+    },
+    {
+      "id": "seeded-guard-agent-diagnostics-2026-11",
+      "question": "Does the switch guard materially change accuracy, and does retrospective correction improve assignment or memory?",
+      "observation": "A seeded two-round campaign disabled the guard by default and ran two agent-authored 100-seed matched ablations. In the high-noise 200-step condition, unguarded minus no-correction B recall was -0.0038 in the first and -0.00279 in the second; the second bootstrap interval was [-0.01072, 0.00563].",
+      "hypothesis": "The guard may have little effect in sampled settings; whether retrospective correction reduces assignment or memory error remains unresolved.",
+      "next_test": "Independently validate the agent-authored diagnostics and compare correction versus no correction on fresh rule families and seeds, using per-seed outcomes and tracking both adaptation and retention.",
+      "limitations": "Agent-authored tests and exploratory intervals are not independently validated; synthetic rule labels select slot mappings at each snapshot, so diagnostic errors may be optimistic. Public task families allow adaptive overfitting; resource budgets are unmatched.",
+      "evidence": [
+        "EXPERIMENTS.md",
+        "toolkit/experiment-results/seeded-guard-followup/campaign-summary.json",
+        "toolkit/experiment-results/seeded-guard-followup/idea-002.tests.log.gz"
+      ],
+      "related_findings": [
+        "correction-guard-ablation-2026-11"
+      ],
+      "candidate_commits": [
+        "fd6de66042c6f4b1f3d16f280aad8a1a945ef0f1",
+        "16963a2a04af6564d89cb0d996013c2f438671dd"
+      ]
     }
   ]
 }

@@ -170,6 +170,25 @@
         "177553b868124eae6f295827e3fc59ee67dc3f48",
         "554d2ba7a9bf9768775b0995d30fc55a16a23859"
       ]
+    },
+    {
+      "id": "milestone-scope-pilot-2026-11",
+      "question": "Does the consistency filter improve recall over the unguarded candidate in the public high-noise condition, and does test-only scope hold?",
+      "observation": "A one-round live test-only campaign held candidate source unchanged and emitted the planned primary comparison. The agent-authored 200-seed result was filter minus unguarded B recall -0.001645, with bootstrap interval [-0.006370, 0.002140], inconclusive under the one-point threshold.",
+      "hypothesis": "The filter may have a small or task-specific effect, but the current result does not establish equivalence or generalization. File-level scope and primary-label matching enforce only narrow operational properties.",
+      "next_test": "Independently validate matched ablations across distinct tasks and assess whether automated milestones actually follow their declared methods before accumulating more complexity.",
+      "limitations": "The test and interval were agent-authored and not independently rerun. Seed freshness was not independently checked; task rules are public, and compute budgets are unmatched.",
+      "evidence": [
+        "EXPERIMENTS.md",
+        "toolkit/experiment-results/milestone-scope-pilot-01/campaign-summary.json",
+        "toolkit/experiment-results/milestone-scope-pilot-01/test.rs"
+      ],
+      "related_findings": [
+        "autonomous-milestone-pilot-2026-11"
+      ],
+      "candidate_commits": [
+        "99e65effd13586f137e3a78831b019c8a6312b15"
+      ]
     }
   ]
 }

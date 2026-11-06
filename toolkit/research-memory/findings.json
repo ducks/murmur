@@ -150,6 +150,26 @@
       "candidate_commits": [
         "16963a2a04af6564d89cb0d996013c2f438671dd"
       ]
+    },
+    {
+      "id": "autonomous-milestone-pilot-2026-11",
+      "question": "Can the campaign propose a bounded milestone and carry a review into a subsequent experiment?",
+      "observation": "A two-round live pilot selected a matched 200-seed correction ablation, then planned and ran an agent-authored boundary-suppression test suggested by the reviewer. Both were inconclusive under the specified one-percentage-point threshold. The second agent added an unablated consistency filter.",
+      "hypothesis": "Structured planning can guide sequential follow-ups, but current prompts do not enforce scope and follow-up records do not independently verify completion.",
+      "next_test": "Develop an independently assessed milestone completion check and compare any added filter with its otherwise identical no-filter control on matched fresh seeds.",
+      "limitations": "Agent-authored tests and bootstrap intervals are unverified; tasks are public and compute is unmatched. The two-round reported input-token total exceeded the between-round threshold.",
+      "evidence": [
+        "EXPERIMENTS.md",
+        "toolkit/experiment-results/auto-milestone-pilot-01/campaign-summary.json",
+        "toolkit/experiment-results/auto-milestone-pilot-01/idea-002.test.rs"
+      ],
+      "related_findings": [
+        "fixed-slot-correction-2026-11"
+      ],
+      "candidate_commits": [
+        "177553b868124eae6f295827e3fc59ee67dc3f48",
+        "554d2ba7a9bf9768775b0995d30fc55a16a23859"
+      ]
     }
   ]
 }

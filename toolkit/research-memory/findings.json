@@ -208,6 +208,25 @@
       "candidate_commits": [
         "ad1c8baaf20b21049b359052ea3a907bdcb13f56"
       ]
+    },
+    {
+      "id": "paired-log-check-2026-11",
+      "question": "Do the saved per-seed counts support the reported aggregate and bootstrap in the milestone review pilot?",
+      "observation": "An independently implemented parser checked 1000 seed rows and all nine aggregate comparisons. The primary mean was -0.000506 and an independent Python seed bootstrap gave [-0.001442, 0.000390], close to the agent-reported interval.",
+      "hypothesis": "The stored aggregate arithmetic is internally consistent; this does not establish that the experimental protocol was faithfully executed.",
+      "next_test": "Define a reusable machine-readable per-seed evidence contract and independently verify new campaign results, with separately tracked seed provenance and optional deterministic reruns.",
+      "limitations": "Post-hoc check of one saved log format; it does not rerun the model, authenticate the log, establish global seed freshness or verify actual pairing and prespecification.",
+      "evidence": [
+        "EXPERIMENTS.md",
+        "toolkit/experiment-results/milestone-review-pilot-01/independent-check/summary.json",
+        "toolkit/experiment-results/milestone-review-pilot-01/tests.log.gz"
+      ],
+      "related_findings": [
+        "milestone-review-pilot-2026-11"
+      ],
+      "candidate_commits": [
+        "ad1c8baaf20b21049b359052ea3a907bdcb13f56"
+      ]
     }
   ]
 }

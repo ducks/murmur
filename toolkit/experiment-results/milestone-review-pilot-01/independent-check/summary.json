@@ -1,0 +1,74 @@
+{
+  "comparisons": {
+    "high_noise_200_retention_b:consistency_filter:mixture": {
+      "candidate_correct": 670253,
+      "control_correct": 644116,
+      "mean_paired_difference": 0.026137,
+      "trials": 1000000
+    },
+    "high_noise_200_retention_b:consistency_filter:unguarded": {
+      "candidate_correct": 670253,
+      "control_correct": 670759,
+      "mean_paired_difference": -0.000506,
+      "trials": 1000000
+    },
+    "high_noise_200_retention_b:unguarded:mixture": {
+      "candidate_correct": 670759,
+      "control_correct": 644116,
+      "mean_paired_difference": 0.026643,
+      "trials": 1000000
+    },
+    "high_noise_200_switch_to_a:consistency_filter:mixture": {
+      "candidate_correct": 64475,
+      "control_correct": 63335,
+      "mean_paired_difference": 0.0114,
+      "trials": 100000
+    },
+    "high_noise_200_switch_to_a:consistency_filter:unguarded": {
+      "candidate_correct": 64475,
+      "control_correct": 64454,
+      "mean_paired_difference": 0.00021,
+      "trials": 100000
+    },
+    "high_noise_200_switch_to_a:unguarded:mixture": {
+      "candidate_correct": 64454,
+      "control_correct": 63335,
+      "mean_paired_difference": 0.01119,
+      "trials": 100000
+    },
+    "high_noise_200_switch_to_b:consistency_filter:mixture": {
+      "candidate_correct": 59666,
+      "control_correct": 58809,
+      "mean_paired_difference": 0.00857,
+      "trials": 100000
+    },
+    "high_noise_200_switch_to_b:consistency_filter:unguarded": {
+      "candidate_correct": 59666,
+      "control_correct": 59569,
+      "mean_paired_difference": 0.00097,
+      "trials": 100000
+    },
+    "high_noise_200_switch_to_b:unguarded:mixture": {
+      "candidate_correct": 59569,
+      "control_correct": 58809,
+      "mean_paired_difference": 0.0076,
+      "trials": 100000
+    }
+  },
+  "limitations": "Validates internal consistency of reported counts only; does not rerun model, verify seed generation or freshness, authenticate logs, or prove pairing, protocol compliance, or generalization.",
+  "primary_independent_bootstrap": {
+    "draws": 10000,
+    "percentile_95": [
+      -0.001442,
+      0.00038999999999999994
+    ],
+    "rng": "Python random.Random",
+    "seed": 42517
+  },
+  "seed_role_starts": [
+    97100000,
+    97200000,
+    97300000
+  ],
+  "seeds": 1000
+}

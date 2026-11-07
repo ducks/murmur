@@ -20,7 +20,7 @@ import sys
 import time
 import uuid
 
-from . import memory, runner
+from . import memory, paired_evidence, runner
 
 GOAL = 'Find a model that retains earlier rules and adapts to rule changes at least as well as the mixture baseline.'
 ALLOWED = {'toolkit/src/agent_candidate.rs', 'toolkit/tests/agent_generated.rs'}
@@ -164,7 +164,7 @@ def init(directory, goal, max_ideas, agent_seconds, test_seconds, local_provider
               'protocol': protocol,
               'diagnose_failures': diagnose_failures, 'diagnostic_seconds': diagnostic_seconds,
               'review_successes': review_successes and diagnose_failures,
-              'auto_milestones': True, 'milestone_schema_version': 2, 'diagnosis_schema_version': 2,
+              'auto_milestones': True, 'milestone_schema_version': 2, 'diagnosis_schema_version': 2, 'paired_evidence_version': 1,
               'max_reported_input_tokens': max_reported_input_tokens,
               'scope': 'binary hidden-context sequence task; candidate Rust model only',
               'limits': 'LLM token/cost limits and blind holdouts are not enforced.'}
@@ -216,6 +216,7 @@ def prompt_for(config, history, research_memory=None, milestone=None):
     seed_note = (f"The current candidate and test files were initialized from prior candidate commit {config['seed_candidate_commit']}. "
                  'Treat that code as the starting point and use the recorded review to design a matched follow-up.'
                  if config.get('seed_candidate_commit') else 'No previous candidate was checked out as a seed.')
+    paired_note = '''For the planned primary comparison, also print one line per paired seed, using exactly: MURMUR_PAIRED {"measure":"name","candidate":"name","control":"name","seed":0,"candidate_correct":1,"control_correct":1,"trials":2}. Use the exact planned labels, unique nonnegative integer seed IDs, equal positive trial counts per seed, and 2 to 10000 seed records. Their counts and trial totals must sum exactly to the single primary MURMUR_FOLLOWUP record. These records are evidence to check, not proof of actual pairing or seed provenance.''' if config.get('paired_evidence_version') == 1 else ''
     return f'''You are one research agent in an automated, bounded model research campaign.
 Overall goal: {config['goal']}
 {seed_note}
@@ -236,6 +237,8 @@ For an apparent failure, distinguish observations from possible explanations and
 If a previous milestone review says partial, not_followed, unclear, or unavailable, treat that as an unresolved issue, not a completed result. If the preceding round contains a completed diagnosis, try to design a focused test that distinguishes its competing explanations, with an explicit control. If the proposed test cannot fit the candidate and test-file scope, state that limitation in your response and select another testable idea. A diagnosis is an unverified hypothesis, not an established cause.
 Prior candidate commits are available locally: when building on a previous idea, inspect its candidate source with git show <commit>:toolkit/src/agent_candidate.rs and adapt it within the permitted files. Starting a new campaign does not automatically check out the prior candidate.
 For any quantitative follow-up in agent_generated.rs, print one single-line record per aggregate measurement using this exact prefix and JSON shape: MURMUR_FOLLOWUP {{"measure":"name","candidate":"name","control":"name","candidate_correct":1,"control_correct":1,"trials":2}}. Counts must refer to the same paired observations. Prefer aggregate counts by task and measure, not one record per seed; keep any per-seed details in the test log. The supervisor preserves and checks the arithmetic but does not independently verify the experimental design. Do not emit a record for a test you did not run.
+
+{paired_note}
 
 Edit ONLY toolkit/src/agent_candidate.rs and toolkit/tests/agent_generated.rs. A test-only investigation is allowed; the latter must contain at least one meaningful Rust test for your proposed mechanism. Do not alter evaluator, baseline, configs, docs, Git metadata, or any other file; do not commit. The supervisor rejects other changes. Preserve Candidate's Clone, new(seed, rate), reset(), predict(x)->f64 and observe(x,y,learn) interface. `predict` must happen without seeing y; output must be finite in [0,1]. In `observe(..., false)`, do not change learned parameters, though context inference state may update. reset clears transient inference state without erasing learned parameters. Candidate may use local Rust standard library and existing local crates only; no network, pretrained weights, external APIs, hidden future data, environment data, or provided true context. Model-code restrictions are reviewed/tested, not a complete security boundary.
 
@@ -433,7 +436,7 @@ def diagnosis_prompt(result, round_dir, structured_assessment=False):
 {focus}
 {'Assess whether the milestone was followed, partially followed, not followed, or is unclear; cite specific file paths, test functions, or logs as evidence, and describe deviations or say none found. Use unclear when evidence is insufficient. Your assessment is an unverified review, not proof.' if structured_assessment else ''}
 Frozen milestone and evidence status:
-{json.dumps({'milestone': result.get('milestone'), 'evidence': result.get('milestone_evidence')}, indent=2)}
+{json.dumps({'milestone': result.get('milestone'), 'evidence': result.get('milestone_evidence'), 'paired_evidence': result.get('paired_evidence')}, indent=2)}
 Check whether the candidate changes and test actually address the planned intervention and primary comparison; explicitly flag any unrelated mechanism or unablated model change. Matching record labels are not verification.
 Candidate hypothesis and implementation summary:
 {json.dumps(result.get('idea'), indent=2)}
@@ -723,6 +726,9 @@ def execute_round(directory, config, state, agent=call_agent):
             runner.write_json(round_dir / 'result.json', result)
             if result['milestone_evidence']['status'] == 'missing_primary_record':
                 raise runner.PlanError('planned primary follow-up record was not reported; inspect tests and milestone')
+            if config.get('paired_evidence_version') == 1:
+                result['paired_evidence'] = paired_evidence.validate(round_dir / 'tests.log', result['milestone'], result['followups'])
+                runner.write_json(round_dir / 'result.json', result)
         unexpected = changed_paths(worktree) - ALLOWED - GENERATED
         if unexpected:
             raise runner.PlanError(f'unexpected changes after tests: {sorted(unexpected)}')
@@ -753,7 +759,7 @@ def execute_round(directory, config, state, agent=call_agent):
     except (runner.PlanError, OSError, subprocess.SubprocessError) as exc:
         result.update(status='failed', error=str(exc))
     runner.write_json(round_dir / 'result.json', result)
-    state['completed'].append({k: result.get(k) for k in ('index', 'status', 'base_commit', 'seed_candidate_commit', 'commit', 'idea', 'milestone', 'milestone_usage', 'milestone_evidence', 'milestone_review', 'agent_elapsed_seconds', 'agent_usage', 'followups', 'development', 'evaluation', 'final_probe_matrix', 'diagnosis', 'error')})
+    state['completed'].append({k: result.get(k) for k in ('index', 'status', 'base_commit', 'seed_candidate_commit', 'commit', 'idea', 'milestone', 'milestone_usage', 'milestone_evidence', 'milestone_review', 'paired_evidence', 'agent_elapsed_seconds', 'agent_usage', 'followups', 'development', 'evaluation', 'final_probe_matrix', 'diagnosis', 'error')})
     state['next_index'] += 1
     state['status'] = 'ready' if result['status'] == 'complete' else 'inspect_failure'
     runner.write_json(directory / 'state.json', state)

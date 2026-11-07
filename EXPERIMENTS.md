@@ -1404,3 +1404,5 @@ The replay created no model-service calls and removed its worktree and isolated 
 ```sh
 nix-shell --run 'python3 -B -m toolkit.coordinator.replay toolkit/experiment-results/seed-allocation-pilot-01 toolkit/runs/seed-allocation-replay-new'
 ```
+
+New campaigns now automatically replay a committed round's primary paired experiment before review or continuation. The replay reuses the owned campaign build cache, compares regenerated paired records to frozen evidence, and stops the campaign if the replay fails or differs; older campaigns retain their original behavior. A clean replay removes only its own detached worktree, while normal campaign cleanup owns removal of the shared cache. This reruns the same untrusted-generated code in the same local environment; it is not an independent evaluation or sandbox. Unit tests cover archive integrity, cache ownership, replay input creation and failure preservation. A live trial is needed to establish end-to-end behavior.

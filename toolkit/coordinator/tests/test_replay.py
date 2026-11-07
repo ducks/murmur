@@ -33,4 +33,25 @@ class ReplayTests(unittest.TestCase):
         self.assertTrue((output/'build-cache').exists());self.assertTrue((output/'tests.log').exists())
         self.assertEqual(json.loads((output/'result.json').read_text())['status'],'failed')
 
+    def test_campaign_replay_creates_checked_archive_and_reuses_owned_cache(self):
+        directory=self.root/'campaign';directory.mkdir();round_dir=directory/'idea-001';round_dir.mkdir()
+        summary=runner.read_json(self.archive/'campaign-summary.json');item=summary['round']
+        for name in ('seed-allocation.json','paired-records.json'):
+            (round_dir/name).write_bytes(replay.unpack(self.archive/(name+'.gz')))
+        config={'campaign_id':summary['campaign_id'],'test_seconds':180}
+        def fake(archive, output, timeout, shared_cache):
+            checked,allocation,records=replay.verify_archive(archive)
+            self.assertEqual(checked['commit'],item['commit'])
+            self.assertEqual(len(records['records']),100)
+            self.assertEqual(Path(shared_cache),directory/'build-cache')
+            return {'status':'reproduced'}
+        with patch.object(replay,'replay',side_effect=fake):
+            outcome=campaign.automatic_replay(directory,config,round_dir,item)
+        self.assertEqual(outcome['status'],'reproduced')
+        self.assertEqual((directory/'build-cache'/'.murmur-campaign').read_text(),config['campaign_id'])
+
+    def test_campaign_replay_requires_seed_and_count_evidence(self):
+        with self.assertRaises(runner.PlanError):
+            campaign.automatic_replay(self.root,{'campaign_id':'id'},self.root,{'commit':'abc'})
+
 if __name__=='__main__':unittest.main()

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import gzip
 import hashlib
 import json
 import os
@@ -182,7 +183,7 @@ def init(directory, goal, max_ideas, agent_seconds, test_seconds, local_provider
               'protocol': protocol,
               'diagnose_failures': diagnose_failures, 'diagnostic_seconds': diagnostic_seconds,
               'review_successes': review_successes and diagnose_failures,
-              'auto_milestones': True, 'milestone_schema_version': 2, 'diagnosis_schema_version': 2, 'paired_evidence_version': 1, 'seed_allocation_version': 1,
+              'auto_milestones': True, 'milestone_schema_version': 2, 'diagnosis_schema_version': 2, 'paired_evidence_version': 1, 'seed_allocation_version': 1, 'automatic_replay': True,
               'max_reported_input_tokens': max_reported_input_tokens,
               'scope': 'binary hidden-context sequence task; candidate Rust model only',
               'limits': 'LLM token/cost limits and blind holdouts are not enforced.'}
@@ -458,7 +459,7 @@ def diagnosis_prompt(result, round_dir, structured_assessment=False):
 {focus}
 {'Assess whether the milestone was followed, partially followed, not followed, or is unclear; cite specific file paths, test functions, or logs as evidence, and describe deviations or say none found. Use unclear when evidence is insufficient. Your assessment is an unverified review, not proof.' if structured_assessment else ''}
 Frozen milestone and evidence status:
-{json.dumps({'milestone': result.get('milestone'), 'evidence': result.get('milestone_evidence'), 'paired_evidence': result.get('paired_evidence'), 'seed_allocation': result.get('seed_allocation')}, indent=2)}
+{json.dumps({'milestone': result.get('milestone'), 'evidence': result.get('milestone_evidence'), 'paired_evidence': result.get('paired_evidence'), 'seed_allocation': result.get('seed_allocation'), 'replay': result.get('replay')}, indent=2)}
 Check whether the candidate changes and test actually address the planned intervention and primary comparison; explicitly flag any unrelated mechanism or unablated model change. Matching record labels are not verification.
 Candidate hypothesis and implementation summary:
 {json.dumps(result.get('idea'), indent=2)}
@@ -689,6 +690,25 @@ def cleanup(directory):
         lock.rmdir()
 
 
+def automatic_replay(directory, config, round_dir, result):
+    """Build immutable replay input from this completed round and replay without a model call."""
+    from . import replay
+    if not result.get('seed_allocation') or not result.get('paired_evidence') or not result.get('commit'):
+        raise runner.PlanError('automatic replay requires committed candidate and primary seed evidence')
+    archive = round_dir / 'replay-input'
+    archive.mkdir(exist_ok=False)
+    for source, name in (('toolkit/src/agent_candidate.rs','candidate.rs'), ('toolkit/tests/agent_generated.rs','test.rs')):
+        (archive / name).write_bytes(seed_blobs(result['commit'])[source])
+    for name in ('seed-allocation.json','paired-records.json'):
+        with (archive / (name+'.gz')).open('wb') as raw:
+            with gzip.GzipFile(filename='',mode='wb',fileobj=raw,mtime=0) as dst:
+                dst.write((round_dir / name).read_bytes())
+    runner.write_json(archive / 'campaign-summary.json', {'campaign_id':config['campaign_id'], 'round':result})
+    # The campaign marker is checked before sharing its target cache. Replay never deletes a shared cache.
+    env = build_environment(directory, config)
+    return replay.replay(archive, round_dir / 'replay', timeout=config['test_seconds'], shared_cache=env['CARGO_TARGET_DIR'])
+
+
 def execute_round(directory, config, state, agent=call_agent):
     index = state['next_index']
     round_dir = directory / f'idea-{index:03d}'
@@ -788,6 +808,11 @@ def execute_round(directory, config, state, agent=call_agent):
         evidence_stage = 'evaluation' if evaluation is not None else 'development'
         matrix = probe_matrix(study / evidence_stage / 'evidence' / 'probes.csv')
         result.update(status='complete', commit=commit, idea=idea, development=development, evaluation=evaluation, final_probe_matrix=matrix)
+        if config.get('automatic_replay', False):
+            result['replay'] = automatic_replay(directory, config, round_dir, result)
+            runner.write_json(round_dir / 'result.json', result)
+            if result['replay']['status'] != 'reproduced':
+                raise runner.PlanError('automatic replay failed or differed; inspect replay evidence')
         result['diagnosis'] = diagnose_failure(config, worktree, round_dir, result)
         result['milestone_review'] = milestone_review(result['diagnosis'])
         if git(worktree, 'rev-parse', 'HEAD') != commit or changed_paths(worktree):
@@ -798,7 +823,7 @@ def execute_round(directory, config, state, agent=call_agent):
     except (runner.PlanError, OSError, subprocess.SubprocessError) as exc:
         result.update(status='failed', error=str(exc))
     runner.write_json(round_dir / 'result.json', result)
-    state['completed'].append({k: result.get(k) for k in ('index', 'status', 'base_commit', 'seed_candidate_commit', 'commit', 'idea', 'milestone', 'milestone_usage', 'milestone_evidence', 'milestone_review', 'paired_evidence', 'seed_allocation', 'agent_elapsed_seconds', 'agent_usage', 'followups', 'development', 'evaluation', 'final_probe_matrix', 'diagnosis', 'error')})
+    state['completed'].append({k: result.get(k) for k in ('index', 'status', 'base_commit', 'seed_candidate_commit', 'commit', 'idea', 'milestone', 'milestone_usage', 'milestone_evidence', 'milestone_review', 'paired_evidence', 'seed_allocation', 'replay', 'agent_elapsed_seconds', 'agent_usage', 'followups', 'development', 'evaluation', 'final_probe_matrix', 'diagnosis', 'error')})
     state['next_index'] += 1
     state['status'] = 'ready' if result['status'] == 'complete' else 'inspect_failure'
     runner.write_json(directory / 'state.json', state)
@@ -847,7 +872,8 @@ def _run_locked(directory, max_new=None, agent=call_agent):
                         'development': (result.get('development') or {}).get('outcome'),
                         'evaluation': (result.get('evaluation') or {}).get('outcome'),
                         'diagnosis': (result.get('diagnosis') or {}).get('status'),
-                        'milestone_review': (result.get('milestone_review') or {}).get('status'), 'error': result.get('error')})
+                        'milestone_review': (result.get('milestone_review') or {}).get('status'),
+                        'replay': (result.get('replay') or {}).get('status'), 'error': result.get('error')})
         if result['status'] != 'complete':
             break
     budget = config.get('max_reported_input_tokens')

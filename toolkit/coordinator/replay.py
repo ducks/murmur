@@ -50,7 +50,7 @@ def verify_archive(root):
     return item, allocation, original
 
 
-def replay(archive, output, timeout=600):
+def replay(archive, output, timeout=600, shared_cache=None):
     archive = Path(archive).resolve()
     item, allocation, original = verify_archive(archive)
     output = runner.output_location(output)
@@ -58,13 +58,16 @@ def replay(archive, output, timeout=600):
         output.mkdir(parents=True, exist_ok=False)
     except OSError as exc:
         raise runner.PlanError(f'cannot create replay directory: {exc}') from exc
-    worktree = output / 'worktree'; cache = output / 'build-cache'; log = output / 'tests.log'
+    worktree = output / 'worktree'; cache = Path(shared_cache) if shared_cache is not None else output / 'build-cache'; log = output / 'tests.log'
     result = {'schema_version':1, 'status':'running', 'commit':item['commit'], 'archive':str(archive),
               'qualification':'Same code and environment rerun; does not independently validate task design or global seed freshness.'}
     runner.write_json(output / 'result.json', result)
     try:
         campaign.git(runner.ROOT, 'worktree', 'add', '--detach', str(worktree), item['commit'])
-        cache.mkdir()
+        if shared_cache is None:
+            cache.mkdir()
+        elif not cache.is_dir() or cache.is_symlink():
+            raise runner.PlanError('shared replay cache is missing or symlinked')
         with log.open('wb') as out:
             code = campaign.bounded_process(['cargo','test','--offline','--manifest-path','toolkit/Cargo.toml',
                          '--test','candidate_context','--test','agent_generated','--','--nocapture'],
@@ -85,10 +88,11 @@ def replay(archive, output, timeout=600):
         if ignored:
             raise runner.PlanError('replay created ignored or untracked files in its worktree; preserved for inspection')
         campaign.git(runner.ROOT, 'worktree', 'remove', str(worktree))
-        shutil.rmtree(cache)
-        result.update(status='reproduced', paired_evidence=check, cleanup={'worktree':'removed','cache':'removed'})
+        if shared_cache is None:
+            shutil.rmtree(cache)
+        result.update(status='reproduced', paired_evidence=check, cleanup={'worktree':'removed','cache':'shared' if shared_cache is not None else 'removed'})
     except (runner.PlanError, OSError, subprocess.SubprocessError, ValueError) as exc:
-        result.update(status='failed', error=str(exc), cleanup={'worktree':'retained_if_present','cache':'retained_if_present'})
+        result.update(status='failed', error=str(exc), cleanup={'worktree':'retained_if_present','cache':'shared' if shared_cache is not None else 'retained_if_present'})
     runner.write_json(output / 'result.json', result)
     return result
 

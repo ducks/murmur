@@ -285,6 +285,25 @@
       "candidate_commits": [
         "653e854a969357c0a0a595d292d6ef0fc1c5882b"
       ]
+    },
+    {
+      "id": "automatic-replay-pilot-2026-11-07",
+      "question": "Can a campaign automatically replay the primary paired records before review and cleanup?",
+      "observation": "One live 100-seed round replayed every primary paired record exactly and cleaned the shared cache. The reviewer nevertheless rated the milestone unclear because it could not establish the provenance of unrelated differences between the older seed candidate and newer campaign revision.",
+      "hypothesis": "Automatic replay can catch non-reproducible reported records, while review still needs an accurate account of seeded candidate provenance and experiment scope.",
+      "next_test": "Improve provenance presentation to distinguish the current campaign base, the seed candidate, the generated seed commit, and the candidate delta; test that reviewers can inspect the correct changes.",
+      "limitations": "Replay uses the same generated code and local environment, not independent science; task and seeds are visible, compute is unmatched, and the input threshold was exceeded within the round.",
+      "evidence": [
+        "EXPERIMENTS.md",
+        "toolkit/experiment-results/automatic-replay-pilot-01/campaign-summary.json",
+        "toolkit/experiment-results/automatic-replay-pilot-01/replay-result.json.gz"
+      ],
+      "related_findings": [
+        "allocated-seed-replay-2026-11-07"
+      ],
+      "candidate_commits": [
+        "f6fd8ef214d4924e84628fa27359a5b2e1f5f47a"
+      ]
     }
   ]
 }

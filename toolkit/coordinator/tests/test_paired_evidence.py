@@ -39,6 +39,14 @@ class PairedEvidenceTests(unittest.TestCase):
                      [self.rows[0],{**self.rows[1],'control_correct':11}]):
             with self.subTest(rows=rows), self.assertRaises(runner.PlanError): self.check(rows)
 
+    def test_well_formed_non_primary_records_do_not_block_primary(self):
+        extra={**self.rows[0], 'measure':'older_experiment'}
+        result=self.check([extra,*self.rows])
+        self.assertEqual(result['seeds'],2)
+        self.assertEqual(result['other_records'],1)
+        malformed={**extra,'trials':0}
+        with self.assertRaises(runner.PlanError):self.check([malformed,*self.rows])
+
     def test_allocated_ids_must_match_exactly(self):
         self.write(self.rows)
         result=paired_evidence.validate(self.path,self.milestone,self.followups,draws=100,expected_seed_ids={11,12})

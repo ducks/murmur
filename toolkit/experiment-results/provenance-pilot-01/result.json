@@ -1,0 +1,163 @@
+{
+  "agent_elapsed_seconds": 410.9295089759398,
+  "agent_usage": {
+    "cache_write_input_tokens": 0,
+    "cached_input_tokens": 725504,
+    "input_tokens": 818932,
+    "output_tokens": 3300,
+    "reasoning_output_tokens": 122
+  },
+  "base_commit": "8e646cdf8cb167edcfe309301b072cf3f3797394",
+  "branch": "toolkit/campaign-358bfd490c2c-001",
+  "error": "paired record does not match planned primary comparison",
+  "followups": {
+    "aggregate_count": 0,
+    "aggregates": [],
+    "full_records_path": "/home/urho/dev/murmur/toolkit/runs/provenance-pilot-01/idea-001/followup-records.json",
+    "qualification": "Agent-authored test output; arithmetic checked, experimental design not independently verified.",
+    "record_count": 21,
+    "records": [
+      {
+        "candidate": "unguarded",
+        "candidate_accuracy": 0.8436,
+        "candidate_correct": 8436,
+        "control": "mixture",
+        "control_accuracy": 0.8467,
+        "control_correct": 8467,
+        "measure": "similar_rules_switch_to_b",
+        "trials": 10000
+      },
+      {
+        "candidate": "unguarded",
+        "candidate_accuracy": 0.8506,
+        "candidate_correct": 8506,
+        "control": "mixture",
+        "control_accuracy": 0.8522,
+        "control_correct": 8522,
+        "measure": "similar_rules_switch_to_a",
+        "trials": 10000
+      },
+      {
+        "candidate": "unguarded",
+        "candidate_accuracy": 0.84781,
+        "candidate_correct": 84781,
+        "control": "mixture",
+        "control_accuracy": 0.84886,
+        "control_correct": 84886,
+        "measure": "similar_rules_retention_b",
+        "trials": 100000
+      },
+      {
+        "candidate": "unguarded",
+        "candidate_accuracy": 0.8435,
+        "candidate_correct": 8435,
+        "control": "no_smoothing",
+        "control_accuracy": 0.8439,
+        "control_correct": 8439,
+        "measure": "similar_rules_switch_to_b",
+        "trials": 10000
+      },
+      {
+        "candidate": "unguarded",
+        "candidate_accuracy": 0.8435,
+        "candidate_correct": 8435,
+        "control": "mixture",
+        "control_accuracy": 0.846,
+        "control_correct": 8460,
+        "measure": "similar_rules_switch_to_b",
+        "trials": 10000
+      },
+      {
+        "candidate": "no_smoothing",
+        "candidate_accuracy": 0.8439,
+        "candidate_correct": 8439,
+        "control": "mixture",
+        "control_accuracy": 0.846,
+        "control_correct": 8460,
+        "measure": "similar_rules_switch_to_b",
+        "trials": 10000
+      },
+      {
+        "candidate": "unguarded",
+        "candidate_accuracy": 0.8428,
+        "candidate_correct": 8428,
+        "control": "no_smoothing",
+        "control_accuracy": 0.8427,
+        "control_correct": 8427,
+        "measure": "similar_rules_switch_to_a",
+        "trials": 10000
+      },
+      {
+        "candidate": "unguarded",
+        "candidate_accuracy": 0.8428,
+        "candidate_correct": 8428,
+        "control": "mixture",
+        "control_accuracy": 0.8437,
+        "control_correct": 8437,
+        "measure": "similar_rules_switch_to_a",
+        "trials": 10000
+      },
+      {
+        "candidate": "no_smoothing",
+        "candidate_accuracy": 0.8427,
+        "candidate_correct": 8427,
+        "control": "mixture",
+        "control_accuracy": 0.8437,
+        "control_correct": 8437,
+        "measure": "similar_rules_switch_to_a",
+        "trials": 10000
+      },
+      {
+        "candidate": "unguarded",
+        "candidate_accuracy": 0.84728,
+        "candidate_correct": 84728,
+        "control": "no_smoothing",
+        "control_accuracy": 0.84818,
+        "control_correct": 84818,
+        "measure": "similar_rules_retention_b",
+        "trials": 100000
+      }
+    ],
+    "records_shown": 10,
+    "warnings": []
+  },
+  "index": 1,
+  "milestone": {
+    "candidate_label": "unguarded",
+    "control": "Use the same initialized candidate with retrospective smoothing disabled via without_smoothing(). Verify that the two variants differ only in smoothing and that the switch guard and consistency filter are disabled in both. Pair initialization, training stream, and frozen probe roles. Include the fixed mixture as a descriptive reference.",
+    "control_label": "no_smoothing",
+    "decision_rule": "For unguarded minus no-smoothing frozen B recall, an entirely positive 95% paired seed-bootstrap interval supports a correction benefit on this condition; an entirely negative interval supports a loss. Otherwise the result is inconclusive. Report the effect size and both switch outcomes separately; do not infer equivalence from an interval spanning zero.",
+    "intervention": "In toolkit/tests/agent_generated.rs, run the existing public similar_rules A\u2013B\u2013A protocol on exactly 100 supervisor-allocated paired seeds, each with distinct stream, initialization, and probe roles. Compare Candidate::new(...).unguarded_smoothing() with its matched without_smoothing() variant. Record the allocation before execution and check it against available seed records. Keep toolkit/src/agent_candidate.rs byte-for-byte unchanged and do not change the evaluator or task rules. If the variants cannot be matched under these constraints, report the test as blocked.",
+    "limitations": "The public condition was selected after an observed deficit and cannot establish generalization. Available records cannot establish global seed freshness. One hundred seeds may yield an inconclusive interval. The ablation measures the combined predictive effect of correction, not its internal causal pathway; compute remains unmatched against the mixture.",
+    "measurement": "Save per-seed correct and total frozen B-probe predictions after the final A phase. Report the paired mean accuracy difference and a 95% percentile interval from 10,000 bootstrap draws resampling seeds, with the bootstrap seed recorded. Emit one MURMUR_FOLLOWUP record with the specified primary labels. Also save first-100-event counts for each switch direction, their paired intervals, mixture comparisons, seed-role mappings, protocol settings, source revision, and available timing and memory measurements.",
+    "motivation": "The latest replayed comparison found the unguarded candidate within the two-point switch-to-B margin against mixture on similar_rules. That whole-model comparison does not establish whether retrospective correction contributes to retention.",
+    "primary_measure": "similar_rules_retention_b",
+    "question": "On similar_rules, does unguarded retrospective correction change frozen B recall relative to the same candidate without smoothing?",
+    "scope": "test_only"
+  },
+  "milestone_evidence": {
+    "matching_records": 1,
+    "model_change_review_required": false,
+    "qualification": "Matching labels only confirm that an arithmetically valid record was reported; they do not verify the intervention, seed pairing, decision rule, or correctness.",
+    "status": "primary_record_reported_unverified"
+  },
+  "milestone_usage": {
+    "cache_write_input_tokens": 0,
+    "cached_input_tokens": 0,
+    "input_tokens": 72135,
+    "output_tokens": 588,
+    "reasoning_output_tokens": 46
+  },
+  "seed_allocation": {
+    "count": 100,
+    "path": "/home/urho/dev/murmur/toolkit/runs/provenance-pilot-01/idea-001/seed-allocation.json",
+    "qualification": "Allocated and recorded in advance; visible to the agent; actual use and global freshness are not verified.",
+    "sha256": "2d2866f58b942db183ef31ea3a82a5353f7bb0a960410229dfdf3c99d0955dc1"
+  },
+  "seed_candidate_commit": "f6fd8ef214d4924e84628fa27359a5b2e1f5f47a",
+  "seed_source_sha256": {
+    "toolkit/src/agent_candidate.rs": "ac85654ec9b0c5f498a05f9ed1caabb7c6824c06d6fa9262722c8f1eeeb6ba2c",
+    "toolkit/tests/agent_generated.rs": "76b805434facd582330242a357e3cb080e3812260d8991df1faf46b10d214718"
+  },
+  "status": "failed"
+}

@@ -1,0 +1,905 @@
+{
+  "records": [
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 836,
+      "control": "no_smoothing",
+      "control_correct": 836,
+      "measure": "similar_rules_retention_b",
+      "seed": 0,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 870,
+      "control": "no_smoothing",
+      "control_correct": 870,
+      "measure": "similar_rules_retention_b",
+      "seed": 1,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 858,
+      "control": "no_smoothing",
+      "control_correct": 858,
+      "measure": "similar_rules_retention_b",
+      "seed": 2,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 852,
+      "control": "no_smoothing",
+      "control_correct": 852,
+      "measure": "similar_rules_retention_b",
+      "seed": 3,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 833,
+      "control": "no_smoothing",
+      "control_correct": 833,
+      "measure": "similar_rules_retention_b",
+      "seed": 4,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 826,
+      "control": "no_smoothing",
+      "control_correct": 826,
+      "measure": "similar_rules_retention_b",
+      "seed": 5,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 839,
+      "control": "no_smoothing",
+      "control_correct": 839,
+      "measure": "similar_rules_retention_b",
+      "seed": 6,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 870,
+      "control": "no_smoothing",
+      "control_correct": 870,
+      "measure": "similar_rules_retention_b",
+      "seed": 7,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 838,
+      "control": "no_smoothing",
+      "control_correct": 838,
+      "measure": "similar_rules_retention_b",
+      "seed": 8,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 821,
+      "control": "no_smoothing",
+      "control_correct": 839,
+      "measure": "similar_rules_retention_b",
+      "seed": 9,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 850,
+      "control": "no_smoothing",
+      "control_correct": 850,
+      "measure": "similar_rules_retention_b",
+      "seed": 10,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 863,
+      "control": "no_smoothing",
+      "control_correct": 863,
+      "measure": "similar_rules_retention_b",
+      "seed": 11,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 852,
+      "control": "no_smoothing",
+      "control_correct": 852,
+      "measure": "similar_rules_retention_b",
+      "seed": 12,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 867,
+      "control": "no_smoothing",
+      "control_correct": 867,
+      "measure": "similar_rules_retention_b",
+      "seed": 13,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 868,
+      "control": "no_smoothing",
+      "control_correct": 868,
+      "measure": "similar_rules_retention_b",
+      "seed": 14,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 833,
+      "control": "no_smoothing",
+      "control_correct": 833,
+      "measure": "similar_rules_retention_b",
+      "seed": 15,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 860,
+      "control": "no_smoothing",
+      "control_correct": 860,
+      "measure": "similar_rules_retention_b",
+      "seed": 16,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 847,
+      "control": "no_smoothing",
+      "control_correct": 869,
+      "measure": "similar_rules_retention_b",
+      "seed": 17,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 837,
+      "control": "no_smoothing",
+      "control_correct": 837,
+      "measure": "similar_rules_retention_b",
+      "seed": 18,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 853,
+      "control": "no_smoothing",
+      "control_correct": 853,
+      "measure": "similar_rules_retention_b",
+      "seed": 19,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 854,
+      "control": "no_smoothing",
+      "control_correct": 854,
+      "measure": "similar_rules_retention_b",
+      "seed": 20,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 851,
+      "control": "no_smoothing",
+      "control_correct": 851,
+      "measure": "similar_rules_retention_b",
+      "seed": 21,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 866,
+      "control": "no_smoothing",
+      "control_correct": 866,
+      "measure": "similar_rules_retention_b",
+      "seed": 22,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 842,
+      "control": "no_smoothing",
+      "control_correct": 842,
+      "measure": "similar_rules_retention_b",
+      "seed": 23,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 851,
+      "control": "no_smoothing",
+      "control_correct": 851,
+      "measure": "similar_rules_retention_b",
+      "seed": 24,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 874,
+      "control": "no_smoothing",
+      "control_correct": 874,
+      "measure": "similar_rules_retention_b",
+      "seed": 25,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 852,
+      "control": "no_smoothing",
+      "control_correct": 852,
+      "measure": "similar_rules_retention_b",
+      "seed": 26,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 870,
+      "control": "no_smoothing",
+      "control_correct": 870,
+      "measure": "similar_rules_retention_b",
+      "seed": 27,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 858,
+      "control": "no_smoothing",
+      "control_correct": 858,
+      "measure": "similar_rules_retention_b",
+      "seed": 28,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 841,
+      "control": "no_smoothing",
+      "control_correct": 841,
+      "measure": "similar_rules_retention_b",
+      "seed": 29,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 849,
+      "control": "no_smoothing",
+      "control_correct": 849,
+      "measure": "similar_rules_retention_b",
+      "seed": 30,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 824,
+      "control": "no_smoothing",
+      "control_correct": 824,
+      "measure": "similar_rules_retention_b",
+      "seed": 31,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 838,
+      "control": "no_smoothing",
+      "control_correct": 838,
+      "measure": "similar_rules_retention_b",
+      "seed": 32,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 855,
+      "control": "no_smoothing",
+      "control_correct": 855,
+      "measure": "similar_rules_retention_b",
+      "seed": 33,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 837,
+      "control": "no_smoothing",
+      "control_correct": 837,
+      "measure": "similar_rules_retention_b",
+      "seed": 34,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 834,
+      "control": "no_smoothing",
+      "control_correct": 834,
+      "measure": "similar_rules_retention_b",
+      "seed": 35,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 869,
+      "control": "no_smoothing",
+      "control_correct": 869,
+      "measure": "similar_rules_retention_b",
+      "seed": 36,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 834,
+      "control": "no_smoothing",
+      "control_correct": 834,
+      "measure": "similar_rules_retention_b",
+      "seed": 37,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 849,
+      "control": "no_smoothing",
+      "control_correct": 849,
+      "measure": "similar_rules_retention_b",
+      "seed": 38,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 850,
+      "control": "no_smoothing",
+      "control_correct": 850,
+      "measure": "similar_rules_retention_b",
+      "seed": 39,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 831,
+      "control": "no_smoothing",
+      "control_correct": 831,
+      "measure": "similar_rules_retention_b",
+      "seed": 40,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 837,
+      "control": "no_smoothing",
+      "control_correct": 837,
+      "measure": "similar_rules_retention_b",
+      "seed": 41,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 845,
+      "control": "no_smoothing",
+      "control_correct": 845,
+      "measure": "similar_rules_retention_b",
+      "seed": 42,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 849,
+      "control": "no_smoothing",
+      "control_correct": 849,
+      "measure": "similar_rules_retention_b",
+      "seed": 43,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 850,
+      "control": "no_smoothing",
+      "control_correct": 850,
+      "measure": "similar_rules_retention_b",
+      "seed": 44,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 864,
+      "control": "no_smoothing",
+      "control_correct": 864,
+      "measure": "similar_rules_retention_b",
+      "seed": 45,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 853,
+      "control": "no_smoothing",
+      "control_correct": 853,
+      "measure": "similar_rules_retention_b",
+      "seed": 46,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 859,
+      "control": "no_smoothing",
+      "control_correct": 859,
+      "measure": "similar_rules_retention_b",
+      "seed": 47,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 839,
+      "control": "no_smoothing",
+      "control_correct": 839,
+      "measure": "similar_rules_retention_b",
+      "seed": 48,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 847,
+      "control": "no_smoothing",
+      "control_correct": 847,
+      "measure": "similar_rules_retention_b",
+      "seed": 49,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 858,
+      "control": "no_smoothing",
+      "control_correct": 858,
+      "measure": "similar_rules_retention_b",
+      "seed": 50,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 855,
+      "control": "no_smoothing",
+      "control_correct": 855,
+      "measure": "similar_rules_retention_b",
+      "seed": 51,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 847,
+      "control": "no_smoothing",
+      "control_correct": 859,
+      "measure": "similar_rules_retention_b",
+      "seed": 52,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 845,
+      "control": "no_smoothing",
+      "control_correct": 845,
+      "measure": "similar_rules_retention_b",
+      "seed": 53,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 837,
+      "control": "no_smoothing",
+      "control_correct": 837,
+      "measure": "similar_rules_retention_b",
+      "seed": 54,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 855,
+      "control": "no_smoothing",
+      "control_correct": 855,
+      "measure": "similar_rules_retention_b",
+      "seed": 55,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 852,
+      "control": "no_smoothing",
+      "control_correct": 852,
+      "measure": "similar_rules_retention_b",
+      "seed": 56,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 862,
+      "control": "no_smoothing",
+      "control_correct": 862,
+      "measure": "similar_rules_retention_b",
+      "seed": 57,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 859,
+      "control": "no_smoothing",
+      "control_correct": 859,
+      "measure": "similar_rules_retention_b",
+      "seed": 58,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 836,
+      "control": "no_smoothing",
+      "control_correct": 836,
+      "measure": "similar_rules_retention_b",
+      "seed": 59,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 838,
+      "control": "no_smoothing",
+      "control_correct": 838,
+      "measure": "similar_rules_retention_b",
+      "seed": 60,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 841,
+      "control": "no_smoothing",
+      "control_correct": 841,
+      "measure": "similar_rules_retention_b",
+      "seed": 61,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 829,
+      "control": "no_smoothing",
+      "control_correct": 829,
+      "measure": "similar_rules_retention_b",
+      "seed": 62,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 853,
+      "control": "no_smoothing",
+      "control_correct": 853,
+      "measure": "similar_rules_retention_b",
+      "seed": 63,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 842,
+      "control": "no_smoothing",
+      "control_correct": 842,
+      "measure": "similar_rules_retention_b",
+      "seed": 64,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 842,
+      "control": "no_smoothing",
+      "control_correct": 842,
+      "measure": "similar_rules_retention_b",
+      "seed": 65,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 829,
+      "control": "no_smoothing",
+      "control_correct": 829,
+      "measure": "similar_rules_retention_b",
+      "seed": 66,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 850,
+      "control": "no_smoothing",
+      "control_correct": 850,
+      "measure": "similar_rules_retention_b",
+      "seed": 67,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 851,
+      "control": "no_smoothing",
+      "control_correct": 851,
+      "measure": "similar_rules_retention_b",
+      "seed": 68,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 830,
+      "control": "no_smoothing",
+      "control_correct": 830,
+      "measure": "similar_rules_retention_b",
+      "seed": 69,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 874,
+      "control": "no_smoothing",
+      "control_correct": 874,
+      "measure": "similar_rules_retention_b",
+      "seed": 70,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 848,
+      "control": "no_smoothing",
+      "control_correct": 848,
+      "measure": "similar_rules_retention_b",
+      "seed": 71,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 856,
+      "control": "no_smoothing",
+      "control_correct": 856,
+      "measure": "similar_rules_retention_b",
+      "seed": 72,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 853,
+      "control": "no_smoothing",
+      "control_correct": 853,
+      "measure": "similar_rules_retention_b",
+      "seed": 73,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 865,
+      "control": "no_smoothing",
+      "control_correct": 865,
+      "measure": "similar_rules_retention_b",
+      "seed": 74,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 823,
+      "control": "no_smoothing",
+      "control_correct": 823,
+      "measure": "similar_rules_retention_b",
+      "seed": 75,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 822,
+      "control": "no_smoothing",
+      "control_correct": 822,
+      "measure": "similar_rules_retention_b",
+      "seed": 76,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 820,
+      "control": "no_smoothing",
+      "control_correct": 831,
+      "measure": "similar_rules_retention_b",
+      "seed": 77,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 834,
+      "control": "no_smoothing",
+      "control_correct": 834,
+      "measure": "similar_rules_retention_b",
+      "seed": 78,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 850,
+      "control": "no_smoothing",
+      "control_correct": 850,
+      "measure": "similar_rules_retention_b",
+      "seed": 79,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 872,
+      "control": "no_smoothing",
+      "control_correct": 872,
+      "measure": "similar_rules_retention_b",
+      "seed": 80,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 836,
+      "control": "no_smoothing",
+      "control_correct": 836,
+      "measure": "similar_rules_retention_b",
+      "seed": 81,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 833,
+      "control": "no_smoothing",
+      "control_correct": 833,
+      "measure": "similar_rules_retention_b",
+      "seed": 82,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 850,
+      "control": "no_smoothing",
+      "control_correct": 850,
+      "measure": "similar_rules_retention_b",
+      "seed": 83,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 840,
+      "control": "no_smoothing",
+      "control_correct": 840,
+      "measure": "similar_rules_retention_b",
+      "seed": 84,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 848,
+      "control": "no_smoothing",
+      "control_correct": 848,
+      "measure": "similar_rules_retention_b",
+      "seed": 85,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 873,
+      "control": "no_smoothing",
+      "control_correct": 873,
+      "measure": "similar_rules_retention_b",
+      "seed": 86,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 857,
+      "control": "no_smoothing",
+      "control_correct": 857,
+      "measure": "similar_rules_retention_b",
+      "seed": 87,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 854,
+      "control": "no_smoothing",
+      "control_correct": 854,
+      "measure": "similar_rules_retention_b",
+      "seed": 88,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 830,
+      "control": "no_smoothing",
+      "control_correct": 830,
+      "measure": "similar_rules_retention_b",
+      "seed": 89,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 849,
+      "control": "no_smoothing",
+      "control_correct": 849,
+      "measure": "similar_rules_retention_b",
+      "seed": 90,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 850,
+      "control": "no_smoothing",
+      "control_correct": 850,
+      "measure": "similar_rules_retention_b",
+      "seed": 91,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 865,
+      "control": "no_smoothing",
+      "control_correct": 865,
+      "measure": "similar_rules_retention_b",
+      "seed": 92,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 842,
+      "control": "no_smoothing",
+      "control_correct": 842,
+      "measure": "similar_rules_retention_b",
+      "seed": 93,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 829,
+      "control": "no_smoothing",
+      "control_correct": 829,
+      "measure": "similar_rules_retention_b",
+      "seed": 94,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 854,
+      "control": "no_smoothing",
+      "control_correct": 854,
+      "measure": "similar_rules_retention_b",
+      "seed": 95,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 823,
+      "control": "no_smoothing",
+      "control_correct": 823,
+      "measure": "similar_rules_retention_b",
+      "seed": 96,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 863,
+      "control": "no_smoothing",
+      "control_correct": 863,
+      "measure": "similar_rules_retention_b",
+      "seed": 97,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 849,
+      "control": "no_smoothing",
+      "control_correct": 849,
+      "measure": "similar_rules_retention_b",
+      "seed": 98,
+      "trials": 1000
+    },
+    {
+      "candidate": "unguarded",
+      "candidate_correct": 810,
+      "control": "no_smoothing",
+      "control_correct": 837,
+      "measure": "similar_rules_retention_b",
+      "seed": 99,
+      "trials": 1000
+    }
+  ],
+  "schema_version": 1
+}

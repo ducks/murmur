@@ -1,0 +1,10 @@
+{
+  "qualification": "Post-hoc check with corrected validator; stopped campaign was not completed.",
+  "primary_records": 100,
+  "other_records": 100,
+  "totals": {
+    "candidate_correct": 84728,
+    "control_correct": 84818,
+    "trials": 100000
+  }
+}

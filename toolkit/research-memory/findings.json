@@ -304,6 +304,23 @@
       "candidate_commits": [
         "f6fd8ef214d4924e84628fa27359a5b2e1f5f47a"
       ]
+    },
+    {
+      "id": "provenance-pilot-record-collision-2026-11-07",
+      "question": "Can seeded campaigns retain prior paired tests while validating a new primary comparison?",
+      "observation": "The first provenance-aware pilot stopped before commit and review because the seeded test suite emitted 100 records for a previous comparison alongside 100 for the new primary; the original validator rejected the extra labels. A post-hoc corrected check found the primary IDs and totals consistent.",
+      "hypothesis": "Primary-evidence validation must distinguish prior or secondary records from malformed primary data without treating those other records as independently validated.",
+      "next_test": "Run a fresh campaign with the corrected mixed-comparison validator and provenance-aware reviewer, and inspect the full replay and review results.",
+      "limitations": "The pilot did not complete a scorecard or replay; post-hoc arithmetic validation does not prove execution, seed use, or scientific validity. The failed worktree remains retained.",
+      "evidence": [
+        "EXPERIMENTS.md",
+        "toolkit/experiment-results/provenance-pilot-01/result.json",
+        "toolkit/experiment-results/provenance-pilot-01/tests.log.gz"
+      ],
+      "related_findings": [
+        "automatic-replay-pilot-2026-11-07"
+      ],
+      "candidate_commits": []
     }
   ]
 }

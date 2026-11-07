@@ -20,6 +20,7 @@ def validate(path, milestone, followups, max_seeds=10000, draws=2000, expected_s
     if len(aggregates) != 1:
         raise runner.PlanError('paired evidence requires exactly one primary aggregate record')
     rows = {}
+    other_records = 0
     with Path(path).open(encoding='utf-8', errors='replace') as source:
         for line in source:
             if MARKER not in line:
@@ -28,16 +29,25 @@ def validate(path, milestone, followups, max_seeds=10000, draws=2000, expected_s
                 item = json.loads(line.split(MARKER, 1)[1], object_pairs_hook=runner.object_no_duplicates,
                                   parse_constant=lambda _: (_ for _ in ()).throw(ValueError('invalid number')))
                 runner.exact_keys(item, FIELDS, 'paired record')
-                if (item['measure'], item['candidate'], item['control']) != expected:
-                    raise runner.PlanError('paired record does not match planned primary comparison')
+                for key in ('measure', 'candidate', 'control'):
+                    runner.text_field(item[key], key)
+                    if len(item[key]) > 200:
+                        raise runner.PlanError('paired label too long')
                 for key in ('seed', 'candidate_correct', 'control_correct', 'trials'):
                     if isinstance(item[key], bool) or not isinstance(item[key], int):
                         raise runner.PlanError(f'paired {key} must be an integer')
                 seed = item['seed']; n = item['trials']
-                if seed < 0 or seed in rows or n < 1 or any(not 0 <= item[k] <= n for k in ('candidate_correct', 'control_correct')):
-                    raise runner.PlanError('invalid or duplicate paired seed/counts')
+                if seed < 0 or n < 1 or any(not 0 <= item[k] <= n for k in ('candidate_correct', 'control_correct')):
+                    raise runner.PlanError('invalid paired seed/counts')
+                if (item['measure'], item['candidate'], item['control']) != expected:
+                    other_records += 1
+                    if other_records > max_seeds:
+                        raise runner.PlanError('too many non-primary paired records')
+                    continue
+                if seed in rows:
+                    raise runner.PlanError('duplicate primary paired seed')
                 if len(rows) >= max_seeds:
-                    raise runner.PlanError('too many paired records')
+                    raise runner.PlanError('too many primary paired records')
                 rows[seed] = item
             except (ValueError, TypeError, KeyError) as exc:
                 raise runner.PlanError(f'invalid paired record: {exc}') from exc
@@ -56,7 +66,7 @@ def validate(path, milestone, followups, max_seeds=10000, draws=2000, expected_s
     bootstrap = sorted(sum(rng.choices(diffs, k=len(diffs))) / len(diffs) for _ in range(draws))
     output = Path(path).parent / 'paired-records.json'
     runner.write_json(output, {'schema_version': 1, 'records': ordered})
-    return {'status': 'arithmetic_checked', 'seeds': len(ordered), 'totals': totals,
+    return {'status': 'arithmetic_checked', 'seeds': len(ordered), 'other_records': other_records, 'totals': totals,
             'mean_paired_difference': sum(diffs)/len(diffs),
             'bootstrap': {'draws': draws, 'seed': 42517, 'percentile_95': [bootstrap[int(draws*.025)], bootstrap[int(draws*.975)-1]]},
             'records_path': str(output), 'records_sha256': hashlib.sha256(output.read_bytes()).hexdigest(),

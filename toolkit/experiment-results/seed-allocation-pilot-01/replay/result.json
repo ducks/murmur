@@ -1,0 +1,32 @@
+{
+  "archive": "/home/urho/dev/murmur/toolkit/experiment-results/seed-allocation-pilot-01",
+  "cleanup": {
+    "cache": "removed",
+    "worktree": "removed"
+  },
+  "commit": "653e854a969357c0a0a595d292d6ef0fc1c5882b",
+  "paired_evidence": {
+    "bootstrap": {
+      "draws": 2000,
+      "percentile_95": [
+        -0.00658,
+        -0.0030399999999999997
+      ],
+      "seed": 42517
+    },
+    "mean_paired_difference": -0.0047,
+    "qualification": "Checks reported counts and aggregate arithmetic only; no proof of actual pairing, seed freshness, protocol compliance, or model correctness.",
+    "records_path": "/home/urho/dev/murmur/toolkit/runs/seed-allocation-replay-01/paired-records.json",
+    "records_sha256": "162f196a0b77ec9c01342260711b58c10b2d58f4594639f0ccf040555aa7aa21",
+    "seeds": 100,
+    "status": "arithmetic_checked",
+    "totals": {
+      "candidate_correct": 84249,
+      "control_correct": 84719,
+      "trials": 100000
+    }
+  },
+  "qualification": "Same code and environment rerun; does not independently validate task design or global seed freshness.",
+  "schema_version": 1,
+  "status": "reproduced"
+}

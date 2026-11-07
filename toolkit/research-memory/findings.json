@@ -266,6 +266,25 @@
       "candidate_commits": [
         "653e854a969357c0a0a595d292d6ef0fc1c5882b"
       ]
+    },
+    {
+      "id": "allocated-seed-replay-2026-11-07",
+      "question": "Can the supervisor-allocated paired result be reproduced from the saved candidate commit?",
+      "observation": "A local rerun of committed candidate 653e854a reproduced all 100 primary paired records exactly after checking archived code and seed-allocation hashes.",
+      "hypothesis": "The reported primary result is reproducible under the local environment, though reproducibility alone does not establish causal interpretation or unbiased experimental design.",
+      "next_test": "Extend replay to more experiments and compare independently authored evaluators and fresh task families before drawing broad conclusions.",
+      "limitations": "Same code and local environment; unpinned Nix package set; executable candidate is not sandboxed by the replay tool; no proof of global seed freshness or scientific validity.",
+      "evidence": [
+        "EXPERIMENTS.md",
+        "toolkit/experiment-results/seed-allocation-pilot-01/replay/result.json",
+        "toolkit/experiment-results/seed-allocation-pilot-01/replay/tests.log.gz"
+      ],
+      "related_findings": [
+        "seed-allocation-pilot-2026-11-07"
+      ],
+      "candidate_commits": [
+        "653e854a969357c0a0a595d292d6ef0fc1c5882b"
+      ]
     }
   ]
 }

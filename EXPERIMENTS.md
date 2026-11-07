@@ -1394,3 +1394,13 @@ A one-round live campaign based on `cd020cf` seeded `40473807`. Its planner chos
 The agent reported filter-minus-unguarded final B recall of -0.00470, with its 10,000-draw paired seed-bootstrap interval [-0.00655, -0.00301]. The supervisor's independent 2,000-draw interval was [-0.00658, -0.00304]. The planner had specified a zero-crossing rule, which indicates a loss in this selected condition; it did not prespecify a minimum practical effect or adjust for other explored comparisons. This does not establish general harm, causation, or generalization. Both public scorecards passed and the candidate file remained unchanged.
 
 The [campaign archive](toolkit/experiment-results/seed-allocation-pilot-01/campaign-summary.json) contains the frozen allocation, paired records, code, logs and reviewer assessment; the compressed JSON files decompress to the recorded hashes. The run reported 1,024,821 input tokens including cached tokens, exceeding its 700,000 threshold because it was checked between rounds. The completed worktree and shared build cache were removed.
+
+### Replay of supervisor-allocated experiment
+
+The committed campaign candidate `653e854a` and the archived allocation were checked against their Git and recorded SHA-256 values, then the saved Rust tests were rerun in a detached local worktree. All 100 primary paired records matched the archived records exactly; the replay reproduced the same totals, -0.00470 mean difference and [-0.00658, -0.00304] supervisor bootstrap interval. This replay uses the same code and local environment; it is reproducibility evidence, not an independent experimental design, proof of the mechanism, or global seed freshness. The Nix package set is unpinned.
+
+The replay created no model-service calls and removed its worktree and isolated cache after checking for changes. Its [result](toolkit/experiment-results/seed-allocation-pilot-01/replay/result.json), per-seed records and full test log are archived. To rerun trusted candidate code in a new ignored directory:
+
+```sh
+nix-shell --run 'python3 -B -m toolkit.coordinator.replay toolkit/experiment-results/seed-allocation-pilot-01 toolkit/runs/seed-allocation-replay-new'
+```

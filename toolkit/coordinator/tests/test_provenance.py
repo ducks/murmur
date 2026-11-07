@@ -18,7 +18,9 @@ class ProvenanceTests(unittest.TestCase):
         self.assertEqual(p['seed_transplant']['source_commit'],self.config['seed_candidate_commit'])
         self.assertEqual(p['candidate_delta']['from_commit'],self.start)
         self.assertNotIn('toolkit/src/agent_candidate.rs',p['candidate_delta']['changed_paths'])
-        self.assertIn('toolkit/tests/agent_generated.rs',p['candidate_delta']['changed_paths'])
+        self.assertIn('toolkit/tests/agent_generated.rs',p['candidate_delta']['agent_editable_paths'])
+        self.assertIn('toolkit/configs/agent/dev.cfg',p['candidate_delta']['supervisor_generated_paths'])
+        self.assertNotIn('toolkit/configs/agent/dev.cfg',p['candidate_delta']['agent_editable_paths'])
         for path,key in [('seed-transplant.patch','seed_transplant'),('candidate-changes.patch','candidate_delta')]:
             self.assertEqual(hashlib.sha256((self.root/path).read_bytes()).hexdigest(),p[key]['patch_sha256'])
         self.assertEqual(json.loads((self.root/'provenance.json').read_text()),p)
@@ -27,10 +29,21 @@ class ProvenanceTests(unittest.TestCase):
         wrong={**self.config,'seed_candidate_commit':self.config['base_commit']}
         with self.assertRaises(runner.PlanError):provenance.record(wrong,1,self.start,self.candidate,self.root)
         with self.assertRaises(runner.PlanError):provenance.exact_commit('short')
+    def test_supervisor_generated_file_tampering_is_detected(self):
+        from toolkit.coordinator import campaign
+        path=self.root/'generated';path.write_text('expected')
+        hashes={'generated':hashlib.sha256(path.read_bytes()).hexdigest()}
+        campaign.verify_generated_files(self.root,hashes)
+        path.write_text('changed')
+        with self.assertRaises(runner.PlanError):campaign.verify_generated_files(self.root,hashes)
+        path.unlink()
+        with self.assertRaises(runner.PlanError):campaign.verify_generated_files(self.root,hashes)
+
     def test_reviewer_is_pointed_at_agent_delta(self):
         from toolkit.coordinator import campaign
         prompt=campaign.diagnosis_prompt({},self.root,True)
         self.assertIn('round_start_commit to candidate_commit',prompt)
         self.assertIn('unrelated campaign history',prompt)
+        self.assertIn('not agent scope violations',prompt)
 
 if __name__=='__main__':unittest.main()

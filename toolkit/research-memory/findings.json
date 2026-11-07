@@ -321,6 +321,25 @@
         "automatic-replay-pilot-2026-11-07"
       ],
       "candidate_commits": []
+    },
+    {
+      "id": "provenance-aware-review-2026-11-07",
+      "question": "Does explicit seed and round provenance prevent misleading scope judgments?",
+      "observation": "A fresh seeded campaign accepted 100 primary and 100 earlier paired records and reproduced its primary results. The reviewer used the round delta but marked the milestone partial, treating supervisor-generated configs and plan as agent changes.",
+      "hypothesis": "Review needs separately labeled, verified supervisor-generated paths and agent-editable paths; Git ancestry by itself does not guarantee correct interpretation.",
+      "next_test": "Run a live review with path categories and generated-file integrity checks, and evaluate whether the assessment distinguishes agent changes from supervisor artifacts.",
+      "limitations": "The path-category fix is tested locally but not yet in a live reviewer. The ablation uses public selected synthetic data, unadjusted zero-crossing intervals and unmatched compute.",
+      "evidence": [
+        "EXPERIMENTS.md",
+        "toolkit/experiment-results/provenance-pilot-02/campaign-summary.json",
+        "toolkit/experiment-results/provenance-pilot-02/provenance.json.gz"
+      ],
+      "related_findings": [
+        "provenance-pilot-record-collision-2026-11-07"
+      ],
+      "candidate_commits": [
+        "68ae1ad8887e08515c4e8553a92fe8f000965929"
+      ]
     }
   ]
 }

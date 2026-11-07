@@ -61,6 +61,8 @@ def record(config, index, starting_commit, candidate_commit, directory):
     result = {'schema_version': 1, 'campaign_base_commit': campaign_base, 'round_start_commit': start,
               'candidate_commit': candidate, 'candidate_parent_commit': parent, 'seed_transplant': seed_info,
               'candidate_delta': {'from_commit': start, 'to_commit': candidate, 'changed_paths': agent_names,
+                                  'agent_editable_paths': [p for p in agent_names if p in ALLOWED_SEED],
+                                  'supervisor_generated_paths': [p for p in agent_names if p in ALLOWED_GENERATED],
                                   'patch_sha256': hashlib.sha256(agent_patch).hexdigest(),
                                   'candidate_and_test_sha256': blobs(candidate)},
               'qualification': 'Git provenance and hashes identify recorded changes; they do not establish experimental validity or safe code.'}

@@ -1,0 +1,625 @@
+{
+  "base_commit": "6feea2f8866e63ac5d8af078a615534c83fdbd24",
+  "campaign_id": "d82141ce55e5",
+  "cleanup": {
+    "cache": "removed",
+    "rounds": [
+      {
+        "index": 1,
+        "status": "removed"
+      }
+    ]
+  },
+  "provenance_version": 1,
+  "round": {
+    "agent_usage": {
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 742016,
+      "input_tokens": 838456,
+      "output_tokens": 2951,
+      "reasoning_output_tokens": 100
+    },
+    "base_commit": "b9f772ec8bcbf42bbfaa6470755427c56180f179",
+    "commit": "68ae1ad8887e08515c4e8553a92fe8f000965929",
+    "development": {
+      "baseline": "mixture",
+      "candidate": "candidate",
+      "checks": {
+        "asymmetric:retention_b": true,
+        "asymmetric:switch_to_a": true,
+        "asymmetric:switch_to_b": true,
+        "complementary:retention_b": true,
+        "complementary:switch_to_a": true,
+        "complementary:switch_to_b": true,
+        "constant_bias:retention_b": true,
+        "constant_bias:switch_to_a": true,
+        "constant_bias:switch_to_b": true,
+        "unequal_noise:retention_b": true,
+        "unequal_noise:switch_to_a": true,
+        "unequal_noise:switch_to_b": true
+      },
+      "comparisons": {
+        "asymmetric:retention_b": {
+          "baseline_accuracy": 0.45920000000000005,
+          "candidate_accuracy": 0.6611,
+          "losses": 1,
+          "mean_paired_difference": 0.20190000000000002,
+          "ties": 0,
+          "wins": 9
+        },
+        "asymmetric:switch_to_a": {
+          "baseline_accuracy": 0.6940000000000001,
+          "candidate_accuracy": 0.75,
+          "losses": 2,
+          "mean_paired_difference": 0.055999999999999994,
+          "ties": 0,
+          "wins": 8
+        },
+        "asymmetric:switch_to_b": {
+          "baseline_accuracy": 0.5429999999999999,
+          "candidate_accuracy": 0.5940000000000001,
+          "losses": 2,
+          "mean_paired_difference": 0.05099999999999999,
+          "ties": 0,
+          "wins": 8
+        },
+        "complementary:retention_b": {
+          "baseline_accuracy": 0.4925,
+          "candidate_accuracy": 0.7321,
+          "losses": 2,
+          "mean_paired_difference": 0.23959999999999998,
+          "ties": 0,
+          "wins": 8
+        },
+        "complementary:switch_to_a": {
+          "baseline_accuracy": 0.575,
+          "candidate_accuracy": 0.678,
+          "losses": 2,
+          "mean_paired_difference": 0.10299999999999998,
+          "ties": 0,
+          "wins": 8
+        },
+        "complementary:switch_to_b": {
+          "baseline_accuracy": 0.5740000000000001,
+          "candidate_accuracy": 0.63,
+          "losses": 1,
+          "mean_paired_difference": 0.05599999999999997,
+          "ties": 0,
+          "wins": 9
+        },
+        "constant_bias:retention_b": {
+          "baseline_accuracy": 0.8983000000000001,
+          "candidate_accuracy": 0.8944000000000001,
+          "losses": 7,
+          "mean_paired_difference": -0.0039000000000000033,
+          "ties": 1,
+          "wins": 2
+        },
+        "constant_bias:switch_to_a": {
+          "baseline_accuracy": 0.8539999999999999,
+          "candidate_accuracy": 0.85,
+          "losses": 4,
+          "mean_paired_difference": -0.003999999999999992,
+          "ties": 2,
+          "wins": 4
+        },
+        "constant_bias:switch_to_b": {
+          "baseline_accuracy": 0.737,
+          "candidate_accuracy": 0.8029999999999999,
+          "losses": 0,
+          "mean_paired_difference": 0.066,
+          "ties": 2,
+          "wins": 8
+        },
+        "unequal_noise:retention_b": {
+          "baseline_accuracy": 0.31579999999999997,
+          "candidate_accuracy": 0.6446,
+          "losses": 0,
+          "mean_paired_difference": 0.32880000000000004,
+          "ties": 0,
+          "wins": 10
+        },
+        "unequal_noise:switch_to_a": {
+          "baseline_accuracy": 0.9029999999999999,
+          "candidate_accuracy": 0.8960000000000001,
+          "losses": 4,
+          "mean_paired_difference": -0.0070000000000000175,
+          "ties": 4,
+          "wins": 2
+        },
+        "unequal_noise:switch_to_b": {
+          "baseline_accuracy": 0.517,
+          "candidate_accuracy": 0.568,
+          "losses": 2,
+          "mean_paired_difference": 0.05099999999999999,
+          "ties": 0,
+          "wins": 8
+        }
+      },
+      "elapsed_seconds": 7.523889588192105,
+      "limitations": [
+        "Thresholds on means are operational, not statistical guarantees.",
+        "Non-inferiority alone does not demonstrate novelty; copying the baseline could pass.",
+        "Task families and evaluation seeds are locally visible and can be overfit.",
+        "The oracle receives context labels.",
+        "Inline bytes exclude heap allocations; peak memory is not measured.",
+        "Per-model training times include clock overhead, exclude probes, and are noisy; resource budgets are not matched."
+      ],
+      "logical_transitions": 360000,
+      "max_accuracy_drop": 0.02,
+      "outcome": "criteria_met",
+      "peak_memory": "not measured",
+      "resources": {
+        "candidate": {
+          "inline_bytes": 288,
+          "training_ns_total": 18228848,
+          "training_steps": 120000
+        },
+        "mixture": {
+          "inline_bytes": 72,
+          "training_ns_total": 3755602,
+          "training_steps": 120000
+        },
+        "oracle": {
+          "inline_bytes": 48,
+          "training_ns_total": 2708153,
+          "training_steps": 120000
+        },
+        "single": {
+          "inline_bytes": 48,
+          "training_ns_total": 2738049,
+          "training_steps": 120000
+        }
+      },
+      "seeds": 10,
+      "split": "development"
+    },
+    "diagnosis": {
+      "analysis": {
+        "alternative": "The small recall loss could reflect noisy corrections, cross-switch assignments, or other downstream interactions; the observed accuracy difference does not identify which pathway caused it. Existing pooling, calibration, and release mechanisms remain active in both variants and are not individually ablated by this comparison.",
+        "expected_evidence": "A prespecified paired interval above zero for frozen B recall in a new condition would support a context-dependent correction benefit; an interval below zero would support a loss there. An interval spanning zero is inconclusive, not evidence of equivalence. Report both switch directions and resource costs separately.",
+        "followup_test": "Before adding complexity, run one matched ablation on a prespecified public condition other than similar_rules: compare Candidate::new(...).unguarded_smoothing() with its without_smoothing() clone using fresh supervisor-allocated paired stream, initialization, and probe seeds. Record per-seed frozen B recall and first-100-event switch counts, and use a prespecified 10,000-draw paired seed bootstrap. Keep the fixed mixture as a descriptive reference and report training time and memory where feasible. This can be implemented in toolkit/tests/agent_generated.rs; the supervisor has not executed it.",
+        "hypothesis": "Retrospective correction may improve memory assignment in some conditions, but noisy or cross-switch correction may reduce recall. The matched ablation estimates its combined predictive effect, not its internal pathway.",
+        "limitations": "This is an unverified review, not proof. The public condition was selected after a deficit; global seed freshness and experimental validity are not established. Replay reproduces the same code and environment. The mixture is not compute matched, peak memory was not measured, and an interval spanning zero does not establish equivalence.",
+        "milestone_deviations": "The test prints source revision f6fd8ef214d4924e84628fa27359a5b2e1f5f47a, the seed-transplant source, rather than the actual round candidate revision 68ae1ad8887e08515c4e8553a92fe8f000965929. The round delta also adds two configuration files and a plan outside the stated test-only scope; no candidate-source or evaluator change appears in that delta. The independently arithmetic-checked 2,000-draw interval is a separate calculation from the required 10,000-draw test result.",
+        "milestone_evidence": "toolkit/tests/agent_generated.rs::similar_rules_correction_allocated_followup uses 100 allocated role triples, shared streams and probes, a cloned no-smoothing control, frozen B probes, switch counts, and a mixture reference. toolkit/src/agent_candidate.rs::unguarded_smoothing disables the guard and filter; without_smoothing clones the model, disables smoothing, and clears pending state, which is initially empty. The round-start-to-candidate diff leaves that source unchanged and preserves prior tests. /tmp/murmur-d821-followup.log reports 10,000 draws with primary bootstrap seed 830050 and both offline suites passing; provenance records a reproduced replay.",
+        "milestone_status": "partial",
+        "observation": "The reported paired frozen B accuracy is 84.681% versus 84.786%, a -0.105 percentage-point effect. The test's 10,000-draw 95% interval is [-0.194, -0.031] percentage points, supporting a loss under the frozen rule if the protocol is valid. Switch-to-B is -0.060 points [-0.200, 0.070] and switch-to-A is -0.020 points [-0.100, 0.050]; both are inconclusive. The evaluation also reports a similar_rules deficit versus mixture and approximately 4.9 times the mixture's training time and four times its inline bytes, with noisy timing and unmeasured heap memory."
+      },
+      "elapsed_seconds": 31.04113976401277,
+      "qualification": "Agent-proposed explanations and follow-up are unverified.",
+      "status": "complete",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 58752,
+        "input_tokens": 101704,
+        "output_tokens": 1395,
+        "reasoning_output_tokens": 19
+      }
+    },
+    "evaluation": {
+      "baseline": "mixture",
+      "candidate": "candidate",
+      "checks": {
+        "mixed_rules:retention_b": true,
+        "mixed_rules:switch_to_a": true,
+        "mixed_rules:switch_to_b": true,
+        "reversed_asym:retention_b": true,
+        "reversed_asym:switch_to_a": true,
+        "reversed_asym:switch_to_b": true,
+        "shifted_bias:retention_b": true,
+        "shifted_bias:switch_to_a": true,
+        "shifted_bias:switch_to_b": true,
+        "similar_rules:retention_b": true,
+        "similar_rules:switch_to_a": true,
+        "similar_rules:switch_to_b": true
+      },
+      "comparisons": {
+        "mixed_rules:retention_b": {
+          "baseline_accuracy": 0.46235,
+          "candidate_accuracy": 0.6829,
+          "losses": 0,
+          "mean_paired_difference": 0.22054999999999997,
+          "ties": 0,
+          "wins": 20
+        },
+        "mixed_rules:switch_to_a": {
+          "baseline_accuracy": 0.8210000000000001,
+          "candidate_accuracy": 0.865,
+          "losses": 1,
+          "mean_paired_difference": 0.04399999999999999,
+          "ties": 5,
+          "wins": 14
+        },
+        "mixed_rules:switch_to_b": {
+          "baseline_accuracy": 0.5780000000000001,
+          "candidate_accuracy": 0.605,
+          "losses": 5,
+          "mean_paired_difference": 0.02699999999999999,
+          "ties": 1,
+          "wins": 14
+        },
+        "reversed_asym:retention_b": {
+          "baseline_accuracy": 0.398,
+          "candidate_accuracy": 0.7675500000000001,
+          "losses": 5,
+          "mean_paired_difference": 0.36955000000000005,
+          "ties": 0,
+          "wins": 15
+        },
+        "reversed_asym:switch_to_a": {
+          "baseline_accuracy": 0.6205,
+          "candidate_accuracy": 0.718,
+          "losses": 0,
+          "mean_paired_difference": 0.09749999999999999,
+          "ties": 0,
+          "wins": 20
+        },
+        "reversed_asym:switch_to_b": {
+          "baseline_accuracy": 0.5715,
+          "candidate_accuracy": 0.622,
+          "losses": 2,
+          "mean_paired_difference": 0.05049999999999999,
+          "ties": 1,
+          "wins": 17
+        },
+        "shifted_bias:retention_b": {
+          "baseline_accuracy": 0.3809,
+          "candidate_accuracy": 0.79,
+          "losses": 4,
+          "mean_paired_difference": 0.4091,
+          "ties": 0,
+          "wins": 16
+        },
+        "shifted_bias:switch_to_a": {
+          "baseline_accuracy": 0.7405,
+          "candidate_accuracy": 0.7745,
+          "losses": 2,
+          "mean_paired_difference": 0.034000000000000016,
+          "ties": 2,
+          "wins": 16
+        },
+        "shifted_bias:switch_to_b": {
+          "baseline_accuracy": 0.639,
+          "candidate_accuracy": 0.6825,
+          "losses": 2,
+          "mean_paired_difference": 0.043500000000000004,
+          "ties": 1,
+          "wins": 17
+        },
+        "similar_rules:retention_b": {
+          "baseline_accuracy": 0.8452500000000001,
+          "candidate_accuracy": 0.8371999999999999,
+          "losses": 6,
+          "mean_paired_difference": -0.008049999999999996,
+          "ties": 14,
+          "wins": 0
+        },
+        "similar_rules:switch_to_a": {
+          "baseline_accuracy": 0.8525,
+          "candidate_accuracy": 0.851,
+          "losses": 2,
+          "mean_paired_difference": -0.0015000000000000013,
+          "ties": 18,
+          "wins": 0
+        },
+        "similar_rules:switch_to_b": {
+          "baseline_accuracy": 0.8625,
+          "candidate_accuracy": 0.861,
+          "losses": 2,
+          "mean_paired_difference": -0.0015000000000000013,
+          "ties": 17,
+          "wins": 1
+        }
+      },
+      "elapsed_seconds": 0.4161865490023047,
+      "limitations": [
+        "Thresholds on means are operational, not statistical guarantees.",
+        "Non-inferiority alone does not demonstrate novelty; copying the baseline could pass.",
+        "Task families and evaluation seeds are locally visible and can be overfit.",
+        "The oracle receives context labels.",
+        "Inline bytes exclude heap allocations; peak memory is not measured.",
+        "Per-model training times include clock overhead, exclude probes, and are noisy; resource budgets are not matched."
+      ],
+      "logical_transitions": 720000,
+      "max_accuracy_drop": 0.02,
+      "outcome": "criteria_met",
+      "peak_memory": "not measured",
+      "resources": {
+        "candidate": {
+          "inline_bytes": 288,
+          "training_ns_total": 35205647,
+          "training_steps": 240000
+        },
+        "mixture": {
+          "inline_bytes": 72,
+          "training_ns_total": 7165939,
+          "training_steps": 240000
+        },
+        "oracle": {
+          "inline_bytes": 48,
+          "training_ns_total": 5337756,
+          "training_steps": 240000
+        },
+        "single": {
+          "inline_bytes": 48,
+          "training_ns_total": 5215769,
+          "training_steps": 240000
+        }
+      },
+      "seeds": 20,
+      "split": "evaluation"
+    },
+    "followups": {
+      "aggregate_count": 0,
+      "aggregates": [],
+      "full_records_path": "/home/urho/dev/murmur/toolkit/runs/provenance-pilot-02/idea-001/followup-records.json",
+      "qualification": "Agent-authored test output; arithmetic checked, experimental design not independently verified.",
+      "record_count": 21,
+      "records": [
+        {
+          "candidate": "unguarded",
+          "candidate_accuracy": 0.8436,
+          "candidate_correct": 8436,
+          "control": "mixture",
+          "control_accuracy": 0.8467,
+          "control_correct": 8467,
+          "measure": "similar_rules_switch_to_b",
+          "trials": 10000
+        },
+        {
+          "candidate": "unguarded",
+          "candidate_accuracy": 0.8506,
+          "candidate_correct": 8506,
+          "control": "mixture",
+          "control_accuracy": 0.8522,
+          "control_correct": 8522,
+          "measure": "similar_rules_switch_to_a",
+          "trials": 10000
+        },
+        {
+          "candidate": "unguarded",
+          "candidate_accuracy": 0.84781,
+          "candidate_correct": 84781,
+          "control": "mixture",
+          "control_accuracy": 0.84886,
+          "control_correct": 84886,
+          "measure": "similar_rules_retention_b",
+          "trials": 100000
+        },
+        {
+          "candidate": "unguarded",
+          "candidate_accuracy": 0.8481,
+          "candidate_correct": 8481,
+          "control": "no_smoothing",
+          "control_accuracy": 0.8487,
+          "control_correct": 8487,
+          "measure": "similar_rules_switch_to_b",
+          "trials": 10000
+        },
+        {
+          "candidate": "unguarded",
+          "candidate_accuracy": 0.8481,
+          "candidate_correct": 8481,
+          "control": "mixture",
+          "control_accuracy": 0.8519,
+          "control_correct": 8519,
+          "measure": "similar_rules_switch_to_b",
+          "trials": 10000
+        },
+        {
+          "candidate": "no_smoothing",
+          "candidate_accuracy": 0.8487,
+          "candidate_correct": 8487,
+          "control": "mixture",
+          "control_accuracy": 0.8519,
+          "control_correct": 8519,
+          "measure": "similar_rules_switch_to_b",
+          "trials": 10000
+        },
+        {
+          "candidate": "unguarded",
+          "candidate_accuracy": 0.8424,
+          "candidate_correct": 8424,
+          "control": "no_smoothing",
+          "control_accuracy": 0.8426,
+          "control_correct": 8426,
+          "measure": "similar_rules_switch_to_a",
+          "trials": 10000
+        },
+        {
+          "candidate": "unguarded",
+          "candidate_accuracy": 0.8424,
+          "candidate_correct": 8424,
+          "control": "mixture",
+          "control_accuracy": 0.8436,
+          "control_correct": 8436,
+          "measure": "similar_rules_switch_to_a",
+          "trials": 10000
+        },
+        {
+          "candidate": "no_smoothing",
+          "candidate_accuracy": 0.8426,
+          "candidate_correct": 8426,
+          "control": "mixture",
+          "control_accuracy": 0.8436,
+          "control_correct": 8436,
+          "measure": "similar_rules_switch_to_a",
+          "trials": 10000
+        },
+        {
+          "candidate": "unguarded",
+          "candidate_accuracy": 0.84681,
+          "candidate_correct": 84681,
+          "control": "no_smoothing",
+          "control_accuracy": 0.84786,
+          "control_correct": 84786,
+          "measure": "similar_rules_retention_b",
+          "trials": 100000
+        }
+      ],
+      "records_shown": 10,
+      "warnings": []
+    },
+    "idea": {
+      "approach": "Added a matched 100-seed similar_rules A\u2013B\u2013A test in toolkit/tests/agent_generated.rs, preserving prior comparison labels. It records allocated roles, per-seed counts, bootstrap intervals and mixture comparisons in /tmp/murmur-d821-followup.log. Both required offline test suites passed; candidate source remained unchanged.",
+      "falsification": "Unguarded minus no-smoothing frozen B recall was -0.105 percentage points, with a 95% paired seed-bootstrap interval of [-0.194, -0.031] points; the specified rule supports a loss on this condition. Switch-to-B was -0.060 points [-0.200, 0.070], and switch-to-A was -0.020 points [-0.100, 0.050].",
+      "hypothesis": "Retrospective correction could improve context assignments and preserve memories, but noisy or cross-switch corrections could instead impair recall. The matched no-smoothing control tests the correction\u2019s combined predictive effect; accuracy alone cannot identify its internal pathway.",
+      "limitations": "This selected public condition cannot establish generalization. Available allocations showed no seed-role overlap, but global freshness is unknown. Compute is unmatched against mixture, and the previous review\u2019s unclear provenance remains unresolved. Test-only scope precluded adding a new candidate mechanism.",
+      "question": "On similar_rules, does unguarded retrospective correction change frozen B recall relative to the same candidate without smoothing?"
+    },
+    "index": 1,
+    "milestone": {
+      "candidate_label": "unguarded",
+      "control": "Use the otherwise identical candidate with retrospective correction disabled through without_smoothing(). Verify from the existing source that the two variants differ only in smoothing and that the consistency filter and switch guard are disabled in both. Include the fixed mixture as a descriptive reference.",
+      "control_label": "no_smoothing",
+      "decision_rule": "For unguarded minus no-smoothing frozen B recall, a 95% paired seed-bootstrap interval entirely above zero supports a correction benefit on this condition; an interval entirely below zero supports a loss. Otherwise, report the result as inconclusive. Report the effect size and switch outcomes separately; an interval spanning zero does not establish equivalence.",
+      "intervention": "In toolkit/tests/agent_generated.rs, run the existing public similar_rules A\u2013B\u2013A protocol using exactly 100 supervisor-allocated paired seeds, each with distinct stream, initialization, and probe roles. Compare Candidate::new(...).unguarded_smoothing() with the matched without_smoothing() variant. Record the allocation before execution and check it against available campaign seed records. Keep toolkit/src/agent_candidate.rs byte-for-byte unchanged; do not alter the evaluator or task rules. If the variants cannot be matched under these constraints, report the test as blocked.",
+      "limitations": "This public condition was selected after an observed deficit and cannot establish generalization. Available records cannot establish global seed freshness. The prior result is unverified, and 100 seeds may yield an inconclusive interval. The comparison estimates correction's combined predictive effect, not its internal causal pathway; compute remains unmatched against the mixture.",
+      "measurement": "Save per-seed correct and total frozen B-probe predictions after the final A phase. Report the paired mean accuracy difference and a 95% percentile interval from 10,000 bootstrap draws resampling seeds, with the bootstrap seed recorded. Emit one MURMUR_FOLLOWUP record with the specified primary labels and corresponding per-seed paired records. Also save first-100-event counts for each switch direction, their paired intervals, mixture comparisons, seed-role mappings, protocol settings, and source revision. Preserve records from other comparisons with their original labels so the primary evidence can be distinguished.",
+      "motivation": "A previous test of this ablation reported a small recall loss, but its campaign stopped before replay and review when the validator rejected records from an earlier comparison. A fresh allocated test can assess the same uncertainty while exercising the corrected mixed-comparison validation.",
+      "primary_measure": "similar_rules_retention_b",
+      "question": "On similar_rules, does unguarded retrospective correction change frozen B recall relative to the same candidate without smoothing?",
+      "scope": "test_only"
+    },
+    "milestone_evidence": {
+      "matching_records": 1,
+      "model_change_review_required": false,
+      "qualification": "Matching labels only confirm that an arithmetically valid record was reported; they do not verify the intervention, seed pairing, decision rule, or correctness.",
+      "status": "primary_record_reported_unverified"
+    },
+    "milestone_review": {
+      "deviations": "The test prints source revision f6fd8ef214d4924e84628fa27359a5b2e1f5f47a, the seed-transplant source, rather than the actual round candidate revision 68ae1ad8887e08515c4e8553a92fe8f000965929. The round delta also adds two configuration files and a plan outside the stated test-only scope; no candidate-source or evaluator change appears in that delta. The independently arithmetic-checked 2,000-draw interval is a separate calculation from the required 10,000-draw test result.",
+      "evidence": "toolkit/tests/agent_generated.rs::similar_rules_correction_allocated_followup uses 100 allocated role triples, shared streams and probes, a cloned no-smoothing control, frozen B probes, switch counts, and a mixture reference. toolkit/src/agent_candidate.rs::unguarded_smoothing disables the guard and filter; without_smoothing clones the model, disables smoothing, and clears pending state, which is initially empty. The round-start-to-candidate diff leaves that source unchanged and preserves prior tests. /tmp/murmur-d821-followup.log reports 10,000 draws with primary bootstrap seed 830050 and both offline suites passing; provenance records a reproduced replay.",
+      "qualification": "Reviewer judgment only; not independent verification or a completion guarantee.",
+      "status": "partial"
+    },
+    "milestone_usage": {
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 14720,
+      "input_tokens": 73759,
+      "output_tokens": 614,
+      "reasoning_output_tokens": 42
+    },
+    "paired_evidence": {
+      "bootstrap": {
+        "draws": 2000,
+        "percentile_95": [
+          -0.00191,
+          -0.00033
+        ],
+        "seed": 42517
+      },
+      "mean_paired_difference": -0.00105,
+      "other_records": 100,
+      "qualification": "Checks reported counts and aggregate arithmetic only; no proof of actual pairing, seed freshness, protocol compliance, or model correctness.",
+      "records_path": "/home/urho/dev/murmur/toolkit/runs/provenance-pilot-02/idea-001/paired-records.json",
+      "records_sha256": "8d10a50c1c1a92f3a4eb2136fddb1a6a0f1edf7dd31f53e31db26fbe12e2a8a8",
+      "seeds": 100,
+      "status": "arithmetic_checked",
+      "totals": {
+        "candidate_correct": 84681,
+        "control_correct": 84786,
+        "trials": 100000
+      }
+    },
+    "provenance": {
+      "campaign_base_commit": "6feea2f8866e63ac5d8af078a615534c83fdbd24",
+      "candidate_commit": "68ae1ad8887e08515c4e8553a92fe8f000965929",
+      "candidate_delta": {
+        "candidate_and_test_sha256": {
+          "toolkit/src/agent_candidate.rs": "ac85654ec9b0c5f498a05f9ed1caabb7c6824c06d6fa9262722c8f1eeeb6ba2c",
+          "toolkit/tests/agent_generated.rs": "a09419515b1a8277f0532cf94e5ba705a4e26c02ab2691fc2e773882448e53fd"
+        },
+        "changed_paths": [
+          "toolkit/configs/agent/dev.cfg",
+          "toolkit/configs/agent/evaluation.cfg",
+          "toolkit/plans/agent-candidate.json",
+          "toolkit/tests/agent_generated.rs"
+        ],
+        "from_commit": "b9f772ec8bcbf42bbfaa6470755427c56180f179",
+        "patch_sha256": "88e490b78750d66b15848fe09b5554a793ef47be7f8e11847dc0a31fcbc069a2",
+        "to_commit": "68ae1ad8887e08515c4e8553a92fe8f000965929"
+      },
+      "candidate_parent_commit": "b9f772ec8bcbf42bbfaa6470755427c56180f179",
+      "qualification": "Git provenance and hashes identify recorded changes; they do not establish experimental validity or safe code.",
+      "round_start_commit": "b9f772ec8bcbf42bbfaa6470755427c56180f179",
+      "schema_version": 1,
+      "seed_transplant": {
+        "candidate_and_test_sha256": {
+          "toolkit/src/agent_candidate.rs": "ac85654ec9b0c5f498a05f9ed1caabb7c6824c06d6fa9262722c8f1eeeb6ba2c",
+          "toolkit/tests/agent_generated.rs": "76b805434facd582330242a357e3cb080e3812260d8991df1faf46b10d214718"
+        },
+        "changed_paths": [
+          "toolkit/src/agent_candidate.rs",
+          "toolkit/tests/agent_generated.rs"
+        ],
+        "patch_sha256": "a8fc2a62a154887993e350fc615048ebdf22a9b7450956cd9fddf829e5a4a06e",
+        "source_commit": "f6fd8ef214d4924e84628fa27359a5b2e1f5f47a",
+        "transplant_base": "6feea2f8866e63ac5d8af078a615534c83fdbd24",
+        "transplant_commit": "b9f772ec8bcbf42bbfaa6470755427c56180f179"
+      }
+    },
+    "replay": {
+      "archive": "/home/urho/dev/murmur/toolkit/runs/provenance-pilot-02/idea-001/replay-input",
+      "cleanup": {
+        "cache": "shared",
+        "worktree": "removed"
+      },
+      "commit": "68ae1ad8887e08515c4e8553a92fe8f000965929",
+      "paired_evidence": {
+        "bootstrap": {
+          "draws": 2000,
+          "percentile_95": [
+            -0.00191,
+            -0.00033
+          ],
+          "seed": 42517
+        },
+        "mean_paired_difference": -0.00105,
+        "other_records": 100,
+        "qualification": "Checks reported counts and aggregate arithmetic only; no proof of actual pairing, seed freshness, protocol compliance, or model correctness.",
+        "records_path": "/home/urho/dev/murmur/toolkit/runs/provenance-pilot-02/idea-001/replay/paired-records.json",
+        "records_sha256": "8d10a50c1c1a92f3a4eb2136fddb1a6a0f1edf7dd31f53e31db26fbe12e2a8a8",
+        "seeds": 100,
+        "status": "arithmetic_checked",
+        "totals": {
+          "candidate_correct": 84681,
+          "control_correct": 84786,
+          "trials": 100000
+        }
+      },
+      "qualification": "Same code and environment rerun; does not independently validate task design or global seed freshness.",
+      "schema_version": 1,
+      "status": "reproduced"
+    },
+    "seed_allocation": {
+      "count": 100,
+      "path": "/home/urho/dev/murmur/toolkit/runs/provenance-pilot-02/idea-001/seed-allocation.json",
+      "qualification": "Allocated and recorded in advance; visible to the agent; actual use and global freshness are not verified.",
+      "sha256": "39f13ae5a20c557d77c5b05b875cff5379991f9a8946442afca95bc52aab34fb"
+    },
+    "status": "complete"
+  },
+  "run": {
+    "action": "review_results",
+    "completed": 1,
+    "limit": 1,
+    "max_reported_input_tokens": 700000,
+    "reported_input_tokens": 1013919,
+    "rounds": [
+      {
+        "commit": "68ae1ad8887e08515c4e8553a92fe8f000965929",
+        "development": "criteria_met",
+        "diagnosis": "complete",
+        "error": null,
+        "evaluation": "criteria_met",
+        "index": 1,
+        "milestone_review": "partial",
+        "replay": "reproduced",
+        "status": "complete"
+      }
+    ]
+  },
+  "seed_candidate_commit": "f6fd8ef214d4924e84628fa27359a5b2e1f5f47a"
+}

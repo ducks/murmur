@@ -460,7 +460,7 @@ def diagnosis_prompt(result, round_dir, structured_assessment=False):
 {'Assess whether the milestone was followed, partially followed, not followed, or is unclear; cite specific file paths, test functions, or logs as evidence, and describe deviations or say none found. Use unclear when evidence is insufficient. Your assessment is an unverified review, not proof.' if structured_assessment else ''}
 Frozen milestone and evidence status:
 {json.dumps({'milestone': result.get('milestone'), 'evidence': result.get('milestone_evidence'), 'paired_evidence': result.get('paired_evidence'), 'seed_allocation': result.get('seed_allocation'), 'replay': result.get('replay'), 'provenance': result.get('provenance')}, indent=2)}
-The provenance record distinguishes the campaign base, the seed transplant, and the current agent's candidate delta. Inspect the candidate delta from round_start_commit to candidate_commit when assessing this round; a diff against the older seed source also includes unrelated campaign history. Check whether the candidate changes and test actually address the planned intervention and primary comparison; explicitly flag any unrelated mechanism or unablated model change. Matching record labels are not verification.
+The provenance record distinguishes the campaign base, the seed transplant, and the current agent's candidate delta. Inspect the candidate delta from round_start_commit to candidate_commit when assessing this round; a diff against the older seed source also includes unrelated campaign history. The provenance record identifies supervisor_generated_paths, created by the supervisor after the agent finishes; those generated configs and plan are not agent scope violations. The final candidate commit is created after the test, so a test-time source revision can refer to its starting commit; use the recorded candidate commit to identify the final saved artifact. Check whether the candidate changes and test actually address the planned intervention and primary comparison; explicitly flag any unrelated mechanism or unablated model change. Matching record labels are not verification.
 Candidate hypothesis and implementation summary:
 {json.dumps(result.get('idea'), indent=2)}
 
@@ -690,6 +690,13 @@ def cleanup(directory):
         lock.rmdir()
 
 
+def verify_generated_files(worktree, hashes):
+    for name, expected_hash in hashes.items():
+        path = worktree / name
+        if path.is_symlink() or not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != expected_hash:
+            raise runner.PlanError(f'supervisor-generated file changed during tests: {name}')
+
+
 def automatic_replay(directory, config, round_dir, result):
     """Build immutable replay input from this completed round and replay without a model call."""
     from . import replay
@@ -768,6 +775,7 @@ def execute_round(directory, config, state, agent=call_agent):
         (worktree / 'toolkit/configs/agent/dev.cfg').write_text(dev, encoding='utf-8')
         (worktree / 'toolkit/configs/agent/evaluation.cfg').write_text(evaluation, encoding='utf-8')
         runner.write_json(worktree / 'toolkit/plans/agent-candidate.json', plan)
+        generated_hashes = {name: hashlib.sha256((worktree / name).read_bytes()).hexdigest() for name in GENERATED}
         with (round_dir / 'tests.log').open('wb') as out:
             tests = bounded_process(['cargo', 'test', '--offline', '--manifest-path', 'toolkit/Cargo.toml',
                                      '--test', 'candidate_context', '--test', 'agent_generated', '--', '--nocapture'],
@@ -775,6 +783,7 @@ def execute_round(directory, config, state, agent=call_agent):
                                     env=build_environment(directory, config))
         if tests:
             raise runner.PlanError(f'candidate tests failed ({tests}); see tests.log')
+        verify_generated_files(worktree, generated_hashes)
         result['followups'] = followup_metrics(round_dir / 'tests.log')
         if result.get('milestone'):
             enforce_milestone_scope(worktree, result['milestone'])

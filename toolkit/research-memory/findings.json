@@ -227,6 +227,25 @@
       "candidate_commits": [
         "ad1c8baaf20b21049b359052ea3a907bdcb13f56"
       ]
+    },
+    {
+      "id": "paired-evidence-pilot-2026-11",
+      "question": "Can a campaign automatically check per-seed count records against its planned aggregate?",
+      "observation": "A live test-only similar-rules comparison emitted 500 paired count records; supervisor validation matched the totals and calculated candidate-minus-mixture recall -0.005456 with bootstrap interval [-0.006468, -0.004520]. The planned two-point recall margin was met.",
+      "hypothesis": "Machine-readable per-seed records enable automatic arithmetic checks, but do not establish the validity or provenance of the underlying observations.",
+      "next_test": "Add independently allocated, recorded seed roles and deterministic reruns or other provenance checks; extend the contract beyond equal-trial binary accuracy when needed.",
+      "limitations": "Agent-authored records and tests, selected public task, unmatched compute, no global seed registry, and between-round input-token threshold exceeded during the round.",
+      "evidence": [
+        "EXPERIMENTS.md",
+        "toolkit/experiment-results/paired-evidence-pilot-01/campaign-summary.json",
+        "toolkit/experiment-results/paired-evidence-pilot-01/paired-records.json.gz"
+      ],
+      "related_findings": [
+        "paired-log-check-2026-11"
+      ],
+      "candidate_commits": [
+        "40473807b7859079012b571eb8f7af41aae41af4"
+      ]
     }
   ]
 }

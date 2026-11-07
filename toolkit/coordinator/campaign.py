@@ -21,7 +21,7 @@ import sys
 import time
 import uuid
 
-from . import memory, paired_evidence, runner
+from . import memory, paired_evidence, provenance, runner
 
 GOAL = 'Find a model that retains earlier rules and adapts to rule changes at least as well as the mixture baseline.'
 ALLOWED = {'toolkit/src/agent_candidate.rs', 'toolkit/tests/agent_generated.rs'}
@@ -183,7 +183,7 @@ def init(directory, goal, max_ideas, agent_seconds, test_seconds, local_provider
               'protocol': protocol,
               'diagnose_failures': diagnose_failures, 'diagnostic_seconds': diagnostic_seconds,
               'review_successes': review_successes and diagnose_failures,
-              'auto_milestones': True, 'milestone_schema_version': 2, 'diagnosis_schema_version': 2, 'paired_evidence_version': 1, 'seed_allocation_version': 1, 'automatic_replay': True,
+              'auto_milestones': True, 'milestone_schema_version': 2, 'diagnosis_schema_version': 2, 'paired_evidence_version': 1, 'seed_allocation_version': 1, 'automatic_replay': True, 'provenance_version': 1,
               'max_reported_input_tokens': max_reported_input_tokens,
               'scope': 'binary hidden-context sequence task; candidate Rust model only',
               'limits': 'LLM token/cost limits and blind holdouts are not enforced.'}
@@ -459,8 +459,8 @@ def diagnosis_prompt(result, round_dir, structured_assessment=False):
 {focus}
 {'Assess whether the milestone was followed, partially followed, not followed, or is unclear; cite specific file paths, test functions, or logs as evidence, and describe deviations or say none found. Use unclear when evidence is insufficient. Your assessment is an unverified review, not proof.' if structured_assessment else ''}
 Frozen milestone and evidence status:
-{json.dumps({'milestone': result.get('milestone'), 'evidence': result.get('milestone_evidence'), 'paired_evidence': result.get('paired_evidence'), 'seed_allocation': result.get('seed_allocation'), 'replay': result.get('replay')}, indent=2)}
-Check whether the candidate changes and test actually address the planned intervention and primary comparison; explicitly flag any unrelated mechanism or unablated model change. Matching record labels are not verification.
+{json.dumps({'milestone': result.get('milestone'), 'evidence': result.get('milestone_evidence'), 'paired_evidence': result.get('paired_evidence'), 'seed_allocation': result.get('seed_allocation'), 'replay': result.get('replay'), 'provenance': result.get('provenance')}, indent=2)}
+The provenance record distinguishes the campaign base, the seed transplant, and the current agent's candidate delta. Inspect the candidate delta from round_start_commit to candidate_commit when assessing this round; a diff against the older seed source also includes unrelated campaign history. Check whether the candidate changes and test actually address the planned intervention and primary comparison; explicitly flag any unrelated mechanism or unablated model change. Matching record labels are not verification.
 Candidate hypothesis and implementation summary:
 {json.dumps(result.get('idea'), indent=2)}
 
@@ -808,6 +808,9 @@ def execute_round(directory, config, state, agent=call_agent):
         evidence_stage = 'evaluation' if evaluation is not None else 'development'
         matrix = probe_matrix(study / evidence_stage / 'evidence' / 'probes.csv')
         result.update(status='complete', commit=commit, idea=idea, development=development, evaluation=evaluation, final_probe_matrix=matrix)
+        if config.get('provenance_version') == 1:
+            result['provenance'] = provenance.record(config, index, base, commit, round_dir)
+            runner.write_json(round_dir / 'result.json', result)
         if config.get('automatic_replay', False):
             result['replay'] = automatic_replay(directory, config, round_dir, result)
             runner.write_json(round_dir / 'result.json', result)
@@ -823,7 +826,7 @@ def execute_round(directory, config, state, agent=call_agent):
     except (runner.PlanError, OSError, subprocess.SubprocessError) as exc:
         result.update(status='failed', error=str(exc))
     runner.write_json(round_dir / 'result.json', result)
-    state['completed'].append({k: result.get(k) for k in ('index', 'status', 'base_commit', 'seed_candidate_commit', 'commit', 'idea', 'milestone', 'milestone_usage', 'milestone_evidence', 'milestone_review', 'paired_evidence', 'seed_allocation', 'replay', 'agent_elapsed_seconds', 'agent_usage', 'followups', 'development', 'evaluation', 'final_probe_matrix', 'diagnosis', 'error')})
+    state['completed'].append({k: result.get(k) for k in ('index', 'status', 'base_commit', 'seed_candidate_commit', 'commit', 'idea', 'milestone', 'milestone_usage', 'milestone_evidence', 'milestone_review', 'paired_evidence', 'seed_allocation', 'replay', 'provenance', 'agent_elapsed_seconds', 'agent_usage', 'followups', 'development', 'evaluation', 'final_probe_matrix', 'diagnosis', 'error')})
     state['next_index'] += 1
     state['status'] = 'ready' if result['status'] == 'complete' else 'inspect_failure'
     runner.write_json(directory / 'state.json', state)

@@ -189,6 +189,25 @@
       "candidate_commits": [
         "99e65effd13586f137e3a78831b019c8a6312b15"
       ]
+    },
+    {
+      "id": "milestone-review-pilot-2026-11",
+      "question": "Can a separate reviewer record an evidence-based assessment of whether a milestone was followed?",
+      "observation": "A live test-only 1000-seed filter ablation produced the structured reviewer status followed and retained cited evidence. The agent-reported filter-minus-unguarded B-recall difference was -0.000506 with bootstrap interval [-0.001460, 0.000384], inconclusive under the one-point rule.",
+      "hypothesis": "Structured review can expose claimed compliance and unresolved limitations to subsequent rounds, but it remains a model judgment rather than verification.",
+      "next_test": "Independently reproduce or validate the per-seed calculation and improve seed provenance before interpreting repeated public-task experiments.",
+      "limitations": "The reviewer did not rerun the test or independently establish broader seed freshness or timing. The experiment and bootstrap are agent-authored, synthetic tasks are public, and compute is unmatched.",
+      "evidence": [
+        "EXPERIMENTS.md",
+        "toolkit/experiment-results/milestone-review-pilot-01/campaign-summary.json",
+        "toolkit/experiment-results/milestone-review-pilot-01/tests.log.gz"
+      ],
+      "related_findings": [
+        "milestone-scope-pilot-2026-11"
+      ],
+      "candidate_commits": [
+        "ad1c8baaf20b21049b359052ea3a907bdcb13f56"
+      ]
     }
   ]
 }

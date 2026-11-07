@@ -246,6 +246,26 @@
       "candidate_commits": [
         "40473807b7859079012b571eb8f7af41aae41af4"
       ]
+    },
+    {
+      "id": "seed-allocation-pilot-2026-11-07",
+      "question": "Can a campaign use supervisor-allocated primary seed roles and preserve them with the reported paired evidence?",
+      "observation": "A live test-only campaign reported all 100 allocated IDs, the allocation and paired-record hashes matched, and a reviewer found the allocated role values in the test. In a selected similar-rules ablation, filter-minus-unguarded B recall was -0.00470 with supervisor bootstrap interval [-0.00658, -0.00304].",
+      "hypothesis": "Supervisor allocation improves traceability and the filter may hurt recall in this condition; the saved records do not establish actual seed use or the cause of the result.",
+      "next_test": "Independently reproduce the recorded experiment from the frozen allocation and code, and validate seed provenance across broader historical campaigns.",
+      "limitations": "Agent-authored test, visible seeds, no global seed registry, public selected condition, unadjusted exploratory zero-crossing rule, unmatched compute, and input threshold exceeded within the round.",
+      "evidence": [
+        "EXPERIMENTS.md",
+        "toolkit/experiment-results/seed-allocation-pilot-01/campaign-summary.json",
+        "toolkit/experiment-results/seed-allocation-pilot-01/seed-allocation.json.gz",
+        "toolkit/experiment-results/seed-allocation-pilot-01/paired-records.json.gz"
+      ],
+      "related_findings": [
+        "paired-evidence-pilot-2026-11"
+      ],
+      "candidate_commits": [
+        "653e854a969357c0a0a595d292d6ef0fc1c5882b"
+      ]
     }
   ]
 }

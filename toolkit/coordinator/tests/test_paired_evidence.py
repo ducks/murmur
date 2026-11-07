@@ -39,6 +39,30 @@ class PairedEvidenceTests(unittest.TestCase):
                      [self.rows[0],{**self.rows[1],'control_correct':11}]):
             with self.subTest(rows=rows), self.assertRaises(runner.PlanError): self.check(rows)
 
+    def test_allocated_ids_must_match_exactly(self):
+        self.write(self.rows)
+        result=paired_evidence.validate(self.path,self.milestone,self.followups,draws=100,expected_seed_ids={11,12})
+        self.assertEqual(result['seeds'],2)
+        with self.assertRaisesRegex(runner.PlanError,'supervisor allocation'):
+            paired_evidence.validate(self.path,self.milestone,self.followups,draws=100,expected_seed_ids={11,13})
+
+    def test_supervisor_allocation_is_reproducible_and_role_disjoint(self):
+        first=campaign.allocate_primary_seeds('123456abcdef',1)
+        self.assertEqual(first,campaign.allocate_primary_seeds('123456abcdef',1))
+        self.assertEqual(first['count'],100)
+        self.assertNotEqual(first['rows'],campaign.allocate_primary_seeds('123456abcdef',2)['rows'])
+        self.assertNotEqual(first['rows'],campaign.allocate_primary_seeds('123456abcdee',1)['rows'])
+        roles=[row[k] for row in first['rows'] for k in ('stream','initialization','probe')]
+        self.assertEqual(len(roles),len(set(roles)))
+        self.assertEqual([r['seed_id'] for r in first['rows']],list(range(100)))
+        with self.assertRaises(runner.PlanError):campaign.allocate_primary_seeds('bad',1)
+
+    def test_seed_allocation_is_present_in_agent_prompt(self):
+        allocation=campaign.allocate_primary_seeds('123456abcdef',1,count=2)
+        prompt=campaign.prompt_for({'goal':'g','paired_evidence_version':1},[],seed_allocation=allocation)
+        self.assertIn('supervisor froze',prompt)
+        self.assertIn(str(allocation['rows'][0]['stream']),prompt)
+
     def test_duplicate_primary_aggregate_rejected(self):
         record=dict(self.base,candidate_correct=11,control_correct=12,trials=20)
         runner.write_json(self.root/'followup-records.json',{'records':[record,record]})

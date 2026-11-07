@@ -111,7 +111,7 @@ def campaign_records(directory):
                         'campaign_goal': config.get('goal'), 'protocol': config.get('protocol', 'legacy'),
                         'status': item.get('status'), 'incomplete': incomplete, 'candidate_commit': item.get('commit'),
                         'seed_candidate_commit': config.get('seed_candidate_commit'),
-                        'idea': idea, 'milestone': item.get('milestone'), 'milestone_evidence': item.get('milestone_evidence'), 'milestone_review': item.get('milestone_review'), 'paired_evidence': item.get('paired_evidence'), 'followups': followups, 'development': checks(item.get('development')),
+                        'idea': idea, 'milestone': item.get('milestone'), 'milestone_evidence': item.get('milestone_evidence'), 'milestone_review': item.get('milestone_review'), 'paired_evidence': item.get('paired_evidence'), 'seed_allocation': item.get('seed_allocation'), 'followups': followups, 'development': checks(item.get('development')),
                         'evaluation': checks(item.get('evaluation')), 'diagnosis': item.get('diagnosis'), 'error': item.get('error'),
                         'evidence_directory': str(round_dir),
                         'verification': 'indexed from campaign state; evidence hashes were not rechecked'})

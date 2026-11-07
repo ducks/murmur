@@ -109,6 +109,24 @@ def seed_configs(index, seed_base=7_000_001):
     return content(start, 10), content(start + 100_000, 20)
 
 
+def allocate_primary_seeds(campaign_id, index, count=100):
+    """Allocate deterministic role seeds for the current primary follow-up."""
+    if not re.fullmatch(r'[0-9a-f]{12}', campaign_id) or not 1 <= index <= 100 or not 2 <= count <= 1000:
+        raise runner.PlanError('invalid primary seed allocation parameters')
+    rows = []
+    for seed_id in range(count):
+        roles = {}
+        for role in ('stream', 'initialization', 'probe'):
+            key = f'murmur-primary-v1:{campaign_id}:{index}:{seed_id}:{role}'.encode('ascii')
+            roles[role] = (int.from_bytes(hashlib.sha256(key).digest()[:8], 'big') & ((1 << 63) - 1)) + 1
+        rows.append({'seed_id': seed_id, **roles})
+    values = [row[role] for row in rows for role in ('stream', 'initialization', 'probe')]
+    if len(values) != len(set(values)):
+        raise runner.PlanError('collision in primary seed allocation')
+    return {'schema_version': 1, 'campaign_id': campaign_id, 'round': index, 'count': count,
+            'rows': rows, 'qualification': 'Allocated and recorded in advance; visible to the agent; actual use and global freshness are not verified.'}
+
+
 def make_plan(index, idea, protocol='legacy'):
     plan = {
         'schema_version': 1, 'id': f'agent-idea-{index:03d}',
@@ -164,7 +182,7 @@ def init(directory, goal, max_ideas, agent_seconds, test_seconds, local_provider
               'protocol': protocol,
               'diagnose_failures': diagnose_failures, 'diagnostic_seconds': diagnostic_seconds,
               'review_successes': review_successes and diagnose_failures,
-              'auto_milestones': True, 'milestone_schema_version': 2, 'diagnosis_schema_version': 2, 'paired_evidence_version': 1,
+              'auto_milestones': True, 'milestone_schema_version': 2, 'diagnosis_schema_version': 2, 'paired_evidence_version': 1, 'seed_allocation_version': 1,
               'max_reported_input_tokens': max_reported_input_tokens,
               'scope': 'binary hidden-context sequence task; candidate Rust model only',
               'limits': 'LLM token/cost limits and blind holdouts are not enforced.'}
@@ -206,7 +224,7 @@ def prior_history(path):
     return history
 
 
-def prompt_for(config, history, research_memory=None, milestone=None):
+def prompt_for(config, history, research_memory=None, milestone=None, seed_allocation=None):
     if config.get('protocol', 'legacy') == 'milestone':
         criteria_text = 'The supervisor checks final frozen B recall and the first 100 online predictions after each A→B and B→A switch, on each of four binary task families. The candidate must be within 2 percentage points of the unchanged mixture on each mean paired accuracy. Resource budgets apply to the entire stage; inline size and per-model training time are diagnostic only and heap memory is not measured.'
         evaluator_reference = ', toolkit/src/bin/milestone_context.rs'
@@ -217,6 +235,7 @@ def prompt_for(config, history, research_memory=None, milestone=None):
                  'Treat that code as the starting point and use the recorded review to design a matched follow-up.'
                  if config.get('seed_candidate_commit') else 'No previous candidate was checked out as a seed.')
     paired_note = '''For the planned primary comparison, also print one line per paired seed, using exactly: MURMUR_PAIRED {"measure":"name","candidate":"name","control":"name","seed":0,"candidate_correct":1,"control_correct":1,"trials":2}. Use the exact planned labels, unique nonnegative integer seed IDs, equal positive trial counts per seed, and 2 to 10000 seed records. Their counts and trial totals must sum exactly to the single primary MURMUR_FOLLOWUP record. These records are evidence to check, not proof of actual pairing or seed provenance.''' if config.get('paired_evidence_version') == 1 else ''
+    seed_note_primary = ('The supervisor froze the primary seed allocation below before your work. Use EVERY row exactly once in the primary comparison: use stream for event generation, initialization for candidate and control model initialization, and probe for frozen-probe generation. The MURMUR_PAIRED seed must be the row seed_id (not the role seed). Do not choose replacement seeds. If these roles do not fit the milestone, state the blocker and do not fabricate evidence. These seeds are visible and their use cannot be proven from the records alone.\n' + json.dumps(seed_allocation)) if seed_allocation else ''
     return f'''You are one research agent in an automated, bounded model research campaign.
 Overall goal: {config['goal']}
 {seed_note}
@@ -239,6 +258,8 @@ Prior candidate commits are available locally: when building on a previous idea,
 For any quantitative follow-up in agent_generated.rs, print one single-line record per aggregate measurement using this exact prefix and JSON shape: MURMUR_FOLLOWUP {{"measure":"name","candidate":"name","control":"name","candidate_correct":1,"control_correct":1,"trials":2}}. Counts must refer to the same paired observations. Prefer aggregate counts by task and measure, not one record per seed; keep any per-seed details in the test log. The supervisor preserves and checks the arithmetic but does not independently verify the experimental design. Do not emit a record for a test you did not run.
 
 {paired_note}
+
+{seed_note_primary}
 
 Edit ONLY toolkit/src/agent_candidate.rs and toolkit/tests/agent_generated.rs. A test-only investigation is allowed; the latter must contain at least one meaningful Rust test for your proposed mechanism. Do not alter evaluator, baseline, configs, docs, Git metadata, or any other file; do not commit. The supervisor rejects other changes. Preserve Candidate's Clone, new(seed, rate), reset(), predict(x)->f64 and observe(x,y,learn) interface. `predict` must happen without seeing y; output must be finite in [0,1]. In `observe(..., false)`, do not change learned parameters, though context inference state may update. reset clears transient inference state without erasing learned parameters. Candidate may use local Rust standard library and existing local crates only; no network, pretrained weights, external APIs, hidden future data, environment data, or provided true context. Model-code restrictions are reviewed/tested, not a complete security boundary.
 
@@ -308,6 +329,7 @@ Goal: {config['goal']}
 Recent campaign history: {json.dumps(history[-5:])}
 Research memory: {json.dumps(research_index['agent_context'])}
 Pick a question grounded in evidence or a clearly stated uncertainty. Specify an intervention, an explicit control, a measurable outcome, and a decision rule. Prefer a test that fits edits to toolkit/src/agent_candidate.rs and toolkit/tests/agent_generated.rs. The existing evaluator and public task rules cannot be changed. Do not claim a finding has been established. If a proposed question needs a different evaluator, choose a feasible smaller step or clearly explain the limitation. Do not edit files or run experiments. Return only the structured JSON.
+{('The primary comparison must use exactly 100 supervisor-allocated paired seeds, each with stream, initialization, and probe roles; plan a feasible small experiment within that limit.' if config.get('seed_allocation_version') == 1 else '')}
 {('Choose scope test_only if no model source change is needed; otherwise choose model_change. For test_only the candidate file must remain byte-for-byte unchanged. For model_change describe exactly the necessary change and avoid adding unrelated mechanisms. Set primary_measure, candidate_label, and control_label to concise exact labels for one MURMUR_FOLLOWUP record reporting the primary comparison.' if config.get('milestone_schema_version') == 2 else '')}
 """
     (round_dir / 'milestone-prompt.txt').write_text(prompt, encoding='utf-8')
@@ -340,7 +362,7 @@ def call_agent(config, worktree, round_dir, history):
     env = build_environment(round_dir.parent, config)
     args = agent_command(config, worktree, round_dir / 'idea.json', round_dir.parent / 'agent-output-schema.json')
     index = runner.read_json(round_dir / 'research-memory.json')
-    (round_dir / 'prompt.txt').write_text(prompt_for(config, history, index['agent_context'], runner.read_json(round_dir / 'milestone.json') if (round_dir / 'milestone.json').is_file() else None), encoding='utf-8')
+    (round_dir / 'prompt.txt').write_text(prompt_for(config, history, index['agent_context'], runner.read_json(round_dir / 'milestone.json') if (round_dir / 'milestone.json').is_file() else None, runner.read_json(round_dir / 'seed-allocation.json') if (round_dir / 'seed-allocation.json').is_file() else None), encoding='utf-8')
     try:
         with (round_dir / 'agent-events.jsonl').open('wb') as stdout, (round_dir / 'agent-stderr.log').open('wb') as stderr:
             result = bounded_process(args, cwd=worktree, input_bytes=(round_dir / 'prompt.txt').read_bytes(), stdout=stdout,
@@ -436,7 +458,7 @@ def diagnosis_prompt(result, round_dir, structured_assessment=False):
 {focus}
 {'Assess whether the milestone was followed, partially followed, not followed, or is unclear; cite specific file paths, test functions, or logs as evidence, and describe deviations or say none found. Use unclear when evidence is insufficient. Your assessment is an unverified review, not proof.' if structured_assessment else ''}
 Frozen milestone and evidence status:
-{json.dumps({'milestone': result.get('milestone'), 'evidence': result.get('milestone_evidence'), 'paired_evidence': result.get('paired_evidence')}, indent=2)}
+{json.dumps({'milestone': result.get('milestone'), 'evidence': result.get('milestone_evidence'), 'paired_evidence': result.get('paired_evidence'), 'seed_allocation': result.get('seed_allocation')}, indent=2)}
 Check whether the candidate changes and test actually address the planned intervention and primary comparison; explicitly flag any unrelated mechanism or unablated model change. Matching record labels are not verification.
 Candidate hypothesis and implementation summary:
 {json.dumps(result.get('idea'), indent=2)}
@@ -698,10 +720,24 @@ def execute_round(directory, config, state, agent=call_agent):
             if git(worktree, 'rev-parse', 'HEAD') != base or changed_paths(worktree):
                 raise runner.PlanError('worktree changed during milestone planning; preserve it for inspection')
             runner.write_json(round_dir / 'result.json', result)
+        if config.get('seed_allocation_version') == 1:
+            allocation = allocate_primary_seeds(config['campaign_id'], index)
+            dev_text, evaluation_text = seed_configs(index, config['seed_base'])
+            scorecard_seeds = runner.config_parse(dev_text)['role_seeds'] | runner.config_parse(evaluation_text)['role_seeds']
+            allocated_roles = {row[role] for row in allocation['rows'] for role in ('stream', 'initialization', 'probe')}
+            if scorecard_seeds & allocated_roles:
+                raise runner.PlanError('primary allocation overlaps current scorecard seed roles')
+            allocation_path = round_dir / 'seed-allocation.json'
+            runner.write_json(allocation_path, allocation)
+            allocation_hash = hashlib.sha256(allocation_path.read_bytes()).hexdigest()
+            result['seed_allocation'] = {'path': str(allocation_path), 'sha256': allocation_hash, 'count': allocation['count'], 'qualification': allocation['qualification']}
+            runner.write_json(round_dir / 'result.json', result)
         agent_started = time.monotonic()
         idea = agent(config, worktree, round_dir, config.get('prior_history', []) + state['completed'])
         result['agent_elapsed_seconds'] = time.monotonic() - agent_started
         result['agent_usage'] = agent_usage(round_dir / 'agent-events.jsonl')
+        if config.get('seed_allocation_version') == 1 and hashlib.sha256(allocation_path.read_bytes()).hexdigest() != allocation_hash:
+            raise runner.PlanError('primary seed allocation changed during agent execution')
         verify_agent_changes(worktree, base)
         enforce_milestone_scope(worktree, result.get('milestone'))
         dev, evaluation = seed_configs(index, config['seed_base'])
@@ -727,7 +763,10 @@ def execute_round(directory, config, state, agent=call_agent):
             if result['milestone_evidence']['status'] == 'missing_primary_record':
                 raise runner.PlanError('planned primary follow-up record was not reported; inspect tests and milestone')
             if config.get('paired_evidence_version') == 1:
-                result['paired_evidence'] = paired_evidence.validate(round_dir / 'tests.log', result['milestone'], result['followups'])
+                if config.get('seed_allocation_version') == 1 and hashlib.sha256(allocation_path.read_bytes()).hexdigest() != allocation_hash:
+                    raise runner.PlanError('primary seed allocation changed during tests')
+                expected_ids = {r['seed_id'] for r in allocation['rows']} if config.get('seed_allocation_version') == 1 else None
+                result['paired_evidence'] = paired_evidence.validate(round_dir / 'tests.log', result['milestone'], result['followups'], expected_seed_ids=expected_ids)
                 runner.write_json(round_dir / 'result.json', result)
         unexpected = changed_paths(worktree) - ALLOWED - GENERATED
         if unexpected:
@@ -759,7 +798,7 @@ def execute_round(directory, config, state, agent=call_agent):
     except (runner.PlanError, OSError, subprocess.SubprocessError) as exc:
         result.update(status='failed', error=str(exc))
     runner.write_json(round_dir / 'result.json', result)
-    state['completed'].append({k: result.get(k) for k in ('index', 'status', 'base_commit', 'seed_candidate_commit', 'commit', 'idea', 'milestone', 'milestone_usage', 'milestone_evidence', 'milestone_review', 'paired_evidence', 'agent_elapsed_seconds', 'agent_usage', 'followups', 'development', 'evaluation', 'final_probe_matrix', 'diagnosis', 'error')})
+    state['completed'].append({k: result.get(k) for k in ('index', 'status', 'base_commit', 'seed_candidate_commit', 'commit', 'idea', 'milestone', 'milestone_usage', 'milestone_evidence', 'milestone_review', 'paired_evidence', 'seed_allocation', 'agent_elapsed_seconds', 'agent_usage', 'followups', 'development', 'evaluation', 'final_probe_matrix', 'diagnosis', 'error')})
     state['next_index'] += 1
     state['status'] = 'ready' if result['status'] == 'complete' else 'inspect_failure'
     runner.write_json(directory / 'state.json', state)

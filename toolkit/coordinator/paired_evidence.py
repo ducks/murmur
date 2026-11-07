@@ -13,7 +13,7 @@ MARKER = 'MURMUR_PAIRED '
 FIELDS = {'measure', 'candidate', 'control', 'seed', 'candidate_correct', 'control_correct', 'trials'}
 
 
-def validate(path, milestone, followups, max_seeds=10000, draws=2000):
+def validate(path, milestone, followups, max_seeds=10000, draws=2000, expected_seed_ids=None):
     expected = (milestone['primary_measure'], milestone['candidate_label'], milestone['control_label'])
     aggregates = [x for x in runner.read_json(followups['full_records_path'])['records']
                   if (x['measure'], x['candidate'], x['control']) == expected]
@@ -41,6 +41,8 @@ def validate(path, milestone, followups, max_seeds=10000, draws=2000):
                 rows[seed] = item
             except (ValueError, TypeError, KeyError) as exc:
                 raise runner.PlanError(f'invalid paired record: {exc}') from exc
+    if expected_seed_ids is not None and set(rows) != set(expected_seed_ids):
+        raise runner.PlanError('paired seed IDs do not match supervisor allocation')
     if len(rows) < 2:
         raise runner.PlanError('at least two paired seed records are required')
     if len({x['trials'] for x in rows.values()}) != 1:

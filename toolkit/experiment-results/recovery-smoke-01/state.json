@@ -1,0 +1,540 @@
+{
+  "base_commit": "6cfc25364a1b70ff22386501962c1f63fe601cfc",
+  "completed": [
+    {
+      "agent_elapsed_seconds": 8.340412750840187e-05,
+      "agent_usage": null,
+      "base_commit": "fb84b0c07416a967aee8bee849804d8c602a718f",
+      "commit": null,
+      "development": null,
+      "diagnosis": null,
+      "error": "candidate tests failed (101); see tests.log",
+      "evaluation": null,
+      "evidence_directory": "/home/urho/dev/murmur/toolkit/runs/recovery-smoke-01/idea-001",
+      "final_probe_matrix": null,
+      "followups": null,
+      "idea": {
+        "approach": "Intentional failure then scripted test.",
+        "falsification": "No recovery is scheduled.",
+        "hypothesis": "A retry follows an ordinary failed test.",
+        "limitations": "Synthetic workflow check only; not a model experiment.",
+        "question": "Synthetic recovery smoke test"
+      },
+      "index": 1,
+      "milestone": {
+        "candidate_label": "candidate",
+        "control": "Synthetic recovery smoke test only.",
+        "control_label": "control",
+        "decision_rule": "Synthetic recovery smoke test only.",
+        "intervention": "Synthetic recovery smoke test only.",
+        "limitations": "Synthetic recovery smoke test only.",
+        "measurement": "Synthetic recovery smoke test only.",
+        "motivation": "Synthetic recovery smoke test only.",
+        "primary_measure": "smoke",
+        "question": "Synthetic recovery smoke test only.",
+        "scope": "test_only"
+      },
+      "milestone_evidence": null,
+      "milestone_review": null,
+      "milestone_usage": null,
+      "paired_evidence": null,
+      "provenance": null,
+      "recovery_eligible": true,
+      "recovery_scheduled": true,
+      "replay": null,
+      "seed_allocation": {
+        "count": 100,
+        "path": "/home/urho/dev/murmur/toolkit/runs/recovery-smoke-01/idea-001/seed-allocation.json",
+        "qualification": "Allocated and recorded in advance; visible to the agent; actual use and global freshness are not verified.",
+        "sha256": "0bd7004aeabb88f8f1112cbe136a90cec58e7911fcfe595d05263c7c9bd01c44"
+      },
+      "seed_candidate_commit": "aad7c48287191eef0762906e47ebcb67d03e02c2",
+      "status": "failed"
+    },
+    {
+      "agent_elapsed_seconds": 0.00011652801185846329,
+      "agent_usage": null,
+      "base_commit": "444bffa9e46c1afeab2721cf5080b6e1d5c9dd00",
+      "commit": "6cfc25364a1b70ff22386501962c1f63fe601cfc",
+      "development": {
+        "baseline": "mixture",
+        "candidate": "candidate",
+        "checks": {
+          "asymmetric:retention_b": true,
+          "asymmetric:switch_to_a": true,
+          "asymmetric:switch_to_b": true,
+          "complementary:retention_b": true,
+          "complementary:switch_to_a": true,
+          "complementary:switch_to_b": true,
+          "constant_bias:retention_b": true,
+          "constant_bias:switch_to_a": true,
+          "constant_bias:switch_to_b": true,
+          "unequal_noise:retention_b": true,
+          "unequal_noise:switch_to_a": true,
+          "unequal_noise:switch_to_b": true
+        },
+        "comparisons": {
+          "asymmetric:retention_b": {
+            "baseline_accuracy": 0.37629999999999997,
+            "candidate_accuracy": 0.6931,
+            "losses": 1,
+            "mean_paired_difference": 0.31679999999999997,
+            "ties": 0,
+            "wins": 9
+          },
+          "asymmetric:switch_to_a": {
+            "baseline_accuracy": 0.678,
+            "candidate_accuracy": 0.745,
+            "losses": 1,
+            "mean_paired_difference": 0.067,
+            "ties": 1,
+            "wins": 8
+          },
+          "asymmetric:switch_to_b": {
+            "baseline_accuracy": 0.538,
+            "candidate_accuracy": 0.553,
+            "losses": 3,
+            "mean_paired_difference": 0.015000000000000003,
+            "ties": 1,
+            "wins": 6
+          },
+          "complementary:retention_b": {
+            "baseline_accuracy": 0.3919,
+            "candidate_accuracy": 0.7455,
+            "losses": 1,
+            "mean_paired_difference": 0.3536,
+            "ties": 0,
+            "wins": 9
+          },
+          "complementary:switch_to_a": {
+            "baseline_accuracy": 0.624,
+            "candidate_accuracy": 0.727,
+            "losses": 0,
+            "mean_paired_difference": 0.10299999999999998,
+            "ties": 0,
+            "wins": 10
+          },
+          "complementary:switch_to_b": {
+            "baseline_accuracy": 0.5640000000000001,
+            "candidate_accuracy": 0.609,
+            "losses": 2,
+            "mean_paired_difference": 0.04499999999999998,
+            "ties": 1,
+            "wins": 7
+          },
+          "constant_bias:retention_b": {
+            "baseline_accuracy": 0.7613000000000001,
+            "candidate_accuracy": 0.8963000000000001,
+            "losses": 6,
+            "mean_paired_difference": 0.135,
+            "ties": 2,
+            "wins": 2
+          },
+          "constant_bias:switch_to_a": {
+            "baseline_accuracy": 0.868,
+            "candidate_accuracy": 0.865,
+            "losses": 4,
+            "mean_paired_difference": -0.0030000000000000027,
+            "ties": 4,
+            "wins": 2
+          },
+          "constant_bias:switch_to_b": {
+            "baseline_accuracy": 0.726,
+            "candidate_accuracy": 0.7929999999999999,
+            "losses": 1,
+            "mean_paired_difference": 0.067,
+            "ties": 0,
+            "wins": 9
+          },
+          "unequal_noise:retention_b": {
+            "baseline_accuracy": 0.3406,
+            "candidate_accuracy": 0.6753,
+            "losses": 1,
+            "mean_paired_difference": 0.3347,
+            "ties": 0,
+            "wins": 9
+          },
+          "unequal_noise:switch_to_a": {
+            "baseline_accuracy": 0.9029999999999999,
+            "candidate_accuracy": 0.9,
+            "losses": 4,
+            "mean_paired_difference": -0.0030000000000000027,
+            "ties": 4,
+            "wins": 2
+          },
+          "unequal_noise:switch_to_b": {
+            "baseline_accuracy": 0.54,
+            "candidate_accuracy": 0.591,
+            "losses": 1,
+            "mean_paired_difference": 0.05099999999999999,
+            "ties": 0,
+            "wins": 9
+          }
+        },
+        "elapsed_seconds": 5.120886659016833,
+        "limitations": [
+          "Thresholds on means are operational, not statistical guarantees.",
+          "Non-inferiority alone does not demonstrate novelty; copying the baseline could pass.",
+          "Task families and evaluation seeds are locally visible and can be overfit.",
+          "The oracle receives context labels.",
+          "Inline bytes exclude heap allocations; peak memory is not measured.",
+          "Per-model training times include clock overhead, exclude probes, and are noisy; resource budgets are not matched."
+        ],
+        "logical_transitions": 360000,
+        "max_accuracy_drop": 0.02,
+        "outcome": "criteria_met",
+        "peak_memory": "not measured",
+        "resources": {
+          "candidate": {
+            "inline_bytes": 288,
+            "training_ns_total": 15198793,
+            "training_steps": 120000
+          },
+          "mixture": {
+            "inline_bytes": 72,
+            "training_ns_total": 3260610,
+            "training_steps": 120000
+          },
+          "oracle": {
+            "inline_bytes": 48,
+            "training_ns_total": 2230078,
+            "training_steps": 120000
+          },
+          "single": {
+            "inline_bytes": 48,
+            "training_ns_total": 2186959,
+            "training_steps": 120000
+          }
+        },
+        "seeds": 10,
+        "split": "development"
+      },
+      "diagnosis": {
+        "status": "disabled"
+      },
+      "error": null,
+      "evaluation": {
+        "baseline": "mixture",
+        "candidate": "candidate",
+        "checks": {
+          "mixed_rules:retention_b": true,
+          "mixed_rules:switch_to_a": true,
+          "mixed_rules:switch_to_b": true,
+          "reversed_asym:retention_b": true,
+          "reversed_asym:switch_to_a": true,
+          "reversed_asym:switch_to_b": true,
+          "shifted_bias:retention_b": true,
+          "shifted_bias:switch_to_a": true,
+          "shifted_bias:switch_to_b": true,
+          "similar_rules:retention_b": true,
+          "similar_rules:switch_to_a": true,
+          "similar_rules:switch_to_b": true
+        },
+        "comparisons": {
+          "mixed_rules:retention_b": {
+            "baseline_accuracy": 0.48765000000000003,
+            "candidate_accuracy": 0.68215,
+            "losses": 1,
+            "mean_paired_difference": 0.19450000000000003,
+            "ties": 0,
+            "wins": 19
+          },
+          "mixed_rules:switch_to_a": {
+            "baseline_accuracy": 0.7975,
+            "candidate_accuracy": 0.8535,
+            "losses": 0,
+            "mean_paired_difference": 0.05600000000000001,
+            "ties": 0,
+            "wins": 20
+          },
+          "mixed_rules:switch_to_b": {
+            "baseline_accuracy": 0.5785,
+            "candidate_accuracy": 0.6295,
+            "losses": 3,
+            "mean_paired_difference": 0.050999999999999976,
+            "ties": 0,
+            "wins": 17
+          },
+          "reversed_asym:retention_b": {
+            "baseline_accuracy": 0.2857,
+            "candidate_accuracy": 0.77645,
+            "losses": 1,
+            "mean_paired_difference": 0.4907500000000001,
+            "ties": 0,
+            "wins": 19
+          },
+          "reversed_asym:switch_to_a": {
+            "baseline_accuracy": 0.6014999999999999,
+            "candidate_accuracy": 0.6865,
+            "losses": 0,
+            "mean_paired_difference": 0.085,
+            "ties": 3,
+            "wins": 17
+          },
+          "reversed_asym:switch_to_b": {
+            "baseline_accuracy": 0.5965,
+            "candidate_accuracy": 0.6155,
+            "losses": 6,
+            "mean_paired_difference": 0.01900000000000002,
+            "ties": 2,
+            "wins": 12
+          },
+          "shifted_bias:retention_b": {
+            "baseline_accuracy": 0.52,
+            "candidate_accuracy": 0.79055,
+            "losses": 9,
+            "mean_paired_difference": 0.27055,
+            "ties": 0,
+            "wins": 11
+          },
+          "shifted_bias:switch_to_a": {
+            "baseline_accuracy": 0.7275,
+            "candidate_accuracy": 0.754,
+            "losses": 3,
+            "mean_paired_difference": 0.026499999999999996,
+            "ties": 3,
+            "wins": 14
+          },
+          "shifted_bias:switch_to_b": {
+            "baseline_accuracy": 0.617,
+            "candidate_accuracy": 0.6695,
+            "losses": 3,
+            "mean_paired_difference": 0.05249999999999999,
+            "ties": 1,
+            "wins": 16
+          },
+          "similar_rules:retention_b": {
+            "baseline_accuracy": 0.8524499999999999,
+            "candidate_accuracy": 0.84505,
+            "losses": 7,
+            "mean_paired_difference": -0.007400000000000001,
+            "ties": 13,
+            "wins": 0
+          },
+          "similar_rules:switch_to_a": {
+            "baseline_accuracy": 0.837,
+            "candidate_accuracy": 0.833,
+            "losses": 6,
+            "mean_paired_difference": -0.0040000000000000036,
+            "ties": 14,
+            "wins": 0
+          },
+          "similar_rules:switch_to_b": {
+            "baseline_accuracy": 0.8394999999999999,
+            "candidate_accuracy": 0.834,
+            "losses": 7,
+            "mean_paired_difference": -0.0055,
+            "ties": 12,
+            "wins": 1
+          }
+        },
+        "elapsed_seconds": 0.3441772519145161,
+        "limitations": [
+          "Thresholds on means are operational, not statistical guarantees.",
+          "Non-inferiority alone does not demonstrate novelty; copying the baseline could pass.",
+          "Task families and evaluation seeds are locally visible and can be overfit.",
+          "The oracle receives context labels.",
+          "Inline bytes exclude heap allocations; peak memory is not measured.",
+          "Per-model training times include clock overhead, exclude probes, and are noisy; resource budgets are not matched."
+        ],
+        "logical_transitions": 720000,
+        "max_accuracy_drop": 0.02,
+        "outcome": "criteria_met",
+        "peak_memory": "not measured",
+        "resources": {
+          "candidate": {
+            "inline_bytes": 288,
+            "training_ns_total": 30241408,
+            "training_steps": 240000
+          },
+          "mixture": {
+            "inline_bytes": 72,
+            "training_ns_total": 6556210,
+            "training_steps": 240000
+          },
+          "oracle": {
+            "inline_bytes": 48,
+            "training_ns_total": 4358912,
+            "training_steps": 240000
+          },
+          "single": {
+            "inline_bytes": 48,
+            "training_ns_total": 4363288,
+            "training_steps": 240000
+          }
+        },
+        "seeds": 20,
+        "split": "evaluation"
+      },
+      "evidence_directory": "/home/urho/dev/murmur/toolkit/runs/recovery-smoke-01/idea-002",
+      "final_probe_matrix": {},
+      "followups": {
+        "aggregate_count": 0,
+        "aggregates": [],
+        "full_records_path": "/home/urho/dev/murmur/toolkit/runs/recovery-smoke-01/idea-002/followup-records.json",
+        "qualification": "Agent-authored test output; arithmetic checked, experimental design not independently verified.",
+        "record_count": 1,
+        "records": [
+          {
+            "candidate": "candidate",
+            "candidate_accuracy": 0.5,
+            "candidate_correct": 100,
+            "control": "control",
+            "control_accuracy": 0.5,
+            "control_correct": 100,
+            "measure": "smoke",
+            "trials": 200
+          }
+        ],
+        "records_shown": 1,
+        "warnings": []
+      },
+      "idea": {
+        "approach": "Intentional failure then scripted test.",
+        "falsification": "No recovery is scheduled.",
+        "hypothesis": "A retry follows an ordinary failed test.",
+        "limitations": "Synthetic workflow check only; not a model experiment.",
+        "question": "Synthetic recovery smoke test"
+      },
+      "index": 2,
+      "milestone": {
+        "candidate_label": "candidate",
+        "control": "Synthetic recovery smoke test only.",
+        "control_label": "control",
+        "decision_rule": "Synthetic recovery smoke test only.",
+        "intervention": "Synthetic recovery smoke test only.",
+        "limitations": "Synthetic recovery smoke test only.",
+        "measurement": "Synthetic recovery smoke test only.",
+        "motivation": "Synthetic recovery smoke test only.",
+        "primary_measure": "smoke",
+        "question": "Synthetic recovery smoke test only.",
+        "scope": "test_only"
+      },
+      "milestone_evidence": {
+        "matching_records": 1,
+        "model_change_review_required": false,
+        "qualification": "Matching labels only confirm that an arithmetically valid record was reported; they do not verify the intervention, seed pairing, decision rule, or correctness.",
+        "status": "primary_record_reported_unverified"
+      },
+      "milestone_review": {
+        "qualification": "No milestone assessment was produced.",
+        "reason": "disabled",
+        "status": "unavailable"
+      },
+      "milestone_usage": null,
+      "paired_evidence": {
+        "bootstrap": {
+          "draws": 2000,
+          "percentile_95": [
+            0.0,
+            0.0
+          ],
+          "seed": 42517
+        },
+        "mean_paired_difference": 0.0,
+        "other_records": 0,
+        "qualification": "Checks reported counts and aggregate arithmetic only; no proof of actual pairing, seed freshness, protocol compliance, or model correctness.",
+        "records_path": "/home/urho/dev/murmur/toolkit/runs/recovery-smoke-01/idea-002/paired-records.json",
+        "records_sha256": "b103aa5bf2cf78d11a9d57440cb9d3ca645cecb77a42715fc0ae0beb0add496f",
+        "seeds": 100,
+        "status": "arithmetic_checked",
+        "totals": {
+          "candidate_correct": 100,
+          "control_correct": 100,
+          "trials": 200
+        }
+      },
+      "provenance": {
+        "campaign_base_commit": "6f1603647915be966b41e5b6b5b3fdbae2a84ed1",
+        "candidate_commit": "6cfc25364a1b70ff22386501962c1f63fe601cfc",
+        "candidate_delta": {
+          "agent_editable_paths": [
+            "toolkit/tests/agent_generated.rs"
+          ],
+          "candidate_and_test_sha256": {
+            "toolkit/src/agent_candidate.rs": "ac85654ec9b0c5f498a05f9ed1caabb7c6824c06d6fa9262722c8f1eeeb6ba2c",
+            "toolkit/tests/agent_generated.rs": "b10c12226e08dda52a70bfb4acd7b41bde8ca5d4f714de8f3cfe9e0d99b8e68f"
+          },
+          "changed_paths": [
+            "toolkit/configs/agent/dev.cfg",
+            "toolkit/configs/agent/evaluation.cfg",
+            "toolkit/plans/agent-candidate.json",
+            "toolkit/tests/agent_generated.rs"
+          ],
+          "from_commit": "444bffa9e46c1afeab2721cf5080b6e1d5c9dd00",
+          "patch_sha256": "c22218e03ccb62b701e6769ba9f3a28073fe71061ca4551f5ba7b6d3e9387c14",
+          "supervisor_generated_paths": [
+            "toolkit/configs/agent/dev.cfg",
+            "toolkit/configs/agent/evaluation.cfg",
+            "toolkit/plans/agent-candidate.json"
+          ],
+          "to_commit": "6cfc25364a1b70ff22386501962c1f63fe601cfc"
+        },
+        "candidate_parent_commit": "444bffa9e46c1afeab2721cf5080b6e1d5c9dd00",
+        "qualification": "Git provenance and hashes identify recorded changes; they do not establish experimental validity or safe code.",
+        "round_start_commit": "444bffa9e46c1afeab2721cf5080b6e1d5c9dd00",
+        "schema_version": 1,
+        "seed_transplant": {
+          "candidate_and_test_sha256": {
+            "toolkit/src/agent_candidate.rs": "ac85654ec9b0c5f498a05f9ed1caabb7c6824c06d6fa9262722c8f1eeeb6ba2c",
+            "toolkit/tests/agent_generated.rs": "ab647b8d41bcf4ddd8fc625af7d3ab6093f5c18532c4ed2886cfb4ebaad2d22c"
+          },
+          "changed_paths": [
+            "toolkit/src/agent_candidate.rs",
+            "toolkit/tests/agent_generated.rs"
+          ],
+          "patch_sha256": "e31ab920b358a2b83c02a312727c715f48ba715ebadf448b5c928912df8c24c9",
+          "source_commit": "aad7c48287191eef0762906e47ebcb67d03e02c2",
+          "transplant_base": "6f1603647915be966b41e5b6b5b3fdbae2a84ed1",
+          "transplant_commit": "444bffa9e46c1afeab2721cf5080b6e1d5c9dd00"
+        }
+      },
+      "recovery_eligible": null,
+      "replay": {
+        "archive": "/home/urho/dev/murmur/toolkit/runs/recovery-smoke-01/idea-002/replay-input",
+        "cleanup": {
+          "cache": "shared",
+          "worktree": "removed"
+        },
+        "commit": "6cfc25364a1b70ff22386501962c1f63fe601cfc",
+        "paired_evidence": {
+          "bootstrap": {
+            "draws": 2000,
+            "percentile_95": [
+              0.0,
+              0.0
+            ],
+            "seed": 42517
+          },
+          "mean_paired_difference": 0.0,
+          "other_records": 0,
+          "qualification": "Checks reported counts and aggregate arithmetic only; no proof of actual pairing, seed freshness, protocol compliance, or model correctness.",
+          "records_path": "/home/urho/dev/murmur/toolkit/runs/recovery-smoke-01/idea-002/replay/paired-records.json",
+          "records_sha256": "b103aa5bf2cf78d11a9d57440cb9d3ca645cecb77a42715fc0ae0beb0add496f",
+          "seeds": 100,
+          "status": "arithmetic_checked",
+          "totals": {
+            "candidate_correct": 100,
+            "control_correct": 100,
+            "trials": 200
+          }
+        },
+        "qualification": "Same code and environment rerun; does not independently validate task design or global seed freshness.",
+        "schema_version": 1,
+        "status": "reproduced"
+      },
+      "seed_allocation": {
+        "count": 100,
+        "path": "/home/urho/dev/murmur/toolkit/runs/recovery-smoke-01/idea-002/seed-allocation.json",
+        "qualification": "Allocated and recorded in advance; visible to the agent; actual use and global freshness are not verified.",
+        "sha256": "66a036cab5705725b63dcdf476fed04ce66da565a408fc7a375d7615c83f7a8c"
+      },
+      "seed_candidate_commit": "aad7c48287191eef0762906e47ebcb67d03e02c2",
+      "status": "complete"
+    }
+  ],
+  "next_index": 3,
+  "recoveries_scheduled": 1,
+  "schema_version": 1,
+  "status": "ready"
+}

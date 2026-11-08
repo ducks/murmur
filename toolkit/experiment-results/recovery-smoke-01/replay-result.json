@@ -1,0 +1,33 @@
+{
+  "archive": "/home/urho/dev/murmur/toolkit/runs/recovery-smoke-01/idea-002/replay-input",
+  "cleanup": {
+    "cache": "shared",
+    "worktree": "removed"
+  },
+  "commit": "6cfc25364a1b70ff22386501962c1f63fe601cfc",
+  "paired_evidence": {
+    "bootstrap": {
+      "draws": 2000,
+      "percentile_95": [
+        0.0,
+        0.0
+      ],
+      "seed": 42517
+    },
+    "mean_paired_difference": 0.0,
+    "other_records": 0,
+    "qualification": "Checks reported counts and aggregate arithmetic only; no proof of actual pairing, seed freshness, protocol compliance, or model correctness.",
+    "records_path": "/home/urho/dev/murmur/toolkit/runs/recovery-smoke-01/idea-002/replay/paired-records.json",
+    "records_sha256": "b103aa5bf2cf78d11a9d57440cb9d3ca645cecb77a42715fc0ae0beb0add496f",
+    "seeds": 100,
+    "status": "arithmetic_checked",
+    "totals": {
+      "candidate_correct": 100,
+      "control_correct": 100,
+      "trials": 200
+    }
+  },
+  "qualification": "Same code and environment rerun; does not independently validate task design or global seed freshness.",
+  "schema_version": 1,
+  "status": "reproduced"
+}

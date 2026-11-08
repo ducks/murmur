@@ -1,0 +1,32 @@
+{
+  "action": "review_results",
+  "completed": 2,
+  "limit": 2,
+  "max_reported_input_tokens": null,
+  "reported_input_tokens": null,
+  "rounds": [
+    {
+      "commit": null,
+      "development": null,
+      "diagnosis": null,
+      "error": "candidate tests failed (101); see tests.log",
+      "evaluation": null,
+      "index": 1,
+      "milestone_review": null,
+      "recovery_scheduled": true,
+      "replay": null,
+      "status": "failed"
+    },
+    {
+      "commit": "6cfc25364a1b70ff22386501962c1f63fe601cfc",
+      "development": "criteria_met",
+      "diagnosis": "disabled",
+      "error": null,
+      "evaluation": "criteria_met",
+      "index": 2,
+      "milestone_review": "unavailable",
+      "replay": "reproduced",
+      "status": "complete"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "adapter": "milestone_context",
+  "budget": {
+    "max_logical_transitions_per_split": 1200000,
+    "max_seeds_per_split": 20,
+    "max_wall_seconds": 180
+  },
+  "comparison": {
+    "baseline": "mixture",
+    "candidate": "candidate",
+    "metric": "accuracy",
+    "required_models": [
+      "single",
+      "mixture",
+      "candidate",
+      "oracle"
+    ]
+  },
+  "criteria": {
+    "max_accuracy_drop": 0.02
+  },
+  "development_config": "toolkit/configs/agent/dev.cfg",
+  "evaluation_config": "toolkit/configs/agent/evaluation.cfg",
+  "falsification": "No recovery is scheduled.",
+  "hypothesis": "A retry follows an ordinary failed test.",
+  "id": "agent-idea-001",
+  "question": "Synthetic recovery smoke test",
+  "schema_version": 1
+}

@@ -1,0 +1,33 @@
+{
+  "agent_seconds": 60,
+  "auto_milestones": true,
+  "automatic_replay": true,
+  "base_commit": "6f1603647915be966b41e5b6b5b3fdbae2a84ed1",
+  "campaign_id": "f12c857ee108",
+  "diagnose_failures": false,
+  "diagnosis_schema_version": 2,
+  "diagnostic_seconds": 120,
+  "goal": "exercise bounded recovery with synthetic counts",
+  "limits": "LLM token/cost limits and blind holdouts are not enforced.",
+  "local_provider": null,
+  "max_ideas": 2,
+  "max_recoveries": 1,
+  "max_reported_input_tokens": null,
+  "milestone_schema_version": 2,
+  "model": null,
+  "paired_evidence_version": 1,
+  "prior_history": [],
+  "protocol": "milestone",
+  "provenance_version": 1,
+  "review_successes": false,
+  "schema_version": 1,
+  "scope": "binary hidden-context sequence task; candidate Rust model only",
+  "seed_allocation_version": 1,
+  "seed_base": 173520539922000000,
+  "seed_candidate_commit": "aad7c48287191eef0762906e47ebcb67d03e02c2",
+  "seed_source_sha256": {
+    "toolkit/src/agent_candidate.rs": "ac85654ec9b0c5f498a05f9ed1caabb7c6824c06d6fa9262722c8f1eeeb6ba2c",
+    "toolkit/tests/agent_generated.rs": "ab647b8d41bcf4ddd8fc625af7d3ab6093f5c18532c4ed2886cfb4ebaad2d22c"
+  },
+  "test_seconds": 180
+}

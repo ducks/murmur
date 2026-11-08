@@ -1,6 +1,10 @@
 # Murmur
 
-A small, inspectable research prototype for local graph dynamics and sequence memory. The original experiment uses a fixed random recurrent reservoir with an online trained readout. A second experiment adds an experimental edge-learning rule; neither implements structural growth. See [LEARNING.md](LEARNING.md), [RESEARCH.md](RESEARCH.md), and [EXPERIMENTS.md](EXPERIMENTS.md).
+Murmur is an experimental research toolkit for exploring alternative machine-learning models and the process of testing them. It combines small Rust experiments in sequence memory and graph dynamics with a coordinator that can propose bounded milestones, run candidate experiments, record and review evidence, and replay paired results.
+
+The work is exploratory. The models have been tested on narrow synthetic tasks and have not demonstrated a competitive or novel general-purpose architecture. The coordinator's agent reviews are fallible; seed allocation and replay improve traceability and reproducibility, not scientific validity. See [RESEARCH.md](RESEARCH.md) and [EXPERIMENTS.md](EXPERIMENTS.md) for observations, negative results, and limitations.
+
+The original graph experiments below run locally without external services. Optional automated campaigns invoke the configured Codex CLI and may use a remote model service, incur usage, and execute agent-generated code. Their input-token threshold is checked between rounds, not a hard spending cap. See the [toolkit documentation](toolkit/README.md) and [agent workflow](toolkit/coordinator/AGENT_WORKFLOW.md) before running them.
 
 Enter the Nix shell with `nix-shell`, then run:
 
@@ -19,7 +23,7 @@ cargo run --release --bin stress -- 301 results/stress-example
 cargo run --release --bin sequential -- 601 results/sequential-example
 ```
 
-Or use `nix-shell --run 'cargo test'`. `shell.nix` uses the local `nixpkgs` channel and is not pinned; record its revision for cross-machine replication. There are no Rust dependencies or external services. Optional CLI arguments are seed, output directory, and the positive number of marker steps (default 1). Other settings are in `Config` in `src/experiment.rs`; the JSON output records all settings. Running into the same directory overwrites its files.
+Or use `nix-shell --run 'cargo test'`. `shell.nix` uses the local `nixpkgs` channel and is not pinned; record its revision for cross-machine replication. The original Rust experiments have no external service dependency. Optional CLI arguments are seed, output directory, and the positive number of marker steps (default 1). Other settings are in `Config` in `src/experiment.rs`; the JSON output records all settings. Running into the same directory overwrites its files.
 
 `metrics.json` records accuracy and configuration, `topology.csv` contains directed edges (including possible duplicate and self edges), and `activations.csv` samples unit 0 for the first 16 test trials. The topology file alone is not a full model checkpoint: input weights and trained readout are regenerated only by rerunning with the seed. No structural-change log is produced because topology is fixed.
 

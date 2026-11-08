@@ -340,6 +340,25 @@
       "candidate_commits": [
         "68ae1ad8887e08515c4e8553a92fe8f000965929"
       ]
+    },
+    {
+      "id": "provenance-classification-live-2026-11-07",
+      "question": "Can a reviewer distinguish supervisor-generated files from agent changes using explicit provenance?",
+      "observation": "One live test-only campaign reproduced 100 paired records and its reviewer assessed the milestone followed, explicitly distinguishing supervisor-generated configuration from the test edit.",
+      "hypothesis": "Explicit path categories may reduce provenance confusion, but one model review is insufficient to establish reliability.",
+      "next_test": "Test bounded failure recovery with preserved failure evidence and independent controls; evaluate reviewer reliability over multiple diverse cases.",
+      "limitations": "One live review, public synthetic tasks, same-code replay, unmatched compute, and input-token threshold exceeded during the round.",
+      "evidence": [
+        "EXPERIMENTS.md",
+        "toolkit/experiment-results/provenance-pilot-03/campaign-summary.json",
+        "toolkit/experiment-results/provenance-pilot-03/provenance.json.gz"
+      ],
+      "related_findings": [
+        "provenance-aware-review-2026-11-07"
+      ],
+      "candidate_commits": [
+        "aad7c48287191eef0762906e47ebcb67d03e02c2"
+      ]
     }
   ]
 }

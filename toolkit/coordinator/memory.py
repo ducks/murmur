@@ -112,7 +112,7 @@ def campaign_records(directory):
                         'status': item.get('status'), 'incomplete': incomplete, 'candidate_commit': item.get('commit'),
                         'seed_candidate_commit': config.get('seed_candidate_commit'),
                         'idea': idea, 'milestone': item.get('milestone'), 'milestone_evidence': item.get('milestone_evidence'), 'milestone_review': item.get('milestone_review'), 'paired_evidence': item.get('paired_evidence'), 'seed_allocation': item.get('seed_allocation'), 'replay': item.get('replay'), 'provenance': item.get('provenance'), 'followups': followups, 'development': checks(item.get('development')),
-                        'evaluation': checks(item.get('evaluation')), 'diagnosis': item.get('diagnosis'), 'error': item.get('error'),
+                        'evaluation': checks(item.get('evaluation')), 'diagnosis': item.get('diagnosis'), 'error': item.get('error'), 'recovery_eligible': item.get('recovery_eligible'), 'recovery_scheduled': item.get('recovery_scheduled'),
                         'evidence_directory': str(round_dir),
                         'verification': 'indexed from campaign state; evidence hashes were not rechecked'})
     return records

@@ -24,6 +24,10 @@ class ProvenanceTests(unittest.TestCase):
         for path,key in [('seed-transplant.patch','seed_transplant'),('candidate-changes.patch','candidate_delta')]:
             self.assertEqual(hashlib.sha256((self.root/path).read_bytes()).hexdigest(),p[key]['patch_sha256'])
         self.assertEqual(json.loads((self.root/'provenance.json').read_text()),p)
+    def test_seeded_recovery_records_transplant_after_first_attempt(self):
+        result=provenance.record(self.config,2,self.start,self.candidate,self.root,seeded=True)
+        self.assertEqual(result['seed_transplant']['source_commit'],self.config['seed_candidate_commit'])
+
     def test_wrong_start_or_source_is_rejected(self):
         with self.assertRaises(runner.PlanError):provenance.record(self.config,1,self.config['base_commit'],self.candidate,self.root)
         wrong={**self.config,'seed_candidate_commit':self.config['base_commit']}

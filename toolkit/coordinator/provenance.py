@@ -34,14 +34,14 @@ def blobs(commit):
     return {path: hashlib.sha256(git('show', f'{commit}:{path}')).hexdigest() for path in sorted(ALLOWED_SEED)}
 
 
-def record(config, index, starting_commit, candidate_commit, directory):
+def record(config, index, starting_commit, candidate_commit, directory, seeded=None):
     """Save paths and patches for both the seed transplant and the agent's actual delta."""
     campaign_base = exact_commit(config['base_commit'])
     start = exact_commit(starting_commit); candidate = exact_commit(candidate_commit)
     parent = git('rev-parse', f'{candidate}^').decode().strip()
     if parent != start:
         raise runner.PlanError('candidate parent does not match recorded starting commit')
-    seed_source = config.get('seed_candidate_commit') if index == 1 else None
+    seed_source = config.get('seed_candidate_commit') if (index == 1 if seeded is None else seeded) else None
     seed_info = None
     if seed_source:
         exact_commit(seed_source)

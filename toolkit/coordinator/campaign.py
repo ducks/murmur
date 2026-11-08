@@ -48,6 +48,10 @@ DIAGNOSIS_SCHEMA = {'type': 'object', 'additionalProperties': False,
                     'required': list(DIAGNOSIS_V2_FIELDS)}
 
 
+class RecoverableRoundError(runner.PlanError):
+    """A bounded retry may investigate an ordinary test or evidence-format failure."""
+
+
 def git(cwd, *args):
     try:
         result = subprocess.run(['git', *args], cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
@@ -150,10 +154,12 @@ def make_plan(index, idea, protocol='legacy'):
     return plan
 
 
-def init(directory, goal, max_ideas, agent_seconds, test_seconds, local_provider=None, model=None, prior_campaign=None, protocol='milestone', diagnostic_seconds=120, diagnose_failures=True, max_reported_input_tokens=None, review_successes=True, seed_candidate=None):
+def init(directory, goal, max_ideas, agent_seconds, test_seconds, local_provider=None, model=None, prior_campaign=None, protocol='milestone', diagnostic_seconds=120, diagnose_failures=True, max_reported_input_tokens=None, review_successes=True, seed_candidate=None, max_recoveries=1):
     runner.text_field(goal, 'goal')
     if not (1 <= max_ideas <= 100 and 10 <= agent_seconds <= 7200 and 10 <= test_seconds <= 7200):
         raise runner.PlanError('limits outside supported ranges')
+    if isinstance(max_recoveries, bool) or not isinstance(max_recoveries, int) or not 0 <= max_recoveries <= 10:
+        raise runner.PlanError('max recoveries must be between 0 and 10')
     if not 10 <= diagnostic_seconds <= 7200:
         raise runner.PlanError('diagnostic time outside supported range')
     if max_reported_input_tokens is not None and (isinstance(max_reported_input_tokens, bool) or not isinstance(max_reported_input_tokens, int) or max_reported_input_tokens < 1):
@@ -176,7 +182,7 @@ def init(directory, goal, max_ideas, agent_seconds, test_seconds, local_provider
     campaign_id = uuid.uuid4().hex[:12]
     seed_base = 10_000_000 + (int(campaign_id, 16) % 1_000_000_000_000) * 1_000_000
     config = {'schema_version': 1, 'campaign_id': campaign_id, 'seed_base': seed_base, 'goal': goal,
-              'max_ideas': max_ideas, 'agent_seconds': agent_seconds, 'test_seconds': test_seconds,
+              'max_ideas': max_ideas, 'max_recoveries': max_recoveries, 'agent_seconds': agent_seconds, 'test_seconds': test_seconds,
               'local_provider': local_provider, 'model': model,
               'base_commit': git(runner.ROOT, 'rev-parse', 'HEAD'), 'prior_history': prior,
               'seed_candidate_commit': seed_commit, 'seed_source_sha256': seed_hashes,
@@ -254,7 +260,7 @@ Research memory (observations are not proven explanations; campaign evidence is 
 {json.dumps(research_memory or {}, indent=2)}
 
 For an apparent failure, distinguish observations from possible explanations and propose a discriminating test in your hypothesis and falsification. The full index for this round is saved alongside the agent logs as research-memory.json; the prompt may include only recent campaign rounds.
-If a previous milestone review says partial, not_followed, unclear, or unavailable, treat that as an unresolved issue, not a completed result. If the preceding round contains a completed diagnosis, try to design a focused test that distinguishes its competing explanations, with an explicit control. If the proposed test cannot fit the candidate and test-file scope, state that limitation in your response and select another testable idea. A diagnosis is an unverified hypothesis, not an established cause.
+If the previous attempt failed with recovery_eligible=true, inspect its error, retained tests.log and worktree at evidence_directory, and diagnose the failure. Start from the last accepted candidate; make only scoped changes needed to resolve it, without silently claiming the failed result was valid. If a previous milestone review says partial, not_followed, unclear, or unavailable, treat that as an unresolved issue, not a completed result. If the preceding round contains a completed diagnosis, try to design a focused test that distinguishes its competing explanations, with an explicit control. If the proposed test cannot fit the candidate and test-file scope, state that limitation in your response and select another testable idea. A diagnosis is an unverified hypothesis, not an established cause.
 Prior candidate commits are available locally: when building on a previous idea, inspect its candidate source with git show <commit>:toolkit/src/agent_candidate.rs and adapt it within the permitted files. Starting a new campaign does not automatically check out the prior candidate.
 For any quantitative follow-up in agent_generated.rs, print one single-line record per aggregate measurement using this exact prefix and JSON shape: MURMUR_FOLLOWUP {{"measure":"name","candidate":"name","control":"name","candidate_correct":1,"control_correct":1,"trials":2}}. Counts must refer to the same paired observations. Prefer aggregate counts by task and measure, not one record per seed; keep any per-seed details in the test log. The supervisor preserves and checks the arithmetic but does not independently verify the experimental design. Do not emit a record for a test you did not run.
 
@@ -329,7 +335,7 @@ def plan_milestone(config, worktree, round_dir, history, research_index):
 Goal: {config['goal']}
 Recent campaign history: {json.dumps(history[-5:])}
 Research memory: {json.dumps(research_index['agent_context'])}
-Pick a question grounded in evidence or a clearly stated uncertainty. Specify an intervention, an explicit control, a measurable outcome, and a decision rule. Prefer a test that fits edits to toolkit/src/agent_candidate.rs and toolkit/tests/agent_generated.rs. The existing evaluator and public task rules cannot be changed. Do not claim a finding has been established. If a proposed question needs a different evaluator, choose a feasible smaller step or clearly explain the limitation. Do not edit files or run experiments. Return only the structured JSON.
+If the latest attempt has recovery_eligible=true and recovery_scheduled=true, plan a small diagnostic or repair of that failed attempt, using its preserved evidence and the last accepted candidate; do not claim the failed result was established. Pick a question grounded in evidence or a clearly stated uncertainty. Specify an intervention, an explicit control, a measurable outcome, and a decision rule. Prefer a test that fits edits to toolkit/src/agent_candidate.rs and toolkit/tests/agent_generated.rs. The existing evaluator and public task rules cannot be changed. Do not claim a finding has been established. If a proposed question needs a different evaluator, choose a feasible smaller step or clearly explain the limitation. Do not edit files or run experiments. Return only the structured JSON.
 {('The primary comparison must use exactly 100 supervisor-allocated paired seeds, each with stream, initialization, and probe roles; plan a feasible small experiment within that limit.' if config.get('seed_allocation_version') == 1 else '')}
 {('Choose scope test_only if no model source change is needed; otherwise choose model_change. For test_only the candidate file must remain byte-for-byte unchanged. For model_change describe exactly the necessary change and avoid adding unrelated mechanisms. Set primary_measure, candidate_label, and control_label to concise exact labels for one MURMUR_FOLLOWUP record reporting the primary comparison.' if config.get('milestone_schema_version') == 2 else '')}
 """
@@ -726,11 +732,11 @@ def execute_round(directory, config, state, agent=call_agent):
     worktree = round_dir / 'worktree'
     branch = f"toolkit/campaign-{config['campaign_id']}-{index:03d}"
     base = state['base_commit']
-    result = {'index': index, 'status': 'running', 'base_commit': base, 'branch': branch}
+    result = {'index': index, 'status': 'running', 'base_commit': base, 'branch': branch, 'evidence_directory': str(round_dir)}
     runner.write_json(round_dir / 'result.json', result)
     try:
         git(runner.ROOT, 'worktree', 'add', '-b', branch, str(worktree), base)
-        if index == 1 and config.get('seed_candidate_commit'):
+        if config.get('seed_candidate_commit') and not any(x.get('status') == 'complete' for x in state['completed']):
             base = apply_seed_candidate(worktree, config, base)
             result.update(base_commit=base, seed_candidate_commit=config['seed_candidate_commit'],
                           seed_source_sha256=config['seed_source_sha256'])
@@ -761,6 +767,7 @@ def execute_round(directory, config, state, agent=call_agent):
             runner.write_json(round_dir / 'result.json', result)
         agent_started = time.monotonic()
         idea = agent(config, worktree, round_dir, config.get('prior_history', []) + state['completed'])
+        result['idea'] = idea
         result['agent_elapsed_seconds'] = time.monotonic() - agent_started
         result['agent_usage'] = agent_usage(round_dir / 'agent-events.jsonl')
         if config.get('seed_allocation_version') == 1 and hashlib.sha256(allocation_path.read_bytes()).hexdigest() != allocation_hash:
@@ -782,7 +789,7 @@ def execute_round(directory, config, state, agent=call_agent):
                                     cwd=worktree, stdout=out, stderr=subprocess.STDOUT, timeout=config['test_seconds'],
                                     env=build_environment(directory, config))
         if tests:
-            raise runner.PlanError(f'candidate tests failed ({tests}); see tests.log')
+            raise RecoverableRoundError(f'candidate tests failed ({tests}); see tests.log')
         verify_generated_files(worktree, generated_hashes)
         result['followups'] = followup_metrics(round_dir / 'tests.log')
         if result.get('milestone'):
@@ -790,12 +797,15 @@ def execute_round(directory, config, state, agent=call_agent):
             result['milestone_evidence'] = assess_milestone_evidence(result['milestone'], result['followups'])
             runner.write_json(round_dir / 'result.json', result)
             if result['milestone_evidence']['status'] == 'missing_primary_record':
-                raise runner.PlanError('planned primary follow-up record was not reported; inspect tests and milestone')
+                raise RecoverableRoundError('planned primary follow-up record was not reported; inspect tests and milestone')
             if config.get('paired_evidence_version') == 1:
                 if config.get('seed_allocation_version') == 1 and hashlib.sha256(allocation_path.read_bytes()).hexdigest() != allocation_hash:
                     raise runner.PlanError('primary seed allocation changed during tests')
                 expected_ids = {r['seed_id'] for r in allocation['rows']} if config.get('seed_allocation_version') == 1 else None
-                result['paired_evidence'] = paired_evidence.validate(round_dir / 'tests.log', result['milestone'], result['followups'], expected_seed_ids=expected_ids)
+                try:
+                    result['paired_evidence'] = paired_evidence.validate(round_dir / 'tests.log', result['milestone'], result['followups'], expected_seed_ids=expected_ids)
+                except runner.PlanError as exc:
+                    raise RecoverableRoundError(f'paired evidence invalid: {exc}') from exc
                 runner.write_json(round_dir / 'result.json', result)
         unexpected = changed_paths(worktree) - ALLOWED - GENERATED
         if unexpected:
@@ -818,7 +828,7 @@ def execute_round(directory, config, state, agent=call_agent):
         matrix = probe_matrix(study / evidence_stage / 'evidence' / 'probes.csv')
         result.update(status='complete', commit=commit, idea=idea, development=development, evaluation=evaluation, final_probe_matrix=matrix)
         if config.get('provenance_version') == 1:
-            result['provenance'] = provenance.record(config, index, base, commit, round_dir)
+            result['provenance'] = provenance.record(config, index, base, commit, round_dir, seeded=bool(result.get('seed_candidate_commit')))
             runner.write_json(round_dir / 'result.json', result)
         if config.get('automatic_replay', False):
             result['replay'] = automatic_replay(directory, config, round_dir, result)
@@ -833,9 +843,9 @@ def execute_round(directory, config, state, agent=call_agent):
             raise runner.PlanError('study evidence changed during diagnosis')
         state['base_commit'] = commit
     except (runner.PlanError, OSError, subprocess.SubprocessError) as exc:
-        result.update(status='failed', error=str(exc))
+        result.update(status='failed', error=str(exc), recovery_eligible=isinstance(exc, RecoverableRoundError))
     runner.write_json(round_dir / 'result.json', result)
-    state['completed'].append({k: result.get(k) for k in ('index', 'status', 'base_commit', 'seed_candidate_commit', 'commit', 'idea', 'milestone', 'milestone_usage', 'milestone_evidence', 'milestone_review', 'paired_evidence', 'seed_allocation', 'replay', 'provenance', 'agent_elapsed_seconds', 'agent_usage', 'followups', 'development', 'evaluation', 'final_probe_matrix', 'diagnosis', 'error')})
+    state['completed'].append({k: result.get(k) for k in ('index', 'status', 'base_commit', 'seed_candidate_commit', 'commit', 'idea', 'milestone', 'milestone_usage', 'milestone_evidence', 'milestone_review', 'paired_evidence', 'seed_allocation', 'replay', 'provenance', 'agent_elapsed_seconds', 'agent_usage', 'followups', 'development', 'evaluation', 'final_probe_matrix', 'diagnosis', 'error', 'recovery_eligible', 'evidence_directory')})
     state['next_index'] += 1
     state['status'] = 'ready' if result['status'] == 'complete' else 'inspect_failure'
     runner.write_json(directory / 'state.json', state)
@@ -887,6 +897,15 @@ def _run_locked(directory, max_new=None, agent=call_agent):
                         'milestone_review': (result.get('milestone_review') or {}).get('status'),
                         'replay': (result.get('replay') or {}).get('status'), 'error': result.get('error')})
         if result['status'] != 'complete':
+            recoveries = state.get('recoveries_scheduled', 0)
+            if (result.get('recovery_eligible') and recoveries < config.get('max_recoveries', 0)
+                    and len(state['completed']) < config['max_ideas']):
+                state['recoveries_scheduled'] = recoveries + 1
+                state['status'] = 'ready'
+                state['completed'][-1]['recovery_scheduled'] = True
+                runner.write_json(directory / 'state.json', state)
+                results[-1]['recovery_scheduled'] = True
+                continue
             break
     budget = config.get('max_reported_input_tokens')
     if budget is not None and budget_action is None and len(state['completed']) < config['max_ideas']:
@@ -916,12 +935,13 @@ def main(argv=None):
     p.add_argument('--no-success-review', action='store_true', help='analyze failures but skip reviews of passing candidates')
     p.add_argument('--max-reported-input-tokens', type=int, help='stop between rounds when reported total reaches this threshold (not a hard cap)')
     p.add_argument('--seed-candidate', help='start from the candidate and test files in this Git commit')
+    p.add_argument('--max-recoveries', type=int, default=1, help='maximum automatic retries of eligible test/evidence failures (counts against max ideas)')
     p = sub.add_parser('run'); p.add_argument('directory'); p.add_argument('--ideas', type=int)
     p = sub.add_parser('cleanup'); p.add_argument('directory')
     args = parser.parse_args(argv)
     try:
         if args.command == 'init':
-            result = init(args.directory, args.goal, args.max_ideas, args.agent_seconds, args.test_seconds, args.local_provider, args.model, args.prior_campaign, args.protocol, args.diagnostic_seconds, not args.no_diagnosis, args.max_reported_input_tokens, not args.no_success_review, args.seed_candidate)
+            result = init(args.directory, args.goal, args.max_ideas, args.agent_seconds, args.test_seconds, args.local_provider, args.model, args.prior_campaign, args.protocol, args.diagnostic_seconds, not args.no_diagnosis, args.max_reported_input_tokens, not args.no_success_review, args.seed_candidate, args.max_recoveries)
         elif args.command == 'cleanup':
             result = cleanup(args.directory)
         else:
